@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: LMS clinical simulation
+jwt:
+  signing:
+    key: your_secure_signing_key_hereadhjkfajhsdflkjhsflkjdskdjfh

@@ -67,6 +67,13 @@ public class SecurityConfig {
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                        .authorizeHttpRequests(request -> request
+                        .requestMatchers("/admin/**").hasAuthority("admin")
+                        .requestMatchers("/profesor/**").hasAuthority("profesor")
+                        .requestMatchers("/estudiante/**").hasAuthority("estudiante")
+                        .requestMatchers("/coordinador/**").hasAuthority("coordinador")
+                        .anyRequest().authenticated()
+                    )
                 .build();
     }
 

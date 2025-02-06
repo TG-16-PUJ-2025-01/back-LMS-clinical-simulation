@@ -24,4 +24,4 @@ spring:
 
 jwt:
   signing:
-    key: ${JWT_SIGNING_KEY}
+    key: "${JWT_SIGNING_KEY}"

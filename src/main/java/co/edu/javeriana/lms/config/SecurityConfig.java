@@ -23,7 +23,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import co.edu.javeriana.lms.services.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,18 +40,19 @@ public class SecurityConfig {
     private UserService userService;
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector)
-            throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.headers(headers -> headers.frameOptions(t -> t.disable()));
 
         return http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/streaming/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
+                        .requestMatchers("/streaming/**").permitAll() // Public endpoint
+                        .requestMatchers("/admin/**").hasAuthority("admin") // Admin-only
+                        .requestMatchers("/profesor/**").hasAuthority("profesor") // Profesor-only
+                        .requestMatchers("/estudiante/**").hasAuthority("estudiante") // Estudiante-only
+                        .requestMatchers("/coordinador/**").hasAuthority("coordinador") // Coordinador-only
+                        .anyRequest().authenticated()) // All other requests require authentication
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -65,15 +65,8 @@ public class SecurityConfig {
                             log.error("Forbidden");
                         }))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
-                .authenticationProvider(authenticationProvider()).addFilterBefore(
-                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                        .authorizeHttpRequests(request -> request
-                        .requestMatchers("/admin/**").hasAuthority("admin")
-                        .requestMatchers("/profesor/**").hasAuthority("profesor")
-                        .requestMatchers("/estudiante/**").hasAuthority("estudiante")
-                        .requestMatchers("/coordinador/**").hasAuthority("coordinador")
-                        .anyRequest().authenticated()
-                    )
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -85,14 +78,13 @@ public class SecurityConfig {
     @Bean
     AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userService.userDetailsService());
+        authProvider.setUserDetailsService(userService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
     @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
@@ -108,5 +100,4 @@ public class SecurityConfig {
             }
         };
     }
-
 }

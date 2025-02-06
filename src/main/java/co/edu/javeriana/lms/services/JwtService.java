@@ -23,7 +23,7 @@ public class JwtService {
 
     private static Duration tokeDuration = Duration.ofHours(10);
 
-    @Value("${jwt.signing.key}")
+    @Value("${JWT_SIGNING_KEY}")
     private String jwtPrivateKey;
 
     public String extractUserName(String token) {

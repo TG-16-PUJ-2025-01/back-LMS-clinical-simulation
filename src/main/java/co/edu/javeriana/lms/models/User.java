@@ -1,14 +1,14 @@
 package co.edu.javeriana.lms.models;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,15 +24,21 @@ public class User implements UserDetails {
 
     private String email;
     private String password;
+    private String name;
+    private String lastName;
+    private int instituionalId;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
-    private List<String> roles; // "profesor", "estudiante", "admin", "coordinador"
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(SimpleGrantedAuthority::new).toList();
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -1,6 +1,27 @@
 spring:
   application:
     name: LMS clinical simulation
+  config:
+    import:
+      - optional:file:../.env[.properties]
+  datasource:
+    url: "${DB_URL}"
+    username: "${DB_USER}"
+    password: "${DB_PASSWORD}"
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    generate-ddl: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2GB
+      max-request-size: 2GB
+
 jwt:
   signing:
-    key: your_secure_signing_key_hereadhjkfajhsdflkjhsflkjdskdjfh
+    key: ${JWT_SIGNING_KEY}

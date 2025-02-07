@@ -1,6 +1,7 @@
 package co.edu.javeriana.lms.config;
 
 import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
@@ -14,7 +15,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import co.edu.javeriana.lms.services.JwtService;
-import co.edu.javeriana.lms.services.UserService;
+import co.edu.javeriana.lms.services.CustomUserDetailService;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtService jwtService;
 
     @Autowired
-    private UserService userService;
+    private CustomUserDetailService customUserDetailService; // Cambiado a CustomUserDetailService
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
@@ -49,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             userName = jwtService.extractUserName(jwt);
             if (StringUtils.hasText(userName)
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userService.loadUserByUsername(userName);
+                UserDetails userDetails = customUserDetailService.loadUserByUsername(userName); // Usar CustomUserDetailService
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     SecurityContext context = SecurityContextHolder.createEmptyContext();
                     UsernamePasswordAuthenticationToken authToken;

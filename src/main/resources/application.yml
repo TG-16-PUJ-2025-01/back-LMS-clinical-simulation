@@ -21,6 +21,17 @@ spring:
       enabled: true
       max-file-size: 2GB
       max-request-size: 2GB
+  mail:
+    host: "${SMTP_HOST}"
+    port: "${MAIL_PORT}"
+    username: "${MAIL_USERNAME}"
+    password: "${MAIL_PASSWORD}"
+    properties:
+      mail:
+        smtp:
+          auth: "${MAIL_AUTH}"
+          starttls:
+            enable: "${MAIL_STARTTLS}"
 
 jwt:
   signing:

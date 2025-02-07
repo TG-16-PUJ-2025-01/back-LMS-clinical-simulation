@@ -28,13 +28,14 @@ public class UserController {
         ResponseUserDTO responseUserDTO = new ResponseUserDTO();
         responseUserDTO.userToResponseUserDTO(user);
         return ResponseEntity.ok(responseUserDTO);
-
     }
 
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteUserByEmail(@Valid @RequestParam String email) {
-        userService.deleteByEmail(email);
-        return ResponseEntity.ok("User deleted");
+        if (userService.deleteByEmail(email)) {
+            return ResponseEntity.ok("User deleted");
+        }
+        return ResponseEntity.badRequest().body("User not found");
     }
 
 }

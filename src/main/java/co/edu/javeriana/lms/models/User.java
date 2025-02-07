@@ -26,10 +26,12 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String email;
     private String password;
     private String name;
     private String lastName;
+    @Column(unique = true)
     private int instituionalId;
 
     @ElementCollection(fetch = FetchType.EAGER)

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.repositories.UserRepository;
+import co.edu.javeriana.lms.utils.PasswordGenerator;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,11 +23,21 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private EmailService emailService;
+
 
     public User createUser(User user) {
         log.info("Creating user: " + user.getEmail());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        String password = PasswordGenerator.generatePassword();
+        user.setPassword(passwordEncoder.encode(password));
+        User savedUser =  userRepository.save(user);
+
+        String subject = "Bienvenido a LMS - Tus credenciales de acceso";
+        String body = "Hola " + user.getEmail() + ",\n\nTu cuenta ha sido creada exitosamente.\n" +
+                  "Tu contraseña temporal es: " + password + "\n\nPor favor, cambia tu contraseña después de iniciar sesión.";
+        emailService.sendEmail(user.getEmail(), subject, body);
+        return savedUser;
     }
 
     public User getUserByEmail(String email) {
@@ -43,9 +54,16 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void  deleteByEmail(String email) {
+    public Boolean deleteByEmail(String email) {
         log.info("Deleting user by email: " + email);
-        userRepository.deleteByEmail(email);
+        if (!userRepository.existsByEmail(email)) {
+            return false;
+        }
+
+        if (userRepository.deleteByEmail(email).isEmpty()) {
+            throw new RuntimeException("Error deleting user");
+        }
+        return true;
     }
 
 }

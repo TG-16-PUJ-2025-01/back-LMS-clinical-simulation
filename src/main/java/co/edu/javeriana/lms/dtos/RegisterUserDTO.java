@@ -21,9 +21,6 @@ public class RegisterUserDTO {
     @Email(message = "Email is invalid")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    private String password;
-
     @NotBlank(message = "Name is required")
     private String name;
 
@@ -39,7 +36,7 @@ public class RegisterUserDTO {
     public User toUser() {
         return User.builder()
                 .email(this.email)
-                .password(this.password)
+                .password(null)
                 .name(this.name)
                 .lastName(this.lastName)
                 .instituionalId(this.instituionalId)

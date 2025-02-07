@@ -30,17 +30,13 @@ public class AuthController {
         String email = loginDTO.getEmail();
         String password = loginDTO.getPassword();
         
-        // Verificar si el usuario existe
         User user = userRepository.findByEmail(email)
-                .orElse(null); // Devuelve null si no se encuentra
+                .orElse(null); 
 
-        // Si el usuario no existe o la contraseña no coincide
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-            // Retornar Bad Request con mensaje adecuado
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
-
-        // Generación de JWT
+        
         String token = jwtService.generateToken(user);
         return ResponseEntity.ok(token);
     }

@@ -49,7 +49,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/streaming/**")
+                        .requestMatchers("/streaming/**", "/rooms/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated())

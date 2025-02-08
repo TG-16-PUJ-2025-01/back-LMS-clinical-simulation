@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.services.StreamingService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -23,7 +24,8 @@ public class StreamingController {
     private StreamingService service;
 
     @GetMapping(value = "/video/{title}", produces = "video/mp4")
-    public ResponseEntity<Resource> getVideos(@PathVariable String title, @RequestHeader("Range") String range) throws IOException {
+    public ResponseEntity<Resource> getVideos(@Valid @PathVariable String title,
+            @Valid @RequestHeader(value = "Range", required = false) String range) throws IOException {
         log.info("Request received for video: {}, requesting Range of: {}", title, range);
         return service.getVideo(title, range);
     }

@@ -19,9 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class StreamingService {
-    private static final String FORMAT = "src/main/resources/videos/%s.mp4";
+    private static final String FORMAT = "src/main/resources/videos/%s";
 
-    public ResponseEntity<Resource> getVideo(String title, String rangeHeader) throws IOException {
+    public ResponseEntity<Resource> getVideo(String title, String range) throws IOException {
         Path videoPath = Paths.get(String.format(FORMAT, title));
 
         if (!Files.exists(videoPath)) {
@@ -35,8 +35,8 @@ public class StreamingService {
         long end = fileSize - 1;
 
         // Handle Range Header
-        if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
-            String[] ranges = rangeHeader.substring(6).split("-");
+        if (range != null && range.startsWith("bytes=")) {
+            String[] ranges = range.substring(6).split("-");
             try {
                 start = Long.parseLong(ranges[0]);
                 if (ranges.length > 1) {

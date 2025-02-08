@@ -26,6 +26,21 @@ public class UserService implements UserDetailsService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private JwtService jwtService;
+
+    public String login(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .orElse(null); 
+
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+            return null;
+        }
+
+        String token = jwtService.generateToken(user);
+        return token;
+    }
+
 
     public User createUser(User user) {
         log.info("Creating user: " + user.getEmail());

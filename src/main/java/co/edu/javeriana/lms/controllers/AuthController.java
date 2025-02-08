@@ -7,9 +7,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import co.edu.javeriana.lms.dtos.LoginDTO;
-import co.edu.javeriana.lms.models.User;
-import co.edu.javeriana.lms.repositories.UserRepository;
 import co.edu.javeriana.lms.services.JwtService;
+import co.edu.javeriana.lms.services.UserService;
 import jakarta.validation.Valid;
 
 @RestController
@@ -17,27 +16,23 @@ import jakarta.validation.Valid;
 public class AuthController {
 
     @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody LoginDTO loginDTO) {
         String email = loginDTO.getEmail();
         String password = loginDTO.getPassword();
         
-        User user = userRepository.findByEmail(email)
-                .orElse(null); 
-
-        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+        String token = userService.login(email, password);
+        if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
-        
-        String token = jwtService.generateToken(user);
         return ResponseEntity.ok(token);
     }
+
+
+
+
+
+    
 }

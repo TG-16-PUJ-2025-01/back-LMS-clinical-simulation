@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.dtos.RegisterUserDTO;
@@ -31,11 +30,13 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUserByEmail(@Valid @RequestParam String email) {
+    public ResponseEntity<String> deleteUserByEmail(@Valid @RequestBody String email) {
         if (userService.deleteByEmail(email)) {
             return ResponseEntity.ok("User deleted");
         }
         return ResponseEntity.badRequest().body("User not found");
     }
+
+    
 
 }

@@ -41,6 +41,24 @@ public class UserService implements UserDetailsService {
         return token;
     }
 
+    public String changePassword(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .orElse(null);
+        if (user == null) {
+            return null;
+        }
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        String token = jwtService.generateToken(user);
+
+        String subject = "Cambio de contraseña LMS";
+        String body = "Hola " + user.getEmail() + ",\n\nTu contraseña ha sido cambiada con éxito.\n" +
+                  "Si no fuiste tú, por favor, contacta al administrador.";
+        emailService.sendEmail(user.getEmail(), subject, body);
+
+        return token;
+    }
+
 
     public User createUser(User user) {
         log.info("Creating user: " + user.getEmail());
@@ -52,6 +70,7 @@ public class UserService implements UserDetailsService {
         String body = "Hola " + user.getEmail() + ",\n\nTu cuenta ha sido creada exitosamente.\n" +
                   "Tu contraseña temporal es: " + password + "\n\nPor favor, cambia tu contraseña después de iniciar sesión.";
         emailService.sendEmail(user.getEmail(), subject, body);
+
         return savedUser;
     }
 
@@ -80,5 +99,4 @@ public class UserService implements UserDetailsService {
         }
         return true;
     }
-
 }

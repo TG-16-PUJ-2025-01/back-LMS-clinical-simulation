@@ -46,13 +46,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/streaming/**").permitAll() // Public endpoint
-                        .requestMatchers("/admin/**").hasAuthority("admin") // Admin-only
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN") // Admin-only
                         .requestMatchers("/profesor/**").hasAuthority("profesor") // Profesor-only
                         .requestMatchers("/estudiante/**").hasAuthority("estudiante") // Estudiante-only
                         .requestMatchers("/coordinador/**").hasAuthority("coordinador") // Coordinador-only
-                        .requestMatchers("/auth/**").permitAll() // Public endpoint
+                        .requestMatchers("/auth/login").permitAll() // Public endpoint
                         .requestMatchers("/user/create").permitAll() // Public endpoint
-                        .anyRequest().permitAll()) // All other requests require authentication
+                        .anyRequest().authenticated()) // All other requests require authentication
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

@@ -24,8 +24,8 @@ public class DBInitializer implements CommandLineRunner {
                 GradeStatus.PENDING, new SimpleDateFormat("yyyy-MM-dd").parse("2023-02-28"), "javatechie.mp4",
                 VideoStatus.AVAILABLE, new Date(), 62L, 8.3);
         Simulation simulation2 = new Simulation(new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
-                GradeStatus.PENDING, new SimpleDateFormat("yyyy-MM-dd").parse("2021-02-28"), "unavailable.mp4",
-                VideoStatus.UNAVAILABLE, new Date(), 62L, 300.0);
+                GradeStatus.PENDING, new SimpleDateFormat("yyyy-MM-dd").parse("2021-02-28"), "10350-224234500_small.mp4",
+                VideoStatus.AVAILABLE, new Date(), 600L, 31.2);
         Simulation simulation3 = new Simulation(new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
                 GradeStatus.PENDING, new SimpleDateFormat("yyyy-MM-dd").parse("2021-02-28"), "unavailable1.mp4",
                 VideoStatus.UNAVAILABLE, new Date(), 210L, 300.0);

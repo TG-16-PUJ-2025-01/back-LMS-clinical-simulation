@@ -7,5 +7,4 @@ import co.edu.javeriana.lms.models.Simulation;
 
 @Repository
 public interface SimulationRepository extends JpaRepository<Simulation, Long> {
-    
 }

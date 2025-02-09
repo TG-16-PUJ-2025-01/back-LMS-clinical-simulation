@@ -53,4 +53,12 @@ public class Simulation {
     @NonNull
     @Column(nullable = false)
     private Date videoExpirationDate;
+
+    @NonNull
+    @Column(nullable = false)
+    private Long videoDuration; // in seconds
+
+    @NonNull
+    @Column(nullable = false)
+    private Double videoSize; // in MB
 }

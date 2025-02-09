@@ -29,7 +29,7 @@ public class SimulationController {
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponseDto<?>> getAllSimulations(
-            @Min(1) @RequestParam(defaultValue = "1") Integer page,
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
             @Min(1) @RequestParam(defaultValue = "10") Integer size,
             HttpServletRequest request) {
         log.info("Requesting all simulations");

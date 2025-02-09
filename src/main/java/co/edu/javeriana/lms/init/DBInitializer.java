@@ -22,28 +22,28 @@ public class DBInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         Simulation simulation1 = new Simulation(new SimpleDateFormat("yyyy-MM-dd").parse("2023-01-31"),
                 GradeStatus.PENDING, new SimpleDateFormat("yyyy-MM-dd").parse("2023-02-28"), "javatechie.mp4",
-                VideoStatus.AVAILABLE, new Date());
+                VideoStatus.AVAILABLE, new Date(), 62L, 8.3);
         Simulation simulation2 = new Simulation(new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
                 GradeStatus.PENDING, new SimpleDateFormat("yyyy-MM-dd").parse("2021-02-28"), "unavailable.mp4",
-                VideoStatus.UNAVAILABLE, new Date());
+                VideoStatus.UNAVAILABLE, new Date(), 62L, 300.0);
         Simulation simulation3 = new Simulation(new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
                 GradeStatus.PENDING, new SimpleDateFormat("yyyy-MM-dd").parse("2021-02-28"), "unavailable1.mp4",
-                VideoStatus.UNAVAILABLE, new Date());
+                VideoStatus.UNAVAILABLE, new Date(), 210L, 300.0);
         Simulation simulation4 = new Simulation(new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
                 GradeStatus.PENDING, new SimpleDateFormat("yyyy-MM-dd").parse("2021-02-28"), "unavailable2.mp4",
-                VideoStatus.UNAVAILABLE, new Date());
+                VideoStatus.UNAVAILABLE, new Date(), 450L, 420.0);
         Simulation simulation5 = new Simulation(new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
                 GradeStatus.PENDING, new SimpleDateFormat("yyyy-MM-dd").parse("2021-02-28"), "unavailable3.mp4",
-                VideoStatus.UNAVAILABLE, new Date());
+                VideoStatus.UNAVAILABLE, new Date(), 600L, 500.0);
         Simulation simulation6 = new Simulation(new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
                 GradeStatus.PENDING, new SimpleDateFormat("yyyy-MM-dd").parse("2021-02-28"), "unavailable4.mp4",
-                VideoStatus.UNAVAILABLE, new Date());
+                VideoStatus.UNAVAILABLE, new Date(), 780L, 780.0);
         Simulation simulation7 = new Simulation(new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
                 GradeStatus.PENDING, new SimpleDateFormat("yyyy-MM-dd").parse("2021-02-28"), "unavailable5.mp4",
-                VideoStatus.UNAVAILABLE, new Date());
+                VideoStatus.UNAVAILABLE, new Date(), 6000L, 6000.0);
         Simulation simulation8 = new Simulation(new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
                 GradeStatus.PENDING, new SimpleDateFormat("yyyy-MM-dd").parse("2021-02-28"), "unavailable6.mp4",
-                VideoStatus.UNAVAILABLE, new Date());
+                VideoStatus.UNAVAILABLE, new Date(), 620L, 500.0);
         simulationRepository.save(simulation1);
         simulationRepository.save(simulation2);
         simulationRepository.save(simulation3);

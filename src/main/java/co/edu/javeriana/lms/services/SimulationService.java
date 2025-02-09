@@ -23,7 +23,7 @@ public class SimulationService {
     }
 
     public List<Simulation> getAllSimulations(Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Pageable pageable = PageRequest.of(page, size);
         return simulationRepository.findAll(pageable).getContent();
     }
 

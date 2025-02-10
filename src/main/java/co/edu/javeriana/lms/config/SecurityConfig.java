@@ -56,10 +56,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
                         .access((authentication, context) -> new AuthorizationDecision(env.matchesProfiles("dev")))
-                        .requestMatchers("/**")
+                        .requestMatchers("/streaming/**")
                         .permitAll()
                         .anyRequest()
-                        .authenticated())
+                        .permitAll())
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

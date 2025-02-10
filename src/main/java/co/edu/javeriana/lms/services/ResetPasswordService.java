@@ -72,8 +72,9 @@ public class ResetPasswordService {
         authService.changePassword(email, password);
     }
 
-    @Scheduled(fixedRate = 600000)
+    @Scheduled(fixedRate = 1)
     public void deleteExpiredTokens() {
+        log.info("Deleting expired password reset tokens");
         passwordResetTokenRepository.deleteAllExpiredTokens(LocalDateTime.now());
     }
 }

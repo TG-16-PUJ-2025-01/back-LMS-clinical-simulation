@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -110,6 +111,12 @@ public class UserService implements UserDetailsService {
         }
         changePassword(email, password);
     }
+
+    @Scheduled(fixedRate = 600000)
+    public void deleteExpiredTokens() {
+        passwordResetTokenRepository.deleteAllExpiredTokens(LocalDateTime.now());
+    }
+
 
 
     public User createUser(User user) {

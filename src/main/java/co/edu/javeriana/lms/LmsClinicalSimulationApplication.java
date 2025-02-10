@@ -9,5 +9,4 @@ public class LmsClinicalSimulationApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(LmsClinicalSimulationApplication.class, args);
 	}
-
 }

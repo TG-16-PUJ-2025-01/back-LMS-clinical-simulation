@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.repository;
+package co.edu.javeriana.lms.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

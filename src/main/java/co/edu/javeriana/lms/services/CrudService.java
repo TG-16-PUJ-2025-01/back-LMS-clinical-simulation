@@ -6,6 +6,6 @@ import java.util.Optional;
 public interface CrudService<T, ID> {
     T save(T entity);
     Optional<T> findById(ID id);
-    List<T> findAll();
+    List<T> findAll(Integer page, Integer size);
     void deleteById(ID id);
 }

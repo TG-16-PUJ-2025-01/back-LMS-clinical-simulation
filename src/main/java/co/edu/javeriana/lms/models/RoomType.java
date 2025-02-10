@@ -1,21 +1,25 @@
 package co.edu.javeriana.lms.models;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Room")
+@Table(name = "Room_type")
 @Data
 @NoArgsConstructor
-public class Room {
+public class RoomType {
 
-    public Room(Long id2, String name2, RoomType entity) {
+    public RoomType(Long id2, String name2) {
         //TODO Auto-generated constructor stub
     }
 
@@ -24,7 +28,8 @@ public class Room {
     private Long id;
     private String name;
 
-    @ManyToOne
-    private RoomType type;
-
+    @OneToMany(mappedBy = "type")
+    @JsonIgnore
+    private List<Room> rooms;
+    
 }

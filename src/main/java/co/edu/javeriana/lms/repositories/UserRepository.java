@@ -9,7 +9,7 @@ import co.edu.javeriana.lms.models.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
-    Optional<User> deleteByEmail(String email);
+    void deleteByEmail(String email);
     Boolean existsByEmail(String email);
 
 }

@@ -15,7 +15,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email"),
+        @UniqueConstraint(columnNames = "institutionalId")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,8 +34,7 @@ public class User implements UserDetails {
     private String password;
     private String name;
     private String lastName;
-    @Column(unique = true)
-    private int instituionalId;
+    private int institutionalId;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))

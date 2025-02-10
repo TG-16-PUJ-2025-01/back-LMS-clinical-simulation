@@ -51,8 +51,8 @@ public class SecurityConfig {
                         .requestMatchers("/estudiante/**").hasAuthority("estudiante") // Estudiante-only
                         .requestMatchers("/coordinador/**").hasAuthority("coordinador") // Coordinador-only
                         .requestMatchers("/auth/login").permitAll() // Public endpoint
-                        .requestMatchers("/user/create").permitAll() // Public endpoint
-                        .anyRequest().authenticated()) // All other requests require authentication
+                        .requestMatchers("/user/**").permitAll() // Public endpoint
+                        .anyRequest().permitAll()) // All other requests require authentication
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

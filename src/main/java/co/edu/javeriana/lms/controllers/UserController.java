@@ -30,13 +30,8 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUserByEmail(@Valid @RequestBody String email) {
-        if (userService.deleteByEmail(email)) {
-            return ResponseEntity.ok("User deleted");
-        }
-        return ResponseEntity.badRequest().body("User not found");
+    public ResponseEntity<?> deleteUserByEmail(@Valid @RequestBody String email) {
+        userService.deleteByEmail(email);
+        return ResponseEntity.ok("User deleted");
     }
-
-    
-
 }

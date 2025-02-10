@@ -27,11 +27,11 @@ public class RegisterUserDTO {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
-    private int instituionalId;
+    private int institutionalId;
 
     @NotNull(message = "Roles are required")
     @Size(min = 1, message = "At least one role is required")
-    private Set<Role> roles;
+    private Set<String> roles;
 
     public User toUser() {
         return User.builder()
@@ -39,8 +39,8 @@ public class RegisterUserDTO {
                 .password(null)
                 .name(this.name)
                 .lastName(this.lastName)
-                .instituionalId(this.instituionalId)
-                .roles(this.roles)
+                .institutionalId(this.institutionalId)
+                .roles(this.roles.stream().map(Role::valueOf).collect(java.util.stream.Collectors.toSet()))
                 .build();
     }
 }

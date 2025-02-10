@@ -17,14 +17,14 @@ public class ResponseUserDTO {
     private String email;
     private String name;
     private String lastName;
-    private int instituionalId;
+    private int institutionalId;
     private Set<Role> roles;
 
     public void userToResponseUserDTO(User user) {
         this.email = user.getEmail();
         this.name = user.getName();
         this.lastName = user.getLastName();
-        this.instituionalId = user.getInstituionalId();
+        this.institutionalId = user.getInstitutionalId();
         this.roles = user.getRoles();
     }
 }

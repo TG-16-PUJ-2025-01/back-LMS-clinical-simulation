@@ -15,10 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Room {
 
-    public Room(Long id2, String name2, RoomType entity) {
-        //TODO Auto-generated constructor stub
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

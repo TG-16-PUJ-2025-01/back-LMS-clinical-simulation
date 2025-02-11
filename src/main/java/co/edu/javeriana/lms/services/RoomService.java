@@ -24,6 +24,12 @@ public class RoomService implements CrudService<Room, Long> {
 
     @Override
     public Room save(Room room) {
+        // Search for the room name in the database
+        // If it does not exist, create it, if it does, return error
+        if (roomRepository.findByName(room.getName()) != null) {
+            throw new IllegalArgumentException("Room name already exists");
+        }
+
         // Search for the room type in the database
         // If it does not exist, create it
         RoomType type = roomTypeRepository.findByName(room.getType().getName());
@@ -48,9 +54,19 @@ public class RoomService implements CrudService<Room, Long> {
         return roomRepository.findAll(pageable).getContent();
     }
 
+
+
     @Override
     public void deleteById(Long id) {
         roomRepository.deleteById(id);
+    }
+
+    public Room findByName(String name) {
+        return roomRepository.findByName(name);
+    }
+
+    public boolean existsByName(String name) {
+        return roomRepository.findByName(name) != null;
     }
 
     

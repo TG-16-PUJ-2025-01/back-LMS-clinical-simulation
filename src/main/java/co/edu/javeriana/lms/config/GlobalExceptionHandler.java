@@ -44,7 +44,16 @@ public class GlobalExceptionHandler {
                 String message = error.getDefaultMessage();
                 return new ValidationErrorDTO(fieldName, message);
             }).collect(Collectors.toList());
-        } else {
+        }
+        // TODO: Revisar si esto tiene sentido
+        /* 
+         else if (e instanceof IllegalArgumentException) {
+            IllegalArgumentException ex = (IllegalArgumentException) e;
+            errors = List.of(new ValidationErrorDTO("business_rule", ex.getMessage()));
+        } 
+        */
+        
+        else {
             // Default case, shouldn't happen
             log.error("Unknown exception type: {}", e.getClass().getName());
             errors = List.of(new ValidationErrorDTO("unknown", "Unknown validation error"));
@@ -54,4 +63,15 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(new ErrorDTO("Validation failed", errors), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.warn("Business validation failed: {}", ex.getMessage());
+
+        // Crear una lista con un solo error de validación
+        List<ValidationErrorDTO> errors = List.of(new ValidationErrorDTO("business_rule", ex.getMessage()));
+
+        return new ResponseEntity<>(new ErrorDTO("Business validation error", errors), HttpStatus.BAD_REQUEST);
+    }
+
 }

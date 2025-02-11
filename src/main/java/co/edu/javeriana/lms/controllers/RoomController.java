@@ -1,6 +1,7 @@
 package co.edu.javeriana.lms.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import co.edu.javeriana.lms.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.dtos.RoomDto;
 import co.edu.javeriana.lms.models.Room;
 import co.edu.javeriana.lms.services.RoomService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,31 +47,77 @@ public class RoomController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getRoomById(@RequestParam Long id) {
-        return ResponseEntity.ok(roomService.findById(id));
+    public ResponseEntity<ApiResponseDto<?>> getRoomById(@RequestParam Long id) {
+
+        Optional<Room> room = roomService.findById(id);
+
+        if (room.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Room not found", null, null));
+        }
+        
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room found", roomService.findById(id), null));
     }
 
     @DeleteMapping("/delete/{idRoom}")
-    public ResponseEntity<?> deleteRoomById(@RequestParam Long id) {
+    public ResponseEntity<ApiResponseDto<?>> deleteRoomById(@RequestParam Long id) {
+
+        // Check if room exists
+        Optional<Room> room = roomService.findById(id);
+
+        if (room.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Room not found", null, null));
+        }
+
         roomService.deleteById(id);
-        return ResponseEntity.ok().build();
+        
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room deleted successfully", null, null));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateRoom(@RequestBody Room room) {
-        return ResponseEntity.ok(roomService.save(room));
+    public ResponseEntity<ApiResponseDto<?>> updateRoom(@RequestBody RoomDto roomDto) {
+
+        // TODO: Fix this method
+        
+        // Search for the room name in the database
+        Room existingRoom = roomService.findByName(roomDto.getName());
+
+        // If the room does not exist, return error
+        if (existingRoom == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Room not found", null, null));
+        }
+
+        // If the name changed, check for duplicates before saving
+        if (!existingRoom.getName().equals(roomDto.getName()) && roomService.existsByName(roomDto.getName())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ApiResponseDto<>(HttpStatus.CONFLICT.value(), "Room name already exists", null, null));
+        }
+
+        // Update the fields
+        existingRoom.setName(roomDto.getName());
+        existingRoom.setType(roomDto.getType().toEntity());
+
+        // Save the room
+        Room updatedRoom = roomService.save(existingRoom);
+
+        // Return the updated room
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room updated successfully", updatedRoom, null));
     }
 
+
     @PostMapping("/add")
-    public ResponseEntity<?> addRoom(@RequestBody RoomDto room) {
+    public ResponseEntity<ApiResponseDto<?>> addRoom(@Valid @RequestBody RoomDto roomDto) {
 
-        // RoomMapper mapper = new RoomMapper();
-        // Room roomEntity = mapper.toEntity(room);
+        Room roomEntity = roomDto.toEntity(null);
+        Room savedRoom = roomService.save(roomEntity);
 
-
-        // return ResponseEntity.ok(roomService.save(roomEntity));
-
-        return null;
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Room created successfully", savedRoom, null));
     }
     
     

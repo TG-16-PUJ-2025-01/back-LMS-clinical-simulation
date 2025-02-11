@@ -1,43 +1,28 @@
 package co.edu.javeriana.lms.dtos;
 
+import co.edu.javeriana.lms.models.Room;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RoomDto {
-    private Long id;
+    @NotBlank(message = "El nombre de la sala no puede estar vacío")
     private String name;
+
+    @NotNull(message = "El tipo de la sala es obligatorio")
     private RoomTypeDto type;
-    
-    public RoomDto() {
-        super();
-    }
 
-    public RoomDto(Long id, String name, RoomTypeDto type) {
-        super();
-        this.id = id;
-        this.name = name;
-        this.type = type;
-    }
+    public Room toEntity(Long id){
+        Room room = new Room();
+        room.setId(id);
+        room.setName(this.name);
+        room.setType(this.type.toEntity());
 
-    public Long getId() {
-        return id;
+        return room;
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public RoomTypeDto getType() {
-        return type;
-    }
-
-    public void setType(RoomTypeDto type) {
-        this.type = type;
-    }
-    
 }

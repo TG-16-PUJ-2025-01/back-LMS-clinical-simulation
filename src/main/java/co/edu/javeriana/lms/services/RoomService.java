@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.models.Room;
@@ -54,7 +55,9 @@ public class RoomService implements CrudService<Room, Long> {
         return roomRepository.findAll(pageable).getContent();
     }
 
-
+    public Page<Room> findAll(Pageable pageable) {
+        return roomRepository.findAll(pageable);
+    }
 
     @Override
     public void deleteById(Long id) {
@@ -69,6 +72,11 @@ public class RoomService implements CrudService<Room, Long> {
         return roomRepository.findByName(name) != null;
     }
 
-    
-    
+    public RoomType findRoomTypeByName(String name) {
+        return roomTypeRepository.findByName(name);
+    }
+
+    public RoomType saveRoomType(RoomType roomType) {
+        return roomTypeRepository.save(roomType);
+    }
 }

@@ -8,15 +8,25 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import co.edu.javeriana.lms.models.GradeStatus;
+import co.edu.javeriana.lms.models.Room;
+import co.edu.javeriana.lms.models.RoomType;
 import co.edu.javeriana.lms.models.Simulation;
 import co.edu.javeriana.lms.models.VideoStatus;
 import co.edu.javeriana.lms.repositories.SimulationRepository;
+import co.edu.javeriana.lms.repositories.RoomRepository;
+import co.edu.javeriana.lms.repositories.RoomTypeRepository;
 
 @Component
 public class DBInitializer implements CommandLineRunner {
 
     @Autowired
     private SimulationRepository simulationRepository;
+
+    @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
+    private RoomTypeRepository roomTypeRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -52,6 +62,33 @@ public class DBInitializer implements CommandLineRunner {
         simulationRepository.save(simulation6);
         simulationRepository.save(simulation7);
         simulationRepository.save(simulation8);
+        
+        insertRoomsAndTypes();
+    }
+
+    public void insertRoomsAndTypes() {
+        RoomType roomType1 = new RoomType();
+        roomType1.setName("Cirugia");
+        roomTypeRepository.save(roomType1);
+
+        RoomType roomType2 = new RoomType();
+        roomType2.setName("Urgencias");
+        roomTypeRepository.save(roomType2);
+
+        Room room1 = new Room();
+        room1.setName("Sala1");
+        room1.setType(roomType1);
+        roomRepository.save(room1);
+
+        Room room2 = new Room();
+        room2.setName("Sala2");
+        room2.setType(roomType1);
+        roomRepository.save(room2);
+
+        Room room3 = new Room();
+        room3.setName("Sala3");
+        room3.setType(roomType2);
+        roomRepository.save(room3);
     }
 
 }

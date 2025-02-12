@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -25,9 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
-import co.edu.javeriana.lms.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -42,12 +38,8 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Autowired
-    private UserService userService;
-
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector)
-            throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.headers(headers -> headers.frameOptions(t -> t.disable()));
 
         return http
@@ -56,10 +48,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
                         .access((authentication, context) -> new AuthorizationDecision(env.matchesProfiles("dev")))
-                        .requestMatchers("/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
+                        .requestMatchers("/streaming/**").permitAll() // Public endpoint
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN") // Admin-only
+                        .requestMatchers("/profesor/**").hasAuthority("profesor") // Profesor-only
+                        .requestMatchers("/estudiante/**").hasAuthority("estudiante") // Estudiante-only
+                        .requestMatchers("/coordinador/**").hasAuthority("coordinador") // Coordinador-only
+                        .requestMatchers("/auth/login").permitAll() // Public endpoint
+                        .requestMatchers("/auth/change-password").authenticated() // Authenticated endpoint
+                        .requestMatchers("/reset-password/**").permitAll() // Public endpoint
+                        .requestMatchers("/user/**").permitAll() // Public endpoint
+                        .anyRequest().permitAll()) // All other requests require authentication
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -72,8 +70,7 @@ public class SecurityConfig {
                             log.error("Forbidden");
                         }))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
-                .authenticationProvider(authenticationProvider()).addFilterBefore(
-                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -83,16 +80,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userService.userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-    @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
@@ -108,5 +96,4 @@ public class SecurityConfig {
             }
         };
     }
-
 }

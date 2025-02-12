@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import co.edu.javeriana.lms.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -22,7 +23,7 @@ public class JwtService {
 
     private static Duration tokeDuration = Duration.ofHours(10);
 
-    @Value("${jwt.signing.key}")
+    @Value("${JWT_SIGNING_KEY}")
     private String jwtPrivateKey;
 
     public String extractUserName(String token) {
@@ -44,10 +45,16 @@ public class JwtService {
     }
 
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts.builder().claims(extraClaims).subject(userDetails.getUsername())
+        User user = (User) userDetails;
+        extraClaims.put("roles", user.getRoles()); // Add roles to the token
+    
+        return Jwts.builder()
+                .claims(extraClaims)
+                .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + tokeDuration.toMillis()))
-                .signWith(getSigningKey()).compact();
+                .signWith(getSigningKey())
+                .compact();
     }
 
     private boolean isTokenExpired(String token) {

@@ -63,8 +63,14 @@ public class RoomController {
                 .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room found", roomService.findById(id), null));
     }
 
+    @GetMapping("/types")
+    public ResponseEntity<ApiResponseDto<?>> getRoomTypes() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room types found", roomService.findAllTypes(), null));
+    }
+
     @DeleteMapping("/delete/{idRoom}")
-    public ResponseEntity<ApiResponseDto<?>> deleteRoomById(@RequestParam Long id) {
+    public ResponseEntity<ApiResponseDto<?>> deleteRoomById(@PathVariable("idRoom") Long id) {
 
         // Check if room exists
         Optional<Room> room = roomService.findById(id);

@@ -79,4 +79,8 @@ public class RoomService implements CrudService<Room, Long> {
     public RoomType saveRoomType(RoomType roomType) {
         return roomTypeRepository.save(roomType);
     }
+
+    public List<RoomType> findAllTypes() {
+        return roomTypeRepository.findAll();
+    }
 }

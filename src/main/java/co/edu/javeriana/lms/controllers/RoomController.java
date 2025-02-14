@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.dtos.RoomDto;
 import co.edu.javeriana.lms.models.Room;
+import co.edu.javeriana.lms.models.RoomType;
 import co.edu.javeriana.lms.services.RoomService;
+import co.edu.javeriana.lms.services.RoomTypeService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,12 +30,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+@Slf4j
 @RestController
 @RequestMapping("/rooms")
 public class RoomController {
 
     @Autowired
     private RoomService roomService;
+
+    @Autowired
+    private RoomTypeService roomTypeService;
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponseDto<?>> getAllRooms(
@@ -92,34 +99,27 @@ public class RoomController {
         // Check if room exists
         Optional<Room> roomEntity = roomService.findById(room.getId());
 
-        // If room does not exist, return 404
         if (roomEntity.isEmpty()) {
+            log.error("Room not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Room not found", null, null));
         }
 
-        // Check if the name of the room is already in use
-        Room roomByName = roomService.findByName(room.getName());
+        // Update room using the save method
+        try {
+            Room updatedRoom = roomService.update(room);
+            log.info("Updated room: {}", updatedRoom);
 
-        if (roomByName != null && !roomByName.getId().equals(room.getId())) {
+            // Return updated room
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room updated successfully", updatedRoom, null));
+        } catch (IllegalArgumentException e) {
+            // If there's an error (like room name conflict)
+            log.error("Error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new ApiResponseDto<>(HttpStatus.CONFLICT.value(), "Room name already in use", null, null));
+                    .body(new ApiResponseDto<>(HttpStatus.CONFLICT.value(), e.getMessage(), null, null));
         }
-
-        // Check if the room type exists
-        if (room.getType() == null || room.getType().getId() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponseDto<>(HttpStatus.BAD_REQUEST.value(), "Room type is mandatory", null, null));
-        }
-
-        // Update room
-                Room updatedRoom = roomService.save(room);
-
-        // Return updated room
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room updated successfully", updatedRoom, null));
     }
-
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponseDto<?>> addRoom(@Valid @RequestBody RoomDto roomDto) {
@@ -129,6 +129,15 @@ public class RoomController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Room created successfully", savedRoom, null));
+    }
+
+    @PostMapping("/type/add")
+    public ResponseEntity<ApiResponseDto<?>> addRoomType(@Valid @RequestBody RoomType type) {
+
+        RoomType savedType = roomTypeService.save(type);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Room type created successfully", savedType, null));
     }
     
     

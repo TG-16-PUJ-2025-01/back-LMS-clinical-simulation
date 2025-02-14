@@ -44,6 +44,47 @@ public class RoomService implements CrudService<Room, Long> {
         return roomRepository.save(room);
     }
 
+    public Room update(Room room) {
+        // Search if the room already exists by ID
+        Optional<Room> existingRoom = roomRepository.findById(room.getId());
+
+        // If the room exists, proceed with the update logic
+        if (existingRoom.isPresent()) {
+            Room roomToUpdate = existingRoom.get();
+
+            // Check if the name changed and if the new name already exists
+            if (!roomToUpdate.getName().equals(room.getName()) && roomRepository.findByName(room.getName()) != null) {
+                throw new IllegalArgumentException("Room name already exists");
+            }
+
+            // Check if the room type changed
+            RoomType newType = roomTypeRepository.findByName(room.getType().getName());
+            if (newType == null) {
+                newType = roomTypeRepository.save(room.getType()); // create the new type
+            }
+
+            // Update the values
+            roomToUpdate.setName(room.getName());
+            roomToUpdate.setType(newType);
+
+            return roomRepository.save(roomToUpdate);
+        }
+
+        // If the room does not exist, proceed with the creation logic
+        if (roomRepository.findByName(room.getName()) != null) {
+            throw new IllegalArgumentException("Room name already exists");
+        }
+
+        RoomType type = roomTypeRepository.findByName(room.getType().getName());
+        if (type == null) {
+            type = roomTypeRepository.save(room.getType());
+        }
+
+        room.setType(type);
+        return roomRepository.save(room);
+    }
+
+
     @Override
     public Optional<Room> findById(Long id) {
         return roomRepository.findById(id);

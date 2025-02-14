@@ -6,12 +6,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Room")
+@Table(name = "Room",
+        uniqueConstraints = @UniqueConstraint(columnNames = { "name" }))
 @Data
 @NoArgsConstructor
 public class Room {

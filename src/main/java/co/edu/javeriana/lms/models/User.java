@@ -45,16 +45,16 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
-    @OneToMany(mappedBy = "professor")
+    @OneToMany(mappedBy = "professor", cascade = CascadeType.PERSIST)
     @JsonIgnore
     private List<ClassModel> professorClasses;
 
 
-    @OneToMany(mappedBy = "coordinator")
+    @OneToMany(mappedBy = "coordinator", cascade = CascadeType.PERSIST)
     @JsonIgnore
     private List<Course> courses;
 
-    @OneToMany(mappedBy = "student")
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
     private List<StudentClass> studentlassses;
 

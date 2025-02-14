@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,20 +38,26 @@ public class ClassModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique=true, nullable=false)
     private Long idJaveriana;
 
+    @Column(nullable=false)
     private String name;
 
+    @Column(nullable=false)
     private Date beginningDate;
 
+
     @ManyToOne
+    @Column(nullable=false)
     private User professor;
 
-    @OneToMany(mappedBy = "classEnrolled")
+    @OneToMany(mappedBy = "classEnrolled", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
     private List<StudentClass> students;
 
     @ManyToOne
+    @Column(nullable=false)
     private Course course;
 
 }

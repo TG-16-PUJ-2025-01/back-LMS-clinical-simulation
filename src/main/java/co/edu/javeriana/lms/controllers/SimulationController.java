@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,31 +38,28 @@ public class SimulationController {
         String host = request.getHeader("Host");
         String scheme = request.getScheme();
 
-        List<Simulation> simulations = simulationService.getAllSimulations(page, size);
+        Page<Simulation> simulationsPage = simulationService.getAllSimulations(page, size);
 
-        if (simulations.isEmpty()) {
+        if (simulationsPage.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No simulations found", null, null));
         }
 
-        Long total = simulationService.countSimulations();
-        Long totalPages = (long) Math.ceil(total / size);
-
         String previous = null;
-        if (page > 1) {
+        if (simulationsPage.hasPrevious()) {
             previous = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page - 1, size);
         }
 
         String next = null;
-        if (page < totalPages) {
+        if (simulationsPage.hasNext()) {
             next = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page + 1, size);
         }
 
-        PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulations.size(), total, totalPages, next,
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(), simulationsPage.getTotalElements(), simulationsPage.getTotalPages(), next,
                 previous);
 
         return ResponseEntity.ok(
-                new ApiResponseDto<List<Simulation>>(HttpStatus.OK.value(), "ok", simulations, metadata));
+                new ApiResponseDto<List<Simulation>>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(), metadata));
     }
 
 }

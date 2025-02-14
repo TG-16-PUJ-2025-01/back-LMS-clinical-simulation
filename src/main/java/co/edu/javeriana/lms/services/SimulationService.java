@@ -1,8 +1,7 @@
 package co.edu.javeriana.lms.services;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,9 +21,9 @@ public class SimulationService {
         return simulationRepository.count();
     }
 
-    public List<Simulation> getAllSimulations(Integer page, Integer size) {
+    public Page<Simulation> getAllSimulations(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        return simulationRepository.findAll(pageable).getContent();
+        return simulationRepository.findAll(pageable);
     }
 
 }

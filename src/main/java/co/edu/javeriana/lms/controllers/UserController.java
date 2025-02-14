@@ -1,19 +1,27 @@
 package co.edu.javeriana.lms.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.javeriana.lms.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.dtos.RegisterUserDTO;
 import co.edu.javeriana.lms.dtos.ResponseUserDTO;
+import co.edu.javeriana.lms.dtos.UserListDTO;
 import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.services.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -33,5 +41,35 @@ public class UserController {
     public ResponseEntity<?> deleteUserByEmail(@Valid @RequestBody String email) {
         userService.deleteByEmail(email);
         return ResponseEntity.ok("User deleted");
+    }
+
+    @GetMapping("/all/coordinators")
+    public ResponseEntity<?> getAllCoordinators() {
+        
+        log.info("Requesting all classes");
+        
+        List<UserListDTO> coordinators = userService.findAllCoordinators();
+
+        if (coordinators.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No simulations found", null, null));
+        }
+
+        return ResponseEntity.ok(new ApiResponseDto<List<UserListDTO>>(HttpStatus.OK.value(), "ok", coordinators, null));
+    }
+
+    @GetMapping("/all/professors")
+    public ResponseEntity<?> getAllProfessors() {
+        
+        log.info("Requesting all classes");
+        
+        List<UserListDTO> professors = userService.findAllProfessors();
+
+        if (professors.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No simulations found", null, null));
+        }
+
+        return ResponseEntity.ok(new ApiResponseDto<List<UserListDTO>>(HttpStatus.OK.value(), "ok", professors, null));
     }
 }

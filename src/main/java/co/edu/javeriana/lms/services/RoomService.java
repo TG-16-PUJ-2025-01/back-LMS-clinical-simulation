@@ -38,8 +38,8 @@ public class RoomService implements CrudService<Room, Long> {
     }
 
     @Override
-    public Optional<Room> findById(Long id) {
-        return roomRepository.findById(id);
+    public Room findById(Long id) {
+        return roomRepository.findById(id).get();
     }
 
     @Override

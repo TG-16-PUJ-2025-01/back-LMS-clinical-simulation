@@ -76,6 +76,9 @@ public class UserService implements UserDetailsService {
 
     public List<UserListDTO> findAllProfessors() {
         log.info("Getting all professors");
+
+        log.info(userRepository.findAll().toString());
+        
         return userRepository.findAllProfessors()
                 .stream()
                 .map(user -> new UserListDTO(user.getId(), user.getName()))

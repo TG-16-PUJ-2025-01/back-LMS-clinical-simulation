@@ -61,13 +61,13 @@ public class UserController {
     @GetMapping("/all/professors")
     public ResponseEntity<?> getAllProfessors() {
         
-        log.info("Requesting all classes");
+        log.info("Requesting all professors");
         
         List<UserListDTO> professors = userService.findAllProfessors();
 
         if (professors.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No simulations found", null, null));
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No professors found", null, null));
         }
 
         return ResponseEntity.ok(new ApiResponseDto<List<UserListDTO>>(HttpStatus.OK.value(), "ok", professors, null));

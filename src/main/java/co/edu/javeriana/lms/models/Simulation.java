@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -41,6 +42,6 @@ public class Simulation {
     private Date gradeDate;
 
     @OneToOne
-    @Column(nullable = true)
+    @JoinColumn(name = "video_id")
     private Video video;
 }

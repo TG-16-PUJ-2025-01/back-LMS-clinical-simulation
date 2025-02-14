@@ -6,20 +6,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import co.edu.javeriana.lms.models.Simulation;
-import co.edu.javeriana.lms.repositories.SimulationRepository;
+import co.edu.javeriana.lms.models.Video;
+import co.edu.javeriana.lms.repositories.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class SimulationService {
+public class VideoService {
 
     @Autowired
-    private SimulationRepository simulationRepository;
+    private VideoRepository videoRepository;
 
-    public Page<Simulation> getAllSimulations(Integer page, Integer size) {
+    public Page<Video> getAllVideos(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        return simulationRepository.findAll(pageable);
+        return videoRepository.findAll(pageable);
     }
 
 }

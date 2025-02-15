@@ -1,33 +1,20 @@
 package co.edu.javeriana.lms.dtos;
 
+import co.edu.javeriana.lms.models.RoomType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RoomTypeDto {
-    private Long id;
     private String name;
-    
-    public RoomTypeDto() {
-        super();
-    }
 
-    public RoomTypeDto(Long id, String name) {
-        super();
-        this.id = id;
-        this.name = name;
-    }
+    public RoomType toEntity(){
+        RoomType roomType = new RoomType();
+        roomType.setName(this.name);
 
-    public Long getId() {
-        return id;
+        return roomType;
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-    
 }

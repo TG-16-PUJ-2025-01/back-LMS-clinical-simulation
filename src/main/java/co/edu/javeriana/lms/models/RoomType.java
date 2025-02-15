@@ -10,6 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,15 +19,14 @@ import lombok.NoArgsConstructor;
 @Table(name = "Room_type")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class RoomType {
-
-    public RoomType(Long id2, String name2) {
-        //TODO Auto-generated constructor stub
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotNull(message = "Room type name is mandatory")
     private String name;
 
     @OneToMany(mappedBy = "type")

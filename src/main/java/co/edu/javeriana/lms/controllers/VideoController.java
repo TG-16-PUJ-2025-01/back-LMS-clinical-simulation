@@ -5,10 +5,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
+import co.edu.javeriana.lms.dtos.EditVideoDTO;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.models.Video;
 import co.edu.javeriana.lms.services.VideoService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,7 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @Slf4j
 @RestController
@@ -61,6 +68,34 @@ public class VideoController {
 
         return ResponseEntity.ok(
                 new ApiResponseDto<List<Video>>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(), metadata));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponseDto<?>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDTO dto) {
+        log.info("Editing video with id: {}", id);
+
+        Video video = videoService.editVideo(id, dto);
+
+        if (video == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Video not found", null, null));
+        }
+
+        return ResponseEntity.ok(new ApiResponseDto<Video>(HttpStatus.OK.value(), "ok", video, null));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponseDto<?>> deleteVideo(@PathVariable Long id) {
+        log.info("Deleting video with id: {}", id);
+
+        Video video = videoService.deleteVideo(id);
+
+        if (video == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Video not found", null, null));
+        }
+
+        return ResponseEntity.ok(new ApiResponseDto<Video>(HttpStatus.OK.value(), "ok", video, null));
     }
 
 }

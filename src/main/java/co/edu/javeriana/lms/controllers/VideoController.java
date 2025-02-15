@@ -41,13 +41,14 @@ public class VideoController {
             @Min(1) @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "videoId") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
             HttpServletRequest request) {
         log.info("Requesting all simulations");
 
         String host = request.getHeader("Host");
         String scheme = request.getScheme();
 
-        Page<Video> simulationsPage = videoService.getAllVideos(page, size, sort, asc);
+        Page<Video> simulationsPage = videoService.searchVideos(filter, page, size, sort, asc);
 
         if (simulationsPage.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

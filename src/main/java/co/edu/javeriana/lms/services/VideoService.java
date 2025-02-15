@@ -19,8 +19,9 @@ public class VideoService {
     @Autowired
     private VideoRepository videoRepository;
 
-    public Page<Video> getAllVideos(Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("videoId"));
+    public Page<Video> getAllVideos(Integer page, Integer size, String sort, Boolean asc) {
+        Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
         return videoRepository.findAll(pageable);
     }
 

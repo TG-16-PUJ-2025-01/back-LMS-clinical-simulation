@@ -55,6 +55,18 @@ public class DBInitializer implements CommandLineRunner {
                                 new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
                                 new Date(), 620L, 500.0);
                 video8.setAvailable(false);
+                Video video9 = new Video("unavailable7.mp4",
+                                new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
+                                new Date(), 620L, 500.0);
+                video9.setAvailable(false);
+                Video video10 = new Video("unavailable8.mp4",
+                                new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
+                                new Date(), 620L, 500.0);
+                video10.setAvailable(false);
+                Video video11 = new Video("unavailable9.mp4",
+                                new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
+                                new Date(), 620L, 500.0);
+                video11.setAvailable(false);
 
                 videoRepository.save(video1);
                 videoRepository.save(video2);
@@ -64,6 +76,9 @@ public class DBInitializer implements CommandLineRunner {
                 videoRepository.save(video6);
                 videoRepository.save(video7);
                 videoRepository.save(video8);
+                videoRepository.save(video9);
+                videoRepository.save(video10);
+                videoRepository.save(video11);
 
         }
 

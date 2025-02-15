@@ -42,10 +42,10 @@ public class Video {
 
     @NonNull
     @Column(nullable = false)
-    private Long Duration; // in seconds
+    private Long duration; // in seconds
 
     @NonNull
     @Column(nullable = false)
-    private Double Size; // in MB
+    private Double size; // in MB
 
 }

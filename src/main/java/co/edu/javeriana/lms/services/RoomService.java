@@ -124,4 +124,8 @@ public class RoomService implements CrudService<Room, Long> {
     public List<RoomType> findAllTypes() {
         return roomTypeRepository.findAll();
     }
+
+    public long countByType(RoomType type) {
+        return roomRepository.countByType(type);
+    }
 }

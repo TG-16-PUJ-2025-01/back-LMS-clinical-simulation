@@ -31,6 +31,13 @@ public class Course {
         this.coordinator = coordinator;
     }
 
+    public Course(String name, Long idJaveriana, User coordinator) {
+        //TODO Auto-generated constructor stub
+        this.name = name;
+        this.idJaveriana = idJaveriana;
+        this.coordinator = coordinator;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

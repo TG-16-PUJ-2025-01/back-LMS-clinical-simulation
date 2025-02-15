@@ -2,11 +2,11 @@ package co.edu.javeriana.lms.dtos;
 
 import java.util.Date;
 
-import co.edu.javeriana.lms.models.User;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ClassModelDTO {
    
     private Long id;

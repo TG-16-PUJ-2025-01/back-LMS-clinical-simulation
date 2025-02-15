@@ -18,7 +18,6 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "ClassModel")
@@ -55,6 +54,7 @@ public class ClassModel {
 
     @ManyToOne
     @JoinColumn(nullable = false)
+    @JsonIgnore
     private Course course;
 
 

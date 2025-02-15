@@ -2,8 +2,8 @@ package co.edu.javeriana.lms.services;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,9 +13,11 @@ import co.edu.javeriana.lms.repositories.ClassModelRepository;
 import co.edu.javeriana.lms.repositories.CourseRepository;
 import co.edu.javeriana.lms.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
-public class ClassService implements CrudService<ClassModelDTO, Long>{
+public class ClassService {
     
     @Autowired
     private ClassModelRepository classRepository;
@@ -27,43 +29,44 @@ public class ClassService implements CrudService<ClassModelDTO, Long>{
     @Autowired
     private UserRepository userRepository;
 
-    public List<ClassModelDTO> findAll(Integer page, Integer size)
+    public Page<ClassModelDTO> findAll(Integer page, Integer size)
     {
         Pageable pageable = PageRequest.of(page, size);
-        return createDTOsList(classRepository.findAll(pageable).getContent());
+        return classRepository.findAll(pageable).map(this::mapToDTO);
     }
 
-    private List<ClassModelDTO> createDTOsList(List<ClassModel> classes) {
-        return classes.stream()
-        .map(classModel -> new ClassModelDTO(
-            classModel.getId(),  // Pass id here
-            classModel.getIdJaveriana(),
-            classModel.getName(),
-            classModel.getProfessor().getName(),
-            classModel.getProfessor().getId(),
-            classModel.getCourse().getName(),
-            classModel.getCourse().getId(),
-            definePeriod(classModel.getBeginningDate()), 
-            classModel.getBeginningDate()
-        ))
-        .toList();    
+    private ClassModelDTO mapToDTO(ClassModel classmodel) {
+        return new ClassModelDTO(
+            classmodel.getId(),  // Pass id here
+            classmodel.getIdJaveriana(),
+            classmodel.getName(),
+            classmodel.getProfessor().getName(),
+            classmodel.getProfessor().getId(),
+            classmodel.getCourse().getName(),
+            classmodel.getCourse().getId(),
+            definePeriod(classmodel.getBeginningDate()), 
+            classmodel.getBeginningDate()
+        );
     }
         
     private String definePeriod(Date beginningDate) {
+
         if (beginningDate == null) {
             throw new IllegalArgumentException("Beginning date cannot be null");
         }
+        
+        log.info("REVISAR BIEN UNICORNIO"+ beginningDate.toString());
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(beginningDate);
         int month = calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is zero-based
         int year = calendar.get(Calendar.YEAR);
 
-        if (month >= 1 && month <= 2) { // January - February
+        if (month >= 1 && month <5) { // January - February
             return year + "-10";
-        } else if (month >= 5 && month <= 6) { // May - June
+        } else if (month >= 5 && month <9) { // May - June
             return year + "-20";
-        } else if (month >= 9 && month <= 10) { // September - October
+        } else if (month >= 9 && month <=12) { // September - October
             return year + "-30";
         }
 
@@ -78,6 +81,11 @@ public class ClassService implements CrudService<ClassModelDTO, Long>{
     public ClassModelDTO findById(Long id) {
 
         return createDTO(classRepository.findById(id).get());
+    }
+
+    public ClassModel findByIdModel(Long id) {
+
+        return classRepository.findById(id).get();
     }
         
     private ClassModelDTO createDTO(ClassModel classModel) {
@@ -101,10 +109,11 @@ public class ClassService implements CrudService<ClassModelDTO, Long>{
     }
 
     public void deleteById(Long id) {
+        
         classRepository.deleteById(id);
     }
 
-    public void update(ClassModelDTO classModel) {
+    public ClassModel update(ClassModelDTO classModel) {
         ClassModel currentClassModel = classRepository.findById(classModel.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + classModel.getId() + " not found"));
 
@@ -129,6 +138,8 @@ public class ClassService implements CrudService<ClassModelDTO, Long>{
         currentClassModel.setCourse(courseRepository.findById(classModel.getCourseId()).get());
 
         classRepository.save(currentClassModel);
+
+        return currentClassModel;
     }
 
 }

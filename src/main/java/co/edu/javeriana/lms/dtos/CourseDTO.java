@@ -1,12 +1,12 @@
 package co.edu.javeriana.lms.dtos;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class CourseDTO {
 
     Long id;

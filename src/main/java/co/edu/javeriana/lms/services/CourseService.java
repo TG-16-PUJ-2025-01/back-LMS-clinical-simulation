@@ -1,26 +1,22 @@
 package co.edu.javeriana.lms.services;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import co.edu.javeriana.lms.dtos.ClassModelDTO;
 import co.edu.javeriana.lms.dtos.CourseDTO;
-import co.edu.javeriana.lms.models.ClassModel;
 import co.edu.javeriana.lms.models.Course;
-import co.edu.javeriana.lms.models.Room;
 import co.edu.javeriana.lms.repositories.ClassModelRepository;
 import co.edu.javeriana.lms.repositories.CourseRepository;
 import co.edu.javeriana.lms.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
-public class CourseService implements CrudService<CourseDTO, Long>{
+public class CourseService {
     
     @Autowired
     private ClassModelRepository classRepository;
@@ -32,22 +28,20 @@ public class CourseService implements CrudService<CourseDTO, Long>{
     @Autowired
     private UserRepository userRepository;
 
-    public List<CourseDTO> findAll(Integer page, Integer size)
+    public Page<CourseDTO> findAll(Integer page, Integer size)
     {
         Pageable pageable = PageRequest.of(page, size);
-        return createDTOsList(courseRepository.findAll(pageable).getContent());
+        return courseRepository.findAll(pageable).map(this::mapToDTO);
     }
 
-    private List<CourseDTO> createDTOsList(List<Course> courses) {
-        return courses.stream()
-        .map(course -> new CourseDTO(
+    private CourseDTO mapToDTO(Course course) {
+        return new CourseDTO(
             course.getId(),  // Pass id here
             course.getIdJaveriana(),
             course.getName(),
             course.getCoordinator().getId(),
             course.getCoordinator().getName()
-        ))
-        .toList();    
+        );
     }
 
         
@@ -58,6 +52,11 @@ public class CourseService implements CrudService<CourseDTO, Long>{
     public CourseDTO findById(Long id) {
 
         return createDTO(courseRepository.findById(id).get());
+    }
+
+    public Course findByIdModel(Long id) {
+
+        return courseRepository.findById(id).get();
     }
         
     private CourseDTO createDTO(Course course) {
@@ -70,25 +69,29 @@ public class CourseService implements CrudService<CourseDTO, Long>{
         );
     }
         
-    public CourseDTO save(CourseDTO course) {
-        Course newCourse = new Course(course.getId(), course.getName(), course.getIdJaveriana(), userRepository.findById(course.getCoordinatorId()).get());
+    public Course save(CourseDTO course) {
+
+        Course newCourse = new Course(course.getName(), course.getIdJaveriana(), userRepository.findById(course.getCoordinatorId()).get());
+        
+        
         courseRepository.save(newCourse);
-        return course;
+        return newCourse;
     }
 
     public void deleteById(Long id) {
-        classRepository.deleteById(id);
+       
+        courseRepository.deleteById(id);
     }
 
-    public void update(CourseDTO course) {
-        Course currentCourseModel = courseRepository.findById(course.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Class with ID " + course.getId() + " not found"));
+    public Course update(CourseDTO course, Long id) {
+        Course currentCourseModel = courseRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
 
         // Check for null values before updating
         if (course.getCoordinatorId() == null ||
             course.getName() == null ||
             course.getIdJaveriana() == null ||
-            course.getId() == null ||
+            id == null ||
             course.getCoordinatorName() == null
             ) {
             
@@ -101,6 +104,8 @@ public class CourseService implements CrudService<CourseDTO, Long>{
         currentCourseModel.setIdJaveriana(course.getIdJaveriana());
 
         courseRepository.save(currentCourseModel);
+
+        return currentCourseModel;
     }
 
 

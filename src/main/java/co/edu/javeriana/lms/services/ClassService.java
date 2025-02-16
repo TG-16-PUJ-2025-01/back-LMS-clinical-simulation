@@ -29,26 +29,12 @@ public class ClassService {
     @Autowired
     private UserRepository userRepository;
 
-    public Page<ClassModelDTO> findAll(Integer page, Integer size)
+    public Page<ClassModel> findAll(Integer page, Integer size)
     {
         Pageable pageable = PageRequest.of(page, size);
-        return classRepository.findAll(pageable).map(this::mapToDTO);
+        return classRepository.findAll(pageable);
     }
 
-    private ClassModelDTO mapToDTO(ClassModel classmodel) {
-        return new ClassModelDTO(
-            classmodel.getId(),  // Pass id here
-            classmodel.getIdJaveriana(),
-            classmodel.getName(),
-            classmodel.getProfessor().getName(),
-            classmodel.getProfessor().getId(),
-            classmodel.getCourse().getName(),
-            classmodel.getCourse().getId(),
-            definePeriod(classmodel.getBeginningDate()), 
-            classmodel.getBeginningDate()
-        );
-    }
-        
     private String definePeriod(Date beginningDate) {
 
         if (beginningDate == null) {
@@ -73,39 +59,16 @@ public class ClassService {
         throw new IllegalArgumentException("Date does not match any academic period");
     }
 
-        
-    public Long countClasses() {
-        return classRepository.count();
-    }
-
-    public ClassModelDTO findById(Long id) {
-
-        return createDTO(classRepository.findById(id).get());
-    }
-
-    public ClassModel findByIdModel(Long id) {
+    public ClassModel findById(Long id) {
 
         return classRepository.findById(id).get();
-    }
+    }  
+   
         
-    private ClassModelDTO createDTO(ClassModel classModel) {
-        return new ClassModelDTO(
-            classModel.getId(),  // Pass id here
-            classModel.getIdJaveriana(),
-            classModel.getName(),
-            classModel.getProfessor().getName(),
-            classModel.getProfessor().getId(),
-            classModel.getCourse().getName(),
-            classModel.getCourse().getId(),
-            definePeriod(classModel.getBeginningDate()), 
-            classModel.getBeginningDate()
-        );
-    }
-        
-    public ClassModelDTO save(ClassModelDTO entity) {
+    public ClassModel save(ClassModelDTO entity) {
         ClassModel classModel = new ClassModel(entity.getName(), entity.getBeginningDate(), userRepository.findById(entity.getProfessorId()).get(), courseRepository.findById(entity.getCourseId()).get(), entity.getIdJaveriana());
         classRepository.save(classModel);
-        return entity;
+        return classModel;
     }
 
     public void deleteById(Long id) {

@@ -45,7 +45,7 @@ public class ClassModelController {
         String host = request.getHeader("Host");
         String scheme = request.getScheme();
         
-        Page<ClassModelDTO> classModelPage = classService.findAll(page, size);
+        Page<ClassModel> classModelPage = classService.findAll(page, size);
 
         if (classModelPage.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -67,7 +67,7 @@ public class ClassModelController {
                 classModelPage.getTotalPages(), next,
                 previous);
 
-        return ResponseEntity.ok(new ApiResponseDto<List<ClassModelDTO>>(HttpStatus.OK.value(), "ok", classModelPage.getContent(), metadata));
+        return ResponseEntity.ok(new ApiResponseDto<List<ClassModel>>(HttpStatus.OK.value(), "ok", classModelPage.getContent(), metadata));
     }
 
     @GetMapping("/{id}")
@@ -76,14 +76,14 @@ public class ClassModelController {
          
         log.info("Requesting a class by id");
 
-        ClassModelDTO classModel=classService.findById(id);
+        ClassModel classModel=classService.findById(id);
 
         if(classModel==null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No class found", null, null));
         }
 
-        return ResponseEntity.ok(new ApiResponseDto<ClassModelDTO>(HttpStatus.OK.value(), "ok", classModel, null));
+        return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(), "ok", classModel, null));
 
     }
 
@@ -92,7 +92,7 @@ public class ClassModelController {
     public ResponseEntity<?> deleteClassById(@RequestParam Long id) {
         
         try {
-            ClassModel classModel = classService.findByIdModel(id);
+            ClassModel classModel = classService.findById(id);
             classService.deleteById(id);
             return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(), "Clase deleted successfully.", classModel, null));
         } catch (EntityNotFoundException e) {
@@ -122,7 +122,7 @@ public class ClassModelController {
     public ResponseEntity<?> addClass(@RequestBody ClassModelDTO classModel) {
 
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<ClassModelDTO>(HttpStatus.CREATED.value(), "Class added successfully.", classService.save(classModel), null));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<ClassModel>(HttpStatus.CREATED.value(), "Class added successfully.", classService.save(classModel), null));
 
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto<ClassModel>(HttpStatus.BAD_REQUEST.value(), "Error: Invalid data or duplicate entry.", null, null));

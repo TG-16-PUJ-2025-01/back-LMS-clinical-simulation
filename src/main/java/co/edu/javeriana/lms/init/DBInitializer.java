@@ -154,9 +154,6 @@ public class DBInitializer implements CommandLineRunner {
 		room10.setName("Sala10");
 		room10.setType(roomType5);
 		roomRepository.save(room10);
-
-		createUsers();
-
 	}
 
 	private void createUsers() {

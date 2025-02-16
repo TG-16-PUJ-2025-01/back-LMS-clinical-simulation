@@ -34,9 +34,17 @@ public class User implements UserDetails {
 
     @Column(unique = true)
     private String email;
+
+    @JsonIgnore
     private String password;
+
+    @Column
     private String name;
+
+    @Column
     private String lastName;
+
+    @Column // Unique?
     private int institutionalId;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -59,6 +67,7 @@ public class User implements UserDetails {
     private List<StudentClass> studentlassses;
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))
@@ -66,26 +75,31 @@ public class User implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public String getUsername() {
         return email;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return true;
     }

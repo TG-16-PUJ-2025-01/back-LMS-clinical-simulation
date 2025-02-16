@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,18 +22,11 @@ import lombok.NoArgsConstructor;
 @Table(name = "Course")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Course {
 
-    public Course(Long id, String name, Long idJaveriana, User coordinator) {
-        //TODO Auto-generated constructor stub
-        this.id = id;
-        this.name = name;
-        this.idJaveriana = idJaveriana;
-        this.coordinator = coordinator;
-    }
-
     public Course(String name, Long idJaveriana, User coordinator) {
-        //TODO Auto-generated constructor stub
+        // TODO Auto-generated constructor stub
         this.name = name;
         this.idJaveriana = idJaveriana;
         this.coordinator = coordinator;
@@ -40,18 +34,18 @@ public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long courseId;
 
-    @Column(unique=true, nullable=false)
+    @Column(unique = true, nullable = false)
     private Long idJaveriana;
 
-    @Column(unique=true, nullable=false)
+    @Column(unique = true, nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<ClassModel> classModels;
-    
+
     @ManyToOne
     @JoinColumn(nullable = false)
     private User coordinator;

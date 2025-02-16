@@ -30,8 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping(value = "/class")
-public class ClassModelController {
-    
+public class ClassController {
+
     @Autowired
     private  ClassService classService;
 

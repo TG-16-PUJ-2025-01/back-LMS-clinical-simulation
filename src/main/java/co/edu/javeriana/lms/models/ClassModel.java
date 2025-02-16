@@ -20,7 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "ClassModel")
+@Table(name = "Classes")
 @Data
 @NoArgsConstructor
 @Getter

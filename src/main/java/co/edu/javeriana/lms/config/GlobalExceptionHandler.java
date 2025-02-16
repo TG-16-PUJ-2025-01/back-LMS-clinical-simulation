@@ -44,16 +44,7 @@ public class GlobalExceptionHandler {
                 String message = error.getDefaultMessage();
                 return new ValidationErrorDTO(fieldName, message);
             }).collect(Collectors.toList());
-        }
-        // TODO: Revisar si esto tiene sentido
-        /* 
-         else if (e instanceof IllegalArgumentException) {
-            IllegalArgumentException ex = (IllegalArgumentException) e;
-            errors = List.of(new ValidationErrorDTO("business_rule", ex.getMessage()));
-        } 
-        */
-        
-        else {
+        } else {
             // Default case, shouldn't happen
             log.error("Unknown exception type: {}", e.getClass().getName());
             errors = List.of(new ValidationErrorDTO("unknown", "Unknown validation error"));

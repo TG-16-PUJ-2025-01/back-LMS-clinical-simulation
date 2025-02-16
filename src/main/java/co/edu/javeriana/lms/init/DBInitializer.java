@@ -216,6 +216,7 @@ public class DBInitializer implements CommandLineRunner {
 		userRepository.save(both1);
 		userRepository.save(both2);
 	}
+
     public void insertVideos() throws ParseException {
         Video video1 = new Video("javatechie.mp4",
                 new SimpleDateFormat("yyyy-MM-dd").parse("2023-01-31"),

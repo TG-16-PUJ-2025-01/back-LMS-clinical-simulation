@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,7 +44,7 @@ public class CourseController {
         String host = request.getHeader("Host");
         String scheme = request.getScheme();
 
-        Page<CourseDTO> coursesPage = courseService.findAll(page, size);
+        Page<Course> coursesPage = courseService.findAll(page, size);
 
         if (coursesPage.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -65,29 +66,29 @@ public class CourseController {
                 coursesPage.getTotalPages(), next,
                 previous);
 
-        return ResponseEntity.ok(new ApiResponseDto<List<CourseDTO>>(HttpStatus.OK.value(), "ok", coursesPage.getContent(), metadata));
+        return ResponseEntity.ok(new ApiResponseDto<List<Course>>(HttpStatus.OK.value(), "ok", coursesPage.getContent(), metadata));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCourseById(@RequestParam Long id) {
+    public ResponseEntity<?> getCourseById(@PathVariable Long id) {
 
         log.info("Requesting a class by id");
 
-        CourseDTO course = courseService.findById(id);
+        Course course = courseService.findById(id);
 
         if (course == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No class found", null, null));
         }
 
-        return ResponseEntity.ok(new ApiResponseDto<CourseDTO>(HttpStatus.OK.value(), "ok", course, null));
+        return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(), "ok", course, null));
     }
 
-    @DeleteMapping("/delete/{idCourse}")
-    public ResponseEntity<?> deleteCourseById(@RequestParam Long id) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteCourseById(@PathVariable Long id) {
 
         try {
-            Course actualCourse= courseService.findByIdModel(id);
+            Course actualCourse= courseService.findById(id);
             courseService.deleteById(id);
             return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(),
                     "Course deleted successfully.", actualCourse, null));
@@ -104,8 +105,8 @@ public class CourseController {
         }
     }
 
-    @PutMapping("/update/{idCourse}")
-    public ResponseEntity<?> updatCourse(@RequestBody CourseDTO courseModel, @RequestParam Long id) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updatCourse(@RequestBody CourseDTO courseModel, @PathVariable Long id) {
 
         try {
             return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(),

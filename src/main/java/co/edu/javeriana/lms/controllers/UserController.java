@@ -43,33 +43,33 @@ public class UserController {
         return ResponseEntity.ok("User deleted");
     }
 
-    @GetMapping("/all/coordinators")
+    @GetMapping("/all/coordinator")
     public ResponseEntity<?> getAllCoordinators() {
         
         log.info("Requesting all classes");
         
-        List<UserListDTO> coordinators = userService.findAllCoordinators();
+        List<User> coordinators = userService.findAllCoordinators();
 
         if (coordinators.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No simulations found", null, null));
         }
 
-        return ResponseEntity.ok(new ApiResponseDto<List<UserListDTO>>(HttpStatus.OK.value(), "ok", coordinators, null));
+        return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok", coordinators, null));
     }
 
-    @GetMapping("/all/professors")
+    @GetMapping("/all/professor")
     public ResponseEntity<?> getAllProfessors() {
         
         log.info("Requesting all professors");
         
-        List<UserListDTO> professors = userService.findAllProfessors();
+        List<User> professors = userService.findAllProfessors();
 
         if (professors.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No professors found", null, null));
         }
 
-        return ResponseEntity.ok(new ApiResponseDto<List<UserListDTO>>(HttpStatus.OK.value(), "ok", professors, null));
+        return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok", professors, null));
     }
 }

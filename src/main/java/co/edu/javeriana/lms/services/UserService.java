@@ -66,23 +66,16 @@ public class UserService implements UserDetailsService {
         userRepository.deleteByEmail(email);
     }
 
-    public List<UserListDTO> findAllCoordinators() {
+    public List<User> findAllCoordinators() {
         log.info("Getting all coordinators");
-        return userRepository.findAllCoordinators()
-                .stream()
-                .map(user -> new UserListDTO(user.getId(), user.getName()))
-                .toList();
+        return userRepository.findAllCoordinators();
     }
 
-    public List<UserListDTO> findAllProfessors() {
+    public List<User> findAllProfessors() {
         log.info("Getting all professors");
 
-        log.info(userRepository.findAll().toString());
-        
-        return userRepository.findAllProfessors()
-                .stream()
-                .map(user -> new UserListDTO(user.getId(), user.getName()))
-                .toList();
+        return userRepository.findAllProfessors();
+
     }
 
 }

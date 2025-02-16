@@ -28,13 +28,13 @@ public class CourseService {
     @Autowired
     private UserRepository userRepository;
 
-    public Page<CourseDTO> findAll(Integer page, Integer size)
+    public Page<Course> findAll(Integer page, Integer size)
     {
         Pageable pageable = PageRequest.of(page, size);
-        return courseRepository.findAll(pageable).map(this::mapToDTO);
+        return courseRepository.findAll(pageable); //.map(this::mapToDTO);
     }
 
-    private CourseDTO mapToDTO(Course course) {
+    /*private CourseDTO mapToDTO(Course course) {
         return new CourseDTO(
             course.getId(),  // Pass id here
             course.getIdJaveriana(),
@@ -42,24 +42,19 @@ public class CourseService {
             course.getCoordinator().getId(),
             course.getCoordinator().getName()
         );
-    }
+    }*/
 
         
     public Long countClasses() {
         return classRepository.count();
     }
 
-    public CourseDTO findById(Long id) {
-
-        return createDTO(courseRepository.findById(id).get());
-    }
-
-    public Course findByIdModel(Long id) {
+    public Course findById(Long id) {
 
         return courseRepository.findById(id).get();
     }
         
-    private CourseDTO createDTO(Course course) {
+    /*private CourseDTO createDTO(Course course) {
         return new CourseDTO(
             course.getId(),  // Pass id here
             course.getIdJaveriana(),
@@ -67,7 +62,7 @@ public class CourseService {
             course.getCoordinator().getId(),
             course.getCoordinator().getName()
         );
-    }
+    }*/
         
     public Course save(CourseDTO course) {
 
@@ -84,8 +79,15 @@ public class CourseService {
     }
 
     public Course update(CourseDTO course, Long id) {
+
+        log.info("Updating course with ID: " + id); 
+
         Course currentCourseModel = courseRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
+
+
+        //log.info("Updating course with ID: " + course); 
+
 
         // Check for null values before updating
         if (course.getCoordinatorId() == null ||
@@ -98,6 +100,7 @@ public class CourseService {
             throw new IllegalArgumentException("Error: All fields must have values. Null values are not allowed.");
         }
 
+        //log.info("Updating course with ID: " + course); 
         // Update fields
         currentCourseModel.setCoordinator(userRepository.findById(course.getCoordinatorId()).get());
         currentCourseModel.setName(course.getName());
@@ -105,6 +108,7 @@ public class CourseService {
 
         courseRepository.save(currentCourseModel);
 
+        //log.info("Updating course with ID: " + currentCourseModel); 
         return currentCourseModel;
     }
 

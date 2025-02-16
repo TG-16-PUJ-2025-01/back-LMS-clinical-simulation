@@ -15,7 +15,7 @@ import co.edu.javeriana.lms.repositories.RoomRepository;
 import co.edu.javeriana.lms.repositories.RoomTypeRepository;
 
 @Service
-public class RoomService implements CrudService<Room, Long> {
+public class RoomService {
 
     @Autowired
     private RoomRepository roomRepository;
@@ -23,7 +23,6 @@ public class RoomService implements CrudService<Room, Long> {
     @Autowired
     private RoomTypeRepository roomTypeRepository;
 
-    @Override
     public Room save(Room room) {
         // Search for the room name in the database
         // If it does not exist, create it, if it does, return error
@@ -85,12 +84,10 @@ public class RoomService implements CrudService<Room, Long> {
     }
 
 
-    @Override
     public Optional<Room> findById(Long id) {
         return roomRepository.findById(id);
     }
 
-    @Override
     public List<Room> findAll(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         return roomRepository.findAll(pageable).getContent();
@@ -100,7 +97,6 @@ public class RoomService implements CrudService<Room, Long> {
         return roomRepository.findAll(pageable);
     }
 
-    @Override
     public void deleteById(Long id) {
         roomRepository.deleteById(id);
     }

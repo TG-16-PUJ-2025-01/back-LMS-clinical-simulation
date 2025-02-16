@@ -1,5 +1,7 @@
 package co.edu.javeriana.lms.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -7,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import co.edu.javeriana.lms.dtos.UserListDTO;
 import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.repositories.UserRepository;
 import co.edu.javeriana.lms.utils.PasswordGenerator;
@@ -62,5 +65,18 @@ public class UserService implements UserDetailsService {
 
         userRepository.deleteByEmail(email);
     }
+
+    public List<User> findAllCoordinators() {
+        log.info("Getting all coordinators");
+        return userRepository.findAllCoordinators();
+    }
+
+    public List<User> findAllProfessors() {
+        log.info("Getting all professors");
+
+        return userRepository.findAllProfessors();
+
+    }
+
 }
 

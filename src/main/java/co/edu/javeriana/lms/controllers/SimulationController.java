@@ -55,7 +55,7 @@ public class SimulationController {
             next = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page + 1, size);
         }
 
-        PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(), simulationsPage.getTotalElements(), simulationsPage.getTotalPages(), next,
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulations.size(), total, Math.toIntExact(totalPages), next,
                 previous);
 
         return ResponseEntity.ok(

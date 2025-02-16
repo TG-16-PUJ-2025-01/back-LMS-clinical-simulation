@@ -46,6 +46,8 @@ public class RoomController {
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
             @Min(1) @RequestParam(defaultValue = "10") Integer size) {
 
+        log.info("Requesting all rooms");
+
         Pageable pageable = PageRequest.of(page, size);
         Page<Room> roomsPage = roomService.findAll(pageable);
 
@@ -59,6 +61,7 @@ public class RoomController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseDto<?>> getRoomById(@PathVariable Long id) {
+        log.info("Requesting room with id={}", id);
         Optional<Room> room = roomService.findById(id);
 
         if (room.isEmpty()) {
@@ -72,12 +75,16 @@ public class RoomController {
 
     @GetMapping("/types")
     public ResponseEntity<ApiResponseDto<?>> getRoomTypes() {
+        log.info("Requesting all room types");
+
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room types found", roomService.findAllTypes(), null));
     }
 
     @DeleteMapping("/delete/{idRoom}")
     public ResponseEntity<ApiResponseDto<?>> deleteRoomById(@PathVariable("idRoom") Long id) {
+
+        log.info("Requesting deletion of room with id={}", id);
 
         // Check if room exists
         Optional<Room> room = roomService.findById(id);
@@ -96,6 +103,8 @@ public class RoomController {
     @PutMapping("/update")
     public ResponseEntity<ApiResponseDto<?>> updateRoom(@Valid @RequestBody Room room) {
 
+        log.info("Requesting update of room with id={}", room.getId());
+
         // Check if room exists
         Optional<Room> roomEntity = roomService.findById(room.getId());
 
@@ -108,7 +117,7 @@ public class RoomController {
         // Update room using the save method
         try {
             Room updatedRoom = roomService.update(room);
-            log.info("Updated room: {}", updatedRoom);
+            log.info("Updated room: id={}, name={}, type={}", updatedRoom.getId(), updatedRoom.getName(), updatedRoom.getType().getName());
 
             // Return updated room
             return ResponseEntity.status(HttpStatus.OK)
@@ -123,6 +132,7 @@ public class RoomController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponseDto<?>> addRoom(@Valid @RequestBody RoomDto roomDto) {
+        log.info("Requesting creation of room: name={}, type={}", roomDto.getName(), roomDto.getType());
 
         Room roomEntity = roomDto.toEntity(null);
         Room savedRoom = roomService.save(roomEntity);
@@ -133,6 +143,7 @@ public class RoomController {
 
     @PostMapping("/type/add")
     public ResponseEntity<ApiResponseDto<?>> addRoomType(@Valid @RequestBody RoomType type) {
+        log.info("Requesting creation of room type: name={}", type.getName());
 
         RoomType savedType = roomTypeService.save(type);
 

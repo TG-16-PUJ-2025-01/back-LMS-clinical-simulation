@@ -9,7 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import co.edu.javeriana.lms.dtos.CourseDTO;
+import co.edu.javeriana.lms.dtos.CreateCourseDTO;
+import co.edu.javeriana.lms.dtos.EditCourseDTO;
 import co.edu.javeriana.lms.models.Course;
 import co.edu.javeriana.lms.models.Role;
 import co.edu.javeriana.lms.models.User;
@@ -51,7 +52,7 @@ public class CourseService {
         return courseRepository.findById(id).get();
     }
 
-    public Course save(CourseDTO course) {
+    public Course save(CreateCourseDTO course) {
         Optional<User> coordinator = userRepository.findById(course.getCoordinatorId());
 
         if (coordinator.isEmpty()
@@ -71,16 +72,13 @@ public class CourseService {
         courseRepository.deleteById(id);
     }
 
-    public Course update(CourseDTO course, Long id) {
+    public Course update(EditCourseDTO course, Long id) {
 
         log.info("Updating course with ID: " + id);
 
         Course currentCourseModel = courseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Course with ID " + id + " not found"));
 
-        // log.info("Updating course with ID: " + course);
-        // Update fields
-        currentCourseModel.setCoordinator(userRepository.findById(course.getCoordinatorId()).get());
         currentCourseModel.setName(course.getName());
         currentCourseModel.setJaverianaId(course.getJaverianaId());
 

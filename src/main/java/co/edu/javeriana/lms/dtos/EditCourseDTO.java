@@ -10,15 +10,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CourseDTO {
+public class EditCourseDTO {
     @NotNull(message = "Id Javeriana is required")
     @Positive(message = "Id Javeriana must be a positive number")
     private Long javerianaId;
 
     @NotBlank(message = "Name is required")
     private String name;
-
-    @NotNull(message = "Coordinator ID is required")
-    @Positive(message = "Coordinator ID must be a positive number")
-    private Long coordinatorId;
 }

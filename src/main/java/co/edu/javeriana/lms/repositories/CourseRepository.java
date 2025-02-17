@@ -15,5 +15,4 @@ public interface CourseRepository extends JpaRepository <Course, Long> {
         OR LOWER(TRANSLATE(c.name, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
     """)
     Page<Course> findByNameOrJaverianaIdContaining(@Param("filter") String filter, Pageable pageable);
-
 }

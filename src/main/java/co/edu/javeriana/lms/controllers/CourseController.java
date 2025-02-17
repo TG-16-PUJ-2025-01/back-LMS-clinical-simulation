@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
-import co.edu.javeriana.lms.dtos.CourseDTO;
+import co.edu.javeriana.lms.dtos.CreateCourseDTO;
+import co.edu.javeriana.lms.dtos.EditCourseDTO;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.models.Course;
 import co.edu.javeriana.lms.services.CourseService;
@@ -109,29 +110,17 @@ public class CourseController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updatCourse(@RequestBody CourseDTO courseModel, @PathVariable Long id) {
+    public ResponseEntity<?> updatCourse(@RequestBody EditCourseDTO courseModel, @PathVariable Long id) {
         log.info("Updating course with ID: " + id);
 
-        try {
-            return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(),
-                    "Course updated successfully.", courseService.update(courseModel, id), null));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<Course>(HttpStatus.NOT_FOUND.value(),
-                            "Error: + e.getMessage().", null, null));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponseDto<Course>(HttpStatus.BAD_REQUEST.value(),
-                            "Error: Invalid data.", null, null));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponseDto<Course>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                            "Internal server error.", null, null));
-        }
+        Course course = courseService.update(courseModel, id);
+
+        return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(),
+                "Course updated successfully.", course, null));
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addCourse(@Valid @RequestBody CourseDTO courseModel) {
+    public ResponseEntity<?> addCourse(@Valid @RequestBody CreateCourseDTO courseModel) {
         log.info("Adding a course");
 
         Course course = courseService.save(courseModel);

@@ -2,7 +2,6 @@ package co.edu.javeriana.lms.controllers;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,6 @@ import co.edu.javeriana.lms.dtos.EditCourseDTO;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.models.Course;
 import co.edu.javeriana.lms.services.CourseService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -88,25 +86,11 @@ public class CourseController {
     public ResponseEntity<?> deleteCourseById(@PathVariable Long id) {
         log.info("Deleting course with ID: " + id);
 
-        try {
-            Course actualCourse = courseService.findById(id);
-            courseService.deleteById(id);
-            return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(),
-                    "Course deleted successfully.", actualCourse, null));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<Course>(HttpStatus.NOT_FOUND.value(),
-                            "Error: Course with ID " + id + " does not exist.", null, null));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new ApiResponseDto<Course>(HttpStatus.CONFLICT.value(),
-                            "Error: Cannot delete the course because it has related data.", null, null));
+        Course course = courseService.findById(id);
+        courseService.deleteById(id);
 
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponseDto<Course>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                            "Internal server error.", null, null));
-        }
+        return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(),
+                "Course deleted successfully.", course, null));
     }
 
     @PutMapping("/update/{id}")

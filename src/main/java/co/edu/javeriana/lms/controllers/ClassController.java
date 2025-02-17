@@ -33,18 +33,18 @@ import lombok.extern.slf4j.Slf4j;
 public class ClassController {
 
     @Autowired
-    private  ClassService classService;
+    private ClassService classService;
 
     @GetMapping("/all")
     public ResponseEntity<?> getAll(
-        @Min(0) @RequestParam(defaultValue = "0") Integer page,
-        @Min(1) @RequestParam(defaultValue = "10") Integer size, HttpServletRequest request) {
-        
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, HttpServletRequest request) {
+
         log.info("Requesting all classes");
 
         String host = request.getHeader("Host");
         String scheme = request.getScheme();
-        
+
         Page<ClassModel> classModelPage = classService.findAll(page, size);
 
         if (classModelPage.isEmpty()) {
@@ -67,18 +67,18 @@ public class ClassController {
                 classModelPage.getTotalPages(), next,
                 previous);
 
-        return ResponseEntity.ok(new ApiResponseDto<List<ClassModel>>(HttpStatus.OK.value(), "ok", classModelPage.getContent(), metadata));
+        return ResponseEntity.ok(new ApiResponseDto<List<ClassModel>>(HttpStatus.OK.value(), "ok",
+                classModelPage.getContent(), metadata));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getClassById(@RequestParam Long id) {
-        
-         
+
         log.info("Requesting a class by id");
 
-        ClassModel classModel=classService.findById(id);
+        ClassModel classModel = classService.findById(id);
 
-        if(classModel==null){
+        if (classModel == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No class found", null, null));
         }
@@ -87,49 +87,60 @@ public class ClassController {
 
     }
 
-
     @DeleteMapping("/delete/{idClass}")
     public ResponseEntity<?> deleteClassById(@RequestParam Long id) {
-        
+
         try {
             ClassModel classModel = classService.findById(id);
             classService.deleteById(id);
-            return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(), "Clase deleted successfully.", classModel, null));
+            return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
+                    "Clase deleted successfully.", classModel, null));
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDto<ClassModel>(HttpStatus.NOT_FOUND.value(), "Error: Class with ID " + id + " does not exist.", null, null));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDto<ClassModel>(
+                    HttpStatus.NOT_FOUND.value(), "Error: Class with ID " + id + " does not exist.", null, null));
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponseDto<ClassModel>(HttpStatus.CONFLICT.value(), "Error: Cannot delete the class because it has related data.", null, null));
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ApiResponseDto<ClassModel>(HttpStatus.CONFLICT.value(),
+                            "Error: Cannot delete the class because it has related data.", null, null));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto<ClassModel>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error.", null, null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto<ClassModel>(
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error.", null, null));
         }
     }
 
     @PutMapping("/update")
     public ResponseEntity<?> updateClass(@RequestBody ClassModelDTO classModel) {
         try {
-            return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(), "Class updated successfully.", classService.update(classModel), null));
+            return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
+                    "Class updated successfully.", classService.update(classModel), null));
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDto<ClassModel>(HttpStatus.NOT_FOUND.value(), "Error: " + e.getMessage(), null, null));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDto<ClassModel>(
+                    HttpStatus.NOT_FOUND.value(), "Error: " + e.getMessage(), null, null));
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto<ClassModel>(HttpStatus.BAD_REQUEST.value(), "Error: Invalid data.", null, null));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ApiResponseDto<ClassModel>(HttpStatus.BAD_REQUEST.value(), "Error: Invalid data.", null, null));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto<ClassModel>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error.", null, null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto<ClassModel>(
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error.", null, null));
         }
     }
-    
 
     @PostMapping("/add")
     public ResponseEntity<?> addClass(@RequestBody ClassModelDTO classModel) {
 
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<ClassModel>(HttpStatus.CREATED.value(), "Class added successfully.", classService.save(classModel), null));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<ClassModel>(
+                    HttpStatus.CREATED.value(), "Class added successfully.", classService.save(classModel), null));
 
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto<ClassModel>(HttpStatus.BAD_REQUEST.value(), "Error: Invalid data or duplicate entry.", null, null));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto<ClassModel>(
+                    HttpStatus.BAD_REQUEST.value(), "Error: Invalid data or duplicate entry.", null, null));
         } catch (ConstraintViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto<ClassModel>(HttpStatus.BAD_REQUEST.value(), "Error: Validation failed. " + e.getMessage(), null, null));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto<ClassModel>(
+                    HttpStatus.BAD_REQUEST.value(), "Error: Validation failed. " + e.getMessage(), null, null));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto<ClassModel>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error.",null, null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto<ClassModel>(
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error.", null, null));
         }
     }
 }

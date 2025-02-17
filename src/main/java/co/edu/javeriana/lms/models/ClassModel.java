@@ -26,27 +26,26 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ClassModel {
 
-    public ClassModel(String name2, Date beginningDate, User professor, Course course, Long idJaveriana) {
-        this.name=name2;
-        this.beginningDate=beginningDate;
-        this.professor=professor;
-        this.course=course;
-        this.idJaveriana=idJaveriana;
+    public ClassModel(String name2, Date beginningDate, User professor, Course course, Long javerianaId) {
+        this.name = name2;
+        this.beginningDate = beginningDate;
+        this.professor = professor;
+        this.course = course;
+        this.javerianaId = javerianaId;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique=true, nullable=false)
-    private Long idJaveriana;
+    @Column(unique = true, nullable = false)
+    private Long javerianaId;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String name;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private Date beginningDate;
-
 
     @ManyToOne
     @JoinColumn(nullable = false)
@@ -57,8 +56,7 @@ public class ClassModel {
     @JsonIgnore
     private Course course;
 
-
-    @OneToMany(mappedBy = "classEnrolled", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "classEnrolled", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<StudentClass> students;
 

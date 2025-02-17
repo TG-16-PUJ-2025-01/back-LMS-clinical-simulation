@@ -1,5 +1,7 @@
 package co.edu.javeriana.lms.services;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.dtos.CourseDTO;
 import co.edu.javeriana.lms.models.Course;
+import co.edu.javeriana.lms.models.Role;
+import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.repositories.ClassRepository;
 import co.edu.javeriana.lms.repositories.CourseRepository;
 import co.edu.javeriana.lms.repositories.UserRepository;
@@ -35,7 +39,7 @@ public class CourseService {
                     : Sort.by("coordinator.name", "coordinator.lastName").descending();
         }
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        return courseRepository.findByNameOrIdJaverianaContaining(filter, pageable);
+        return courseRepository.findByNameOrJaverianaIdContaining(filter, pageable);
     }
 
     public Long countClasses() {
@@ -48,8 +52,14 @@ public class CourseService {
     }
 
     public Course save(CourseDTO course) {
+        Optional<User> coordinator = userRepository.findById(course.getCoordinatorId());
 
-        Course newCourse = new Course(course.getName(), course.getIdJaveriana(),
+        if (coordinator.isEmpty()
+                || coordinator.get().getRoles().stream().noneMatch(role -> role.equals(Role.COORDINADOR))) {
+            throw new EntityNotFoundException("Coordinator with ID " + course.getCoordinatorId() + " not found");
+        }
+
+        Course newCourse = new Course(course.getName(), course.getJaverianaId(),
                 userRepository.findById(course.getCoordinatorId()).get());
 
         courseRepository.save(newCourse);
@@ -69,22 +79,10 @@ public class CourseService {
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
 
         // log.info("Updating course with ID: " + course);
-
-        // Check for null values before updating
-        if (course.getCoordinatorId() == null ||
-                course.getName() == null ||
-                course.getIdJaveriana() == null ||
-                id == null ||
-                course.getCoordinatorName() == null) {
-
-            throw new IllegalArgumentException("Error: All fields must have values. Null values are not allowed.");
-        }
-
-        // log.info("Updating course with ID: " + course);
         // Update fields
         currentCourseModel.setCoordinator(userRepository.findById(course.getCoordinatorId()).get());
         currentCourseModel.setName(course.getName());
-        currentCourseModel.setIdJaveriana(course.getIdJaveriana());
+        currentCourseModel.setJaverianaId(course.getJaverianaId());
 
         courseRepository.save(currentCourseModel);
 

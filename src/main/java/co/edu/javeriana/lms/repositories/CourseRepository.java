@@ -11,9 +11,9 @@ import co.edu.javeriana.lms.models.Course;
 public interface CourseRepository extends JpaRepository <Course, Long> {
     @Query("""
         SELECT c FROM Course c 
-        WHERE CAST(c.idJaveriana AS string) LIKE %:filter% 
+        WHERE CAST(c.javerianaId AS string) LIKE %:filter% 
         OR LOWER(TRANSLATE(c.name, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
     """)
-    Page<Course> findByNameOrIdJaverianaContaining(@Param("filter") String filter, Pageable pageable);
+    Page<Course> findByNameOrJaverianaIdContaining(@Param("filter") String filter, Pageable pageable);
 
 }

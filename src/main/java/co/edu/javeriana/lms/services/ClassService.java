@@ -18,10 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class ClassService {
-    
+
     @Autowired
     private ClassRepository classRepository;
-
 
     @Autowired
     private CourseRepository courseRepository;
@@ -29,8 +28,7 @@ public class ClassService {
     @Autowired
     private UserRepository userRepository;
 
-    public Page<ClassModel> findAll(Integer page, Integer size)
-    {
+    public Page<ClassModel> findAll(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         return classRepository.findAll(pageable);
     }
@@ -40,19 +38,19 @@ public class ClassService {
         if (beginningDate == null) {
             throw new IllegalArgumentException("Beginning date cannot be null");
         }
-        
-        log.info("REVISAR BIEN UNICORNIO"+ beginningDate.toString());
+
+        log.info("REVISAR BIEN UNICORNIO" + beginningDate.toString());
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(beginningDate);
         int month = calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is zero-based
         int year = calendar.get(Calendar.YEAR);
 
-        if (month >= 1 && month <5) { // January - February
+        if (month >= 1 && month < 5) { // January - February
             return year + "-10";
-        } else if (month >= 5 && month <9) { // May - June
+        } else if (month >= 5 && month < 9) { // May - June
             return year + "-20";
-        } else if (month >= 9 && month <=12) { // September - October
+        } else if (month >= 9 && month <= 12) { // September - October
             return year + "-30";
         }
 
@@ -62,17 +60,18 @@ public class ClassService {
     public ClassModel findById(Long id) {
 
         return classRepository.findById(id).get();
-    }  
-   
-        
+    }
+
     public ClassModel save(ClassModelDTO entity) {
-        ClassModel classModel = new ClassModel(entity.getName(), entity.getBeginningDate(), userRepository.findById(entity.getProfessorId()).get(), courseRepository.findById(entity.getCourseId()).get(), entity.getIdJaveriana());
+        ClassModel classModel = new ClassModel(entity.getName(), entity.getBeginningDate(),
+                userRepository.findById(entity.getProfessorId()).get(),
+                courseRepository.findById(entity.getCourseId()).get(), entity.getJaverianaId());
         classRepository.save(classModel);
         return classModel;
     }
 
     public void deleteById(Long id) {
-        
+
         classRepository.deleteById(id);
     }
 
@@ -81,16 +80,15 @@ public class ClassService {
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + classModel.getId() + " not found"));
 
         // Check for null values before updating
-        if (classModel.getBeginningDate() == null || 
-            classModel.getName() == null || 
-            classModel.getProfessorName() == null ||
-            classModel.getCourseName() == null ||
-            classModel.getPeriod() == null ||
-            classModel.getIdJaveriana() == null ||
-            classModel.getProfessorId() == null ||
-            classModel.getCourseId() == null
-            ) {
-            
+        if (classModel.getBeginningDate() == null ||
+                classModel.getName() == null ||
+                classModel.getProfessorName() == null ||
+                classModel.getCourseName() == null ||
+                classModel.getPeriod() == null ||
+                classModel.getJaverianaId() == null ||
+                classModel.getProfessorId() == null ||
+                classModel.getCourseId() == null) {
+
             throw new IllegalArgumentException("Error: All fields must have values. Null values are not allowed.");
         }
 

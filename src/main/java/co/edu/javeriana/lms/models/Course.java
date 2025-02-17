@@ -25,10 +25,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Course {
 
-    public Course(String name, Long idJaveriana, User coordinator) {
+    public Course(String name, Long javerianaId, User coordinator) {
         // TODO Auto-generated constructor stub
         this.name = name;
-        this.idJaveriana = idJaveriana;
+        this.javerianaId = javerianaId;
         this.coordinator = coordinator;
     }
 
@@ -37,7 +37,7 @@ public class Course {
     private Long courseId;
 
     @Column(unique = true, nullable = false)
-    private Long idJaveriana;
+    private Long javerianaId;
 
     @Column(unique = true, nullable = false)
     private String name;

@@ -23,7 +23,7 @@ import co.edu.javeriana.lms.models.Course;
 import co.edu.javeriana.lms.services.CourseService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 
@@ -131,25 +131,12 @@ public class CourseController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addCourse(@RequestBody CourseDTO courseModel) {
+    public ResponseEntity<?> addCourse(@Valid @RequestBody CourseDTO courseModel) {
         log.info("Adding a course");
 
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<Course>(HttpStatus.OK.value(),
-                    "Class added successfully.", courseService.save(courseModel), null));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponseDto<Course>(HttpStatus.BAD_REQUEST.value(),
-                            "Error: Invalid data or duplicate entry.", null, null));
-        } catch (ConstraintViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponseDto<Course>(HttpStatus.BAD_REQUEST.value(),
-                            "Error: Validation failed. " + e.getMessage(), null, null));
-        } catch (Exception e) {
-            log.error("Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponseDto<Course>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                            "Internal server error.", null, null));
-        }
+        Course course = courseService.save(courseModel);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<Course>(HttpStatus.OK.value(),
+                "Class added successfully.", course, null));
     }
 }

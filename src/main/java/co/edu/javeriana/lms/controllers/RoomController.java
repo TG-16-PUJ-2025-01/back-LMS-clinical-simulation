@@ -57,11 +57,6 @@ public class RoomController {
 
         Page<Room> roomsPage = roomService.searchRooms(filter, page, size, sort, asc);
 
-        if (roomsPage.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No rooms found", null, null));
-        }
-
         String previous = null;
         if (roomsPage.hasPrevious()) {
             previous = String.format("%s://%s/rooms/all?page=%d&size=%d", scheme, host, page - 1, size);

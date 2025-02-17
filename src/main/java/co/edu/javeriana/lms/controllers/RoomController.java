@@ -9,11 +9,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
+import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.dtos.RoomDto;
 import co.edu.javeriana.lms.models.Room;
 import co.edu.javeriana.lms.models.RoomType;
 import co.edu.javeriana.lms.services.RoomService;
 import co.edu.javeriana.lms.services.RoomTypeService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +29,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 @Slf4j
 @RestController
@@ -44,19 +44,39 @@ public class RoomController {
     @GetMapping("/all")
     public ResponseEntity<ApiResponseDto<?>> getAllRooms(
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
-            @Min(1) @RequestParam(defaultValue = "10") Integer size) {
+            @Min(1) @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            HttpServletRequest request) {
 
         log.info("Requesting all rooms");
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Room> roomsPage = roomService.findAll(pageable);
+        String host = request.getHeader("Host");
+        String scheme = request.getScheme();
+
+        Page<Room> roomsPage = roomService.searchRooms(filter, page, size, sort, asc);
 
         if (roomsPage.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No rooms found", null, null));
         }
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Rooms found", roomsPage, null));
+        String previous = null;
+        if (roomsPage.hasPrevious()) {
+            previous = String.format("%s://%s/rooms/all?page=%d&size=%d", scheme, host, page - 1, size);
+        }
+
+        String next = null;
+        if (roomsPage.hasNext()) {
+            next = String.format("%s://%s/rooms/all?page=%d&size=%d", scheme, host, page + 1, size);
+        }
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, roomsPage.getNumberOfElements(),
+                roomsPage.getTotalElements(), roomsPage.getTotalPages(), next, previous);
+
+        return ResponseEntity.ok(
+                new ApiResponseDto<>(HttpStatus.OK.value(), "ok", roomsPage.getContent(), metadata));
     }
 
     @GetMapping("/{id}")
@@ -68,7 +88,7 @@ public class RoomController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Room not found", null, null));
         }
-        
+
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room found", roomService.findById(id), null));
     }
@@ -78,7 +98,8 @@ public class RoomController {
         log.info("Requesting all room types");
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room types found", roomService.findAllTypes(), null));
+                .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room types found", roomService.findAllTypes(),
+                        null));
     }
 
     @DeleteMapping("/delete/{idRoom}")
@@ -95,7 +116,7 @@ public class RoomController {
         }
 
         roomService.deleteById(id);
-        
+
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room deleted successfully", null, null));
     }
@@ -117,7 +138,8 @@ public class RoomController {
         // Update room using the save method
         try {
             Room updatedRoom = roomService.update(room);
-            log.info("Updated room: id={}, name={}, type={}", updatedRoom.getId(), updatedRoom.getName(), updatedRoom.getType().getName());
+            log.info("Updated room: id={}, name={}, type={}", updatedRoom.getId(), updatedRoom.getName(),
+                    updatedRoom.getType().getName());
 
             // Return updated room
             return ResponseEntity.status(HttpStatus.OK)
@@ -148,8 +170,8 @@ public class RoomController {
         RoomType savedType = roomTypeService.save(type);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Room type created successfully", savedType, null));
+                .body(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Room type created successfully", savedType,
+                        null));
     }
-    
-    
+
 }

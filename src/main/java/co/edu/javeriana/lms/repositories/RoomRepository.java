@@ -16,5 +16,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     Page<Room> findAll(Pageable pageable);
     
     long countByType(RoomType type);
+
+    Page<Room> findByNameContaining(String name, Pageable pageable);
     
 }

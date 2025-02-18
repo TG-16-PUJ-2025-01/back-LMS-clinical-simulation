@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.edu.javeriana.lms.dtos.RegisterUserDTO;
-import co.edu.javeriana.lms.dtos.ResponseUserDTO;
+import co.edu.javeriana.lms.dtos.RegisterUserDto;
+import co.edu.javeriana.lms.dtos.ResponseUserDto;
 import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.services.UserService;
 import jakarta.validation.Valid;
@@ -22,9 +22,9 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseUserDTO> createUser(@Valid @RequestBody RegisterUserDTO registerUserDTO) {
+    public ResponseEntity<ResponseUserDto> createUser(@Valid @RequestBody RegisterUserDto registerUserDTO) {
         User user = userService.createUser(registerUserDTO.toUser());
-        ResponseUserDTO responseUserDTO = new ResponseUserDTO();
+        ResponseUserDto responseUserDTO = new ResponseUserDto();
         responseUserDTO.userToResponseUserDTO(user);
         return ResponseEntity.ok(responseUserDTO);
     }

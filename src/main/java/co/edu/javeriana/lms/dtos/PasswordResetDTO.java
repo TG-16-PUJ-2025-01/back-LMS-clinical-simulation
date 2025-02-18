@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class PasswordResetDTO {
+public class PasswordResetDto {
     String email;
     String password;
     String token;

@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ResponseUserDTO {
+public class ResponseUserDto {
     private String email;
     private String name;
     private String lastName;

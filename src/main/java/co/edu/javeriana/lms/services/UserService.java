@@ -28,6 +28,9 @@ public class UserService implements UserDetailsService {
 
     public User createUser(User user) {
         log.info("Creating user: " + user.getEmail());
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("User already exists");
+        }
         String password = PasswordGenerator.generatePassword();
         user.setPassword(passwordEncoder.encode(password));
         User savedUser =  userRepository.save(user);

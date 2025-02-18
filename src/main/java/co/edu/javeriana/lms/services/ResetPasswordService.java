@@ -44,7 +44,9 @@ public class ResetPasswordService {
 
     public void sentPasswordResetEmail(String email, String token) {
         log.info("Sending password reset email to: " + email);
-
+        if (!userRepository.existsByEmail(email)) {
+            throw new RuntimeException("User not found");
+        }
         String subject = "Restablecer contraseña LMS";
         String body = "Hola " + email + ",\n\nPara restablecer tu contraseña, utiliza el siguiente código: " + token + "\n\n" +
                   "Si no solicitaste el cambio de contraseña, por favor, ignora este mensaje.";

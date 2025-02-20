@@ -1,5 +1,7 @@
 package co.edu.javeriana.lms.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
@@ -92,5 +94,18 @@ public class UserService implements UserDetailsService {
         }
         userRepository.deleteById(id);
     }
+
+    public List<User> findAllCoordinators() {
+        log.info("Getting all coordinators");
+        return userRepository.findAllCoordinators();
+    }
+
+    public List<User> findAllProfessors() {
+        log.info("Getting all professors");
+
+        return userRepository.findAllProfessors();
+
+    }
+
 }
 

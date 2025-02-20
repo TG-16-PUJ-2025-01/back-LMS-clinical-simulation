@@ -1,6 +1,7 @@
 package co.edu.javeriana.lms.models;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,6 +47,19 @@ public class User implements UserDetails {
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonIgnore
+    private List<StudentClass> studentlassses;
+
+    @OneToMany(mappedBy = "professor", cascade = CascadeType.PERSIST)
+    @JsonIgnore
+    private List<ClassModel> professorClasses;
+
+
+    @OneToMany(mappedBy = "coordinator", cascade = CascadeType.PERSIST)
+    @JsonIgnore
+    private List<Course> courses;
 
     @JsonIgnore
     @Override

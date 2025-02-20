@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
-import co.edu.javeriana.lms.dtos.CreateCourseDTO;
-import co.edu.javeriana.lms.dtos.EditCourseDTO;
+import co.edu.javeriana.lms.dtos.CourseDTO;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.models.Course;
 import co.edu.javeriana.lms.services.CourseService;
@@ -94,7 +93,7 @@ public class CourseController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updatCourse(@RequestBody EditCourseDTO courseModel, @PathVariable Long id) {
+    public ResponseEntity<?> updatCourse(@RequestBody CourseDTO courseModel, @PathVariable Long id) {
         log.info("Updating course with ID: " + id);
 
         Course course = courseService.update(courseModel, id);
@@ -104,7 +103,7 @@ public class CourseController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addCourse(@Valid @RequestBody CreateCourseDTO courseModel) {
+    public ResponseEntity<?> addCourse(@Valid @RequestBody CourseDTO courseModel) {
         log.info("Adding a course");
 
         Course course = courseService.save(courseModel);

@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +24,27 @@ public class RoomService {
     @Autowired
     private RoomTypeRepository roomTypeRepository;
 
+    public Page<Room> searchRooms(String keyword, Integer page, Integer size, String sort, Boolean asc) {
+        Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        return roomRepository.findByNameContaining(keyword, pageable);
+    }
+
+    private String formatRoomName(String name) {
+        if (name == null || name.isEmpty()) {
+            return name;
+        }
+        return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
+    }
+
     public Room save(Room room) {
+        // Format the room name
+        String formattedName = formatRoomName(room.getName());
+
         // Search for the room name in the database
         // If it does not exist, create it, if it does, return error
-        if (roomRepository.findByName(room.getName()) != null) {
-            throw new IllegalArgumentException("Room name already exists");
+        if (roomRepository.findByName(formattedName) != null) {
+            throw new IllegalArgumentException("El nombre de la sala ya existe");
         }
 
         // Search for the room type in the database
@@ -39,11 +56,15 @@ public class RoomService {
         }
 
         room.setType(type);
+        room.setName(formattedName); // Save the formatted room name
 
         return roomRepository.save(room);
     }
 
     public Room update(Room room) {
+        // Format the room name
+        String formattedName = formatRoomName(room.getName());
+
         // Search if the room already exists by ID
         Optional<Room> existingRoom = roomRepository.findById(room.getId());
 
@@ -52,8 +73,8 @@ public class RoomService {
             Room roomToUpdate = existingRoom.get();
 
             // Check if the name changed and if the new name already exists
-            if (!roomToUpdate.getName().equals(room.getName()) && roomRepository.findByName(room.getName()) != null) {
-                throw new IllegalArgumentException("Room name already exists");
+            if (!roomToUpdate.getName().equals(formattedName) && roomRepository.findByName(formattedName) != null) {
+                throw new IllegalArgumentException("El nombre de la sala ya existe");
             }
 
             // Check if the room type changed
@@ -63,15 +84,15 @@ public class RoomService {
             }
 
             // Update the values
-            roomToUpdate.setName(room.getName());
+            roomToUpdate.setName(formattedName);
             roomToUpdate.setType(newType);
 
             return roomRepository.save(roomToUpdate);
         }
 
         // If the room does not exist, proceed with the creation logic
-        if (roomRepository.findByName(room.getName()) != null) {
-            throw new IllegalArgumentException("Room name already exists");
+        if (roomRepository.findByName(formattedName) != null) {
+            throw new IllegalArgumentException("Nombre de la sala ya existe");
         }
 
         RoomType type = roomTypeRepository.findByName(room.getType().getName());
@@ -80,9 +101,9 @@ public class RoomService {
         }
 
         room.setType(type);
+        room.setName(formattedName); // Save the formatted room name
         return roomRepository.save(room);
     }
-
 
     public Optional<Room> findById(Long id) {
         return roomRepository.findById(id);

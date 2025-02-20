@@ -56,13 +56,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+    public ResponseEntity<ErrorDTO> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.warn("Business validation failed: {}", ex.getMessage());
-
-        // Crear una lista con un solo error de validación
-        List<ValidationErrorDTO> errors = List.of(new ValidationErrorDTO("business_rule", ex.getMessage()));
-
-        return new ResponseEntity<>(new ErrorDTO("Business validation error", errors), HttpStatus.BAD_REQUEST);
+        ErrorDTO errorDTO = new ErrorDTO(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
     }
 
 }

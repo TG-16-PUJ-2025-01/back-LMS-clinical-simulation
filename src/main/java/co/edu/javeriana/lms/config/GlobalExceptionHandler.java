@@ -59,7 +59,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorDTO> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.warn("Business validation failed: {}", ex.getMessage());
         ErrorDTO errorDTO = new ErrorDTO(ex.getMessage());
+        if ("El nombre de la sala ya existe".equals(ex.getMessage())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorDTO);
+        }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
     }
+    
+    //TODO: Crear esto para cuando el nombre sea duplicado
+    /*
+    @ExceptionHandler(RoomNameConflictException.class)
+    public ResponseEntity<ErrorDTO> handleRoomNameConflictException(RoomNameConflictException ex) {
+        log.warn("Room name conflict: {}", ex.getMessage());
+        ErrorDTO errorDTO = new ErrorDTO(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorDTO);
+    }
+    */
+    
 
 }

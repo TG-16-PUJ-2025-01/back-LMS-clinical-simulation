@@ -67,16 +67,14 @@ public class UserService implements UserDetailsService {
 
     public User updateUserById(Long id, User user) {
         log.info("Updating user by id: " + id);
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found");
-        }
-        User existingUser = userRepository.findByEmail(user.getEmail())
+        User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         existingUser.setName(user.getName());
         existingUser.setLastName(user.getLastName());
+        existingUser.setEmail(user.getEmail());
         existingUser.setInstitutionalId(user.getInstitutionalId());
         existingUser.setRoles(user.getRoles());
-        return userRepository.save(user);
+        return userRepository.save(existingUser);
     }
 
     @Override

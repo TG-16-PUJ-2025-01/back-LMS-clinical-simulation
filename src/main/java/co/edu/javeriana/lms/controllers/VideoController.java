@@ -57,12 +57,12 @@ public class VideoController {
 
         String previous = null;
         if (simulationsPage.hasPrevious()) {
-            previous = String.format("%s://%s/video/all?page=%d&size=%d", scheme, host, page - 1, size);
+            previous = String.format("%s://%s/video/all?page=%d&size=%d&sort=%s&asc=%b&filter=%s", scheme, host, page - 1, size, sort, asc, filter);
         }
 
         String next = null;
         if (simulationsPage.hasNext()) {
-            next = String.format("%s://%s/video/all?page=%d&size=%d", scheme, host, page + 1, size);
+            next = String.format("%s://%s/video/all?page=%d&size=%d&sort=%s&asc=%b&filter=%s", scheme, host, page + 1, size, sort, asc, filter);
         }
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),

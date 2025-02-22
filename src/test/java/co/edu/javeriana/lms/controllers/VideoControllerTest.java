@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
@@ -85,7 +86,28 @@ public class VideoControllerTest {
     }
 
     @Test
-    public void testEditVideo() {
+    public void testSearchVideosMultiplePages() {
+        Page<Video> filteredVideosPage = new PageImpl<>(mockVideosPage.getContent(), PageRequest.of(0, 1, Sort.by("name").ascending()), mockVideosPage.getTotalElements());
+
+        when(videoService.searchVideos("", 0, 1, "name", true)).thenReturn(filteredVideosPage);
+        when(request.getHeader("Host")).thenReturn("localhost:8080");
+        when(request.getScheme()).thenReturn("http");
+
+        ResponseEntity<ApiResponseDto<List<Video>>> videosPage = videoController.searchVideos(0, 1, "name", true, "", request);
+
+        PaginationMetadataDto metadata = (PaginationMetadataDto) videosPage.getBody().getMetadata();
+        
+        assert (videosPage.getBody().getData().equals(filteredVideosPage.getContent()));
+        assert (metadata.getTotal() == filteredVideosPage.getTotalElements());
+        assert (metadata.getSize() == filteredVideosPage.getNumberOfElements());
+        assert (metadata.getTotalPages() == filteredVideosPage.getTotalPages());
+        assert (metadata.getPage() == filteredVideosPage.getNumber());
+        assert (metadata.getPrevious() == null);
+        assert (metadata.getNext().equals("http://localhost:8080/video/all?page=1&size=1&sort=name&asc=true&filter="));
+    }
+
+    @Test
+    public void testEditVideoSuccess() {
         Long id = 1L;
         when(videoService.editVideo(id, new EditVideoDTO(mockVideo.getName(), mockVideo.getExpirationDate()))).thenReturn(mockVideo);
 
@@ -96,13 +118,39 @@ public class VideoControllerTest {
     }
 
     @Test
-    public void testDeleteVideos() {
+    public void testEditVideoFailure() {
+        Long id = 1L;
+        when(videoService.editVideo(id, new EditVideoDTO(mockVideo.getName(), mockVideo.getExpirationDate()))).thenReturn(null);
+
+        ResponseEntity<ApiResponseDto<Video>> editedVideo = videoController.editVideo(id, new EditVideoDTO(mockVideo.getName(), mockVideo.getExpirationDate()));
+
+        assert (editedVideo.getBody().getData() == null);
+        assert (editedVideo.getStatusCode() == HttpStatusCode.valueOf(404));
+        assert (editedVideo.getBody().getStatus() == 404);
+        assert (editedVideo.getBody().getMetadata() == null);
+    }
+
+    @Test
+    public void testDeleteVideosSuccess() {
         Long id = 1L;
         when(videoService.deleteVideo(id)).thenReturn(mockVideo);
 
         ResponseEntity<ApiResponseDto<Video>> deletedVideo = videoController.deleteVideo(id);
 
         assert (deletedVideo.getBody().getData().equals(mockVideo));
+        assert (deletedVideo.getBody().getMetadata() == null);
+    }
+
+    @Test
+    public void testDeleteVideosFailure() {
+        Long id = 1L;
+        when(videoService.deleteVideo(id)).thenReturn(null);
+
+        ResponseEntity<ApiResponseDto<Video>> deletedVideo = videoController.deleteVideo(id);
+
+        assert (deletedVideo.getBody().getData() == null);
+        assert (deletedVideo.getStatusCode() == HttpStatusCode.valueOf(404));
+        assert (deletedVideo.getBody().getStatus() == 404);
         assert (deletedVideo.getBody().getMetadata() == null);
     }
 }

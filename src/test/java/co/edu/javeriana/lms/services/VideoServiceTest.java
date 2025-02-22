@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,12 +76,34 @@ public class VideoServiceTest {
         assert (videosPage.getTotalElements() == mockVideosPage.getTotalElements());
         assert (videosPage.getNumber() == mockVideosPage.getNumber());
         assert (videosPage.getSize() == mockVideosPage.getSize());
+        assert (!videosPage.hasPrevious());
+        assert (!videosPage.hasNext());
     }
 
     @Test
-    public void testEditVideo() {
+    public void testSearchVideosMultiplePages() {
+        Page<Video> filteredVideosPage = new PageImpl<>(mockVideosPage.getContent(), PageRequest.of(0, 1, Sort.by("name").ascending()), mockVideosPage.getTotalElements());
+
+        when(videoRepository.findByNameContaining("", PageRequest.of(0, 1, Sort.by("name").ascending()))).thenReturn(filteredVideosPage);
+
+        Page<Video> videosPage = videoService.searchVideos("", 0, 1, "name", true);
+
+        assert (videosPage.getTotalElements() == filteredVideosPage.getTotalElements());
+        assert (videosPage.getContent().size() == filteredVideosPage.getContent().size());
+        assert (videosPage.getContent().equals(filteredVideosPage.getContent()));
+        assert (videosPage.getNumberOfElements() == filteredVideosPage.getNumberOfElements());
+        assert (videosPage.getTotalPages() == filteredVideosPage.getTotalPages());
+        assert (videosPage.getTotalElements() == filteredVideosPage.getTotalElements());
+        assert (videosPage.getNumber() == filteredVideosPage.getNumber());
+        assert (videosPage.getSize() == filteredVideosPage.getSize());
+        assert (!videosPage.hasPrevious());
+        assert (videosPage.hasNext());
+    }
+
+    @Test
+    public void testEditVideoSuccess() {
         Long id = 1L;
-        when(videoRepository.findById(id)).thenReturn(java.util.Optional.of(mockVideo));
+        when(videoRepository.findById(id)).thenReturn(Optional.of(mockVideo));
         when(videoRepository.save(mockVideo)).thenReturn(mockVideo);
 
         Video editedVideo = videoService.editVideo(id,
@@ -90,12 +113,33 @@ public class VideoServiceTest {
     }
 
     @Test
-    public void testDeleteVideos() {
+    public void testEditVideoFailure() {
         Long id = 1L;
-        when(videoRepository.findById(id)).thenReturn(java.util.Optional.of(mockVideo));
+        when(videoRepository.findById(id)).thenReturn(Optional.empty());
+
+        Video editedVideo = videoService.editVideo(id,
+                new EditVideoDTO(mockVideo.getName(), mockVideo.getExpirationDate()));
+
+        assert (editedVideo == null);
+    }
+
+    @Test
+    public void testDeleteVideosSuccess() {
+        Long id = 1L;
+        when(videoRepository.findById(id)).thenReturn(Optional.of(mockVideo));
 
         Video deletedVideo = videoService.deleteVideo(id);
 
         assert (deletedVideo.equals(mockVideo));
+    }
+
+    @Test
+    public void testDeleteVideosFailure() {
+        Long id = 1L;
+        when(videoRepository.findById(id)).thenReturn(Optional.empty());
+
+        Video deletedVideo = videoService.deleteVideo(id);
+
+        assert (deletedVideo == null);
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.dtos.RegisterUserDTO;
 import co.edu.javeriana.lms.dtos.ResponseUserDTO;
-import co.edu.javeriana.lms.dtos.UserListDTO;
 import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.services.UserService;
 import jakarta.validation.Valid;

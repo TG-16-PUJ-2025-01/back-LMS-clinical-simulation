@@ -8,8 +8,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import co.edu.javeriana.lms.dtos.UserListDTO;
 import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.repositories.UserRepository;
 import co.edu.javeriana.lms.utils.PasswordGenerator;

@@ -68,8 +68,6 @@ public class GlobalExceptionHandler {
         log.warn("Business validation failed: {}", ex.getMessage());
         ErrorDTO errorDTO = new ErrorDTO(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
-
-        return new ResponseEntity<>(new ErrorDTO("Business validation error", ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

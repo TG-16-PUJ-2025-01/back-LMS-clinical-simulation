@@ -2,7 +2,6 @@ package co.edu.javeriana.lms.controllers;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
-import co.edu.javeriana.lms.dtos.CourseDTO;
+import co.edu.javeriana.lms.dtos.CreateCourseDTO;
+import co.edu.javeriana.lms.dtos.EditCourseDTO;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.models.Course;
 import co.edu.javeriana.lms.services.CourseService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,20 +35,19 @@ public class CourseController {
     private CourseService courseService;
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAll(@Min(0) @RequestParam(defaultValue = "0") Integer page,
-            @Min(1) @RequestParam(defaultValue = "10") Integer size, HttpServletRequest request) {
-
+    public ResponseEntity<?> getAll(
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "courseId") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            HttpServletRequest request) {
         log.info("Requesting all courses");
 
         String host = request.getHeader("Host");
         String scheme = request.getScheme();
 
-        Page<Course> coursesPage = courseService.findAll(page, size);
-
-        if (coursesPage.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No simulations found", null, null));
-        }
+        Page<Course> coursesPage = courseService.findAll(filter, page, size, sort, asc);
 
         String previous = null;
         if (coursesPage.hasPrevious()) {
@@ -66,13 +64,13 @@ public class CourseController {
                 coursesPage.getTotalPages(), next,
                 previous);
 
-        return ResponseEntity.ok(new ApiResponseDto<List<Course>>(HttpStatus.OK.value(), "ok", coursesPage.getContent(), metadata));
+        return ResponseEntity
+                .ok(new ApiResponseDto<List<Course>>(HttpStatus.OK.value(), "ok", coursesPage.getContent(), metadata));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCourseById(@PathVariable Long id) {
-
-        log.info("Requesting a class by id");
+        log.info("Requesting course with ID: " + id);
 
         Course course = courseService.findById(id);
 
@@ -86,61 +84,32 @@ public class CourseController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteCourseById(@PathVariable Long id) {
+        log.info("Deleting course with ID: " + id);
 
-        try {
-            Course actualCourse= courseService.findById(id);
-            courseService.deleteById(id);
-            return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(),
-                    "Course deleted successfully.", actualCourse, null));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDto<Course>(HttpStatus.NOT_FOUND.value(),
-                    "Error: Course with ID " + id + " does not exist.", null , null));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponseDto<Course>(HttpStatus.CONFLICT.value(),
-            "Error: Cannot delete the course because it has related data.", null , null));
-        
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto<Course>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            "Internal server error.", null , null));
-        }
+        Course course = courseService.findById(id);
+        courseService.deleteById(id);
+
+        return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(),
+                "Course deleted successfully.", course, null));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updatCourse(@RequestBody CourseDTO courseModel, @PathVariable Long id) {
+    public ResponseEntity<?> updatCourse(@RequestBody EditCourseDTO courseModel, @PathVariable Long id) {
+        log.info("Updating course with ID: " + id);
 
-        try {
-            return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(),
-            "Course updated successfully.",courseService.update(courseModel, id), null));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDto<Course>(HttpStatus.NOT_FOUND.value(),
-            "Error: + e.getMessage().", null , null));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto<Course>(HttpStatus.BAD_REQUEST.value(),
-            "Error: Invalid data.", null , null));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto<Course>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            "Internal server error.", null , null));
-        }
+        Course course = courseService.update(courseModel, id);
+
+        return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(),
+                "Course updated successfully.", course, null));
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addCourse(@RequestBody CourseDTO courseModel) {
-
+    public ResponseEntity<?> addCourse(@Valid @RequestBody CreateCourseDTO courseModel) {
         log.info("Adding a course");
 
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<Course>(HttpStatus.OK.value(),
-            "Class added successfully.",courseService.save(courseModel), null));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto<Course>(HttpStatus.BAD_REQUEST.value(),
-            "Error: Invalid data or duplicate entry.",null, null));
-        } catch (ConstraintViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto<Course>(HttpStatus.BAD_REQUEST.value(),
-            "Error: Validation failed. " + e.getMessage(),null, null));
-        } catch (Exception e) {
-            log.error("Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto<Course>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-           "Internal server error.",null, null));
-        }
+        Course course = courseService.save(courseModel);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<Course>(HttpStatus.OK.value(),
+                "Class added successfully.", course, null));
     }
 }

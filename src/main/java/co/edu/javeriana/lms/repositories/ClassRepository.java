@@ -6,6 +6,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import co.edu.javeriana.lms.models.ClassModel;
 
 @Repository
-public interface ClassModelRepository extends JpaRepository <ClassModel, Long> {
-    
-}
+public interface ClassRepository extends JpaRepository <ClassModel, Long> {}

@@ -10,5 +10,5 @@ import co.edu.javeriana.lms.models.Video;
 
 @Repository
 public interface VideoRepository extends JpaRepository<Video, Long> {
-    Page<Video> findByNameContaining(String name, Pageable pageable);
+    Page<Video> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }

@@ -24,7 +24,7 @@ public class StreamingController {
     private StreamingService service;
 
     @GetMapping(value = "/video/{title}", produces = "video/mp4")
-    public ResponseEntity<Resource> getVideos(@Valid @PathVariable String title,
+    public ResponseEntity<Resource> getVideo(@Valid @PathVariable String title,
             @Valid @RequestHeader(value = "Range", required = false) String range) throws IOException {
         log.info("Request received for video: {}, requesting Range of: {}", title, range);
         return service.getVideo(title, range);

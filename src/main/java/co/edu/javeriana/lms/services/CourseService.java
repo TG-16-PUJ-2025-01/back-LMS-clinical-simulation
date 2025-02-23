@@ -9,8 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import co.edu.javeriana.lms.dtos.CreateCourseDTO;
-import co.edu.javeriana.lms.dtos.EditCourseDTO;
+import co.edu.javeriana.lms.dtos.CourseDTO;
 import co.edu.javeriana.lms.models.Course;
 import co.edu.javeriana.lms.models.Role;
 import co.edu.javeriana.lms.models.User;
@@ -52,7 +51,7 @@ public class CourseService {
         return courseRepository.findById(id).get();
     }
 
-    public Course save(CreateCourseDTO course) {
+    public Course save(CourseDTO course) {
         Optional<User> coordinator = userRepository.findById(course.getCoordinatorId());
 
         if (coordinator.isEmpty()
@@ -71,7 +70,7 @@ public class CourseService {
         courseRepository.deleteById(id);
     }
 
-    public Course update(EditCourseDTO course, Long id) {
+    public Course update(CourseDTO course, Long id) {
 
         log.info("Updating course with ID: " + id);
 
@@ -80,6 +79,7 @@ public class CourseService {
 
         currentCourseModel.setName(course.getName());
         currentCourseModel.setJaverianaId(course.getJaverianaId());
+        currentCourseModel.setCoordinator(userRepository.findById(course.getCoordinatorId()).get());
 
         courseRepository.save(currentCourseModel);
 

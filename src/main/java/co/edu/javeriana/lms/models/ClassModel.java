@@ -1,5 +1,6 @@
 package co.edu.javeriana.lms.models;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -53,11 +54,35 @@ public class ClassModel {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    @JsonIgnore
     private Course course;
 
     @OneToMany(mappedBy = "classEnrolled", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<StudentClass> students;
+
+    public String getPeriod() {
+
+        if (beginningDate == null) {
+            throw new IllegalArgumentException("Beginning date cannot be null");
+        }
+
+        //log.info("REVISAR BIEN UNICORNIO" + beginningDate.toString());
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(beginningDate);
+        int month = calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is zero-based
+        int year = calendar.get(Calendar.YEAR);
+
+        if (month >= 1 && month < 5) { // January - February
+            return year + "-10";
+        } else if (month >= 5 && month < 9) { // May - June
+            return year + "-20";
+        } else if (month >= 9 && month <= 12) { // September - October
+            return year + "-30";
+        }
+
+        throw new IllegalArgumentException("Date does not match any academic period");
+    }
+
 
 }

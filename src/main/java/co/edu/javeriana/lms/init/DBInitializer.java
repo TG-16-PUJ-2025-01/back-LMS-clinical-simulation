@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import co.edu.javeriana.lms.models.Room;
@@ -35,6 +36,9 @@ public class DBInitializer implements CommandLineRunner {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -119,14 +123,14 @@ public class DBInitializer implements CommandLineRunner {
 		User professor1 = new User();
 		User professor2 = new User();
 		professor1.setEmail("saristizabal10@javeriana.edu.co");
-		professor1.setPassword("123456");
+		professor1.setPassword(passwordEncoder.encode("123456"));
 		professor1.setName("Santiago");
 		professor1.setLastName("Aristizabal");
 		professor1.setInstitutionalId(123456);
 		professor1.setRoles(Set.of(Role.PROFESOR));
 
 		professor2.setEmail("pedro10@javeriana.edu.co");
-		professor2.setPassword("123456");
+		professor2.setPassword(passwordEncoder.encode("123456"));
 		professor2.setName("Pepo");
 		professor2.setLastName("Pascal");
 		professor2.setInstitutionalId(1256);
@@ -137,14 +141,14 @@ public class DBInitializer implements CommandLineRunner {
 		User coord2 = new User();
 
 		coord1.setEmail("saabal10@javeriana.edu.co");
-		coord1.setPassword("123456");
+		coord1.setPassword(passwordEncoder.encode("123456"));
 		coord1.setName("Salomon");
 		coord1.setLastName("Pira");
 		coord1.setInstitutionalId(456);
 		coord1.setRoles(Set.of(Role.COORDINADOR));
 
 		coord2.setEmail("pucoeocents0@javeriana.edu.co");
-		coord2.setPassword("13456");
+		coord2.setPassword(passwordEncoder.encode("123456"));
 		coord2.setName("Pedro");
 		coord2.setLastName("Puentes");
 		coord2.setInstitutionalId(56);
@@ -155,14 +159,14 @@ public class DBInitializer implements CommandLineRunner {
 		User both2 = new User();
 
 		both1.setEmail("saaal10@javeriana.edu.co");
-		both1.setPassword("123456");
+		both1.setPassword(passwordEncoder.encode("123456"));
 		both1.setName("Salomon ndienid");
 		both1.setLastName("Pira");
 		both1.setInstitutionalId(45996);
 		both1.setRoles(new HashSet<>(Arrays.asList(Role.PROFESOR, Role.COORDINADOR)));
 
 		both2.setEmail("puenjnjnts0@javeriana.edu.co");
-		both2.setPassword("13456");
+		both2.setPassword(passwordEncoder.encode("123456"));
 		both2.setName("Pedro idjei");
 		both2.setLastName("Puentes");
 		both2.setInstitutionalId(5690);

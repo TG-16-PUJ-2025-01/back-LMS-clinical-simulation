@@ -14,12 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.dtos.EditVideoDTO;
@@ -28,6 +30,8 @@ import co.edu.javeriana.lms.models.Video;
 import co.edu.javeriana.lms.services.VideoService;
 import jakarta.servlet.http.HttpServletRequest;
 
+@SpringBootTest
+@ActiveProfiles("test")
 public class VideoControllerTest {
     @InjectMocks
     private VideoController videoController;

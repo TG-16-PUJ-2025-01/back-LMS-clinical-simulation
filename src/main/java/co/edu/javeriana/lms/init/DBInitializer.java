@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import co.edu.javeriana.lms.models.Room;
@@ -24,6 +25,7 @@ import co.edu.javeriana.lms.repositories.UserRepository;
 import co.edu.javeriana.lms.repositories.VideoRepository;
 
 @Component
+@Profile({"dev", "test"})
 public class DBInitializer implements CommandLineRunner {
 
 	@Autowired

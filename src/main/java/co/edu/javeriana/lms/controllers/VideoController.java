@@ -50,11 +50,6 @@ public class VideoController {
 
         Page<Video> simulationsPage = videoService.searchVideos(filter, page, size, sort, asc);
 
-        if (simulationsPage.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No simulations found", null, null));
-        }
-
         String previous = null;
         if (simulationsPage.hasPrevious()) {
             previous = String.format("%s://%s/video/all?page=%d&size=%d&sort=%s&asc=%b&filter=%s", scheme, host, page - 1, size, sort, asc, filter);

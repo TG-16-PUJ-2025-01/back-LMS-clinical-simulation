@@ -20,12 +20,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.context.ActiveProfiles;
 
 import co.edu.javeriana.lms.dtos.EditVideoDTO;
 import co.edu.javeriana.lms.models.Video;
 import co.edu.javeriana.lms.repositories.VideoRepository;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class VideoServiceTest {
 
     @InjectMocks

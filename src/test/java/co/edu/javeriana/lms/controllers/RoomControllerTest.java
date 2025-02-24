@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms;
+package co.edu.javeriana.lms.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -20,7 +20,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 
-import co.edu.javeriana.lms.controllers.RoomController;
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.dtos.RoomDto;
 import co.edu.javeriana.lms.dtos.RoomTypeDto;

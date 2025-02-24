@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,75 +51,49 @@ public class DBInitializer implements CommandLineRunner {
 	}
 
 	private void insertRoomsAndTypes() {
-		RoomType roomType1 = new RoomType();
-		roomType1.setName("Cirugia");
-		roomTypeRepository.save(roomType1);
+		List<RoomType> roomTypes = Arrays.asList(
+				RoomType.builder().name("Cuidado crítico intensivo").build(),
+				RoomType.builder().name("Cuidado crítico urgencias").build(),
+				RoomType.builder().name("Cuidado crítico ginecobstetricia").build(),
+				RoomType.builder().name("Consultorios").build(),
+				RoomType.builder().name("Salas debriefing").build(),
+				RoomType.builder().name("Observación").build(),
+				RoomType.builder().name("Hospitalización").build(),
+				RoomType.builder().name("Microcirugía").build(),
+				RoomType.builder().name("Cirugía").build(),
+				RoomType.builder().name("Procedimiento y habilidades quirúrgicas").build(),
+				RoomType.builder().name("Farmacia").build(),
+				RoomType.builder().name("Salones").build()
+		);
 
-		RoomType roomType2 = new RoomType();
-		roomType2.setName("Urgencias");
-		roomTypeRepository.save(roomType2);
+		roomTypeRepository.saveAll(roomTypes);
 
-		RoomType roomType3 = new RoomType();
-		roomType3.setName("Consulta Externa");
-		roomTypeRepository.save(roomType3);
+		List<Room> rooms = Arrays.asList(
+				Room.builder().name("Sala1").type(roomTypes.get(0)).build(),
+				Room.builder().name("Sala2").type(roomTypes.get(1)).build(),
+				Room.builder().name("Sala3").type(roomTypes.get(2)).build(),
+				Room.builder().name("Sala4").type(roomTypes.get(3)).build(),
+				Room.builder().name("Sala5").type(roomTypes.get(3)).build(),
+				Room.builder().name("Sala6").type(roomTypes.get(3)).build(),
+				Room.builder().name("Sala7").type(roomTypes.get(4)).build(),
+				Room.builder().name("Sala8").type(roomTypes.get(4)).build(),
+				Room.builder().name("Sala9").type(roomTypes.get(4)).build(),
+				Room.builder().name("Sala10").type(roomTypes.get(5)).build(),
+				Room.builder().name("Sala11").type(roomTypes.get(5)).build(),
+				Room.builder().name("Sala12").type(roomTypes.get(5)).build(),
+				Room.builder().name("Sala13").type(roomTypes.get(6)).build(),
+				Room.builder().name("Sala14").type(roomTypes.get(6)).build(),
+				Room.builder().name("Sala15").type(roomTypes.get(6)).build(),
+				Room.builder().name("Sala16").type(roomTypes.get(7)).build(),
+				Room.builder().name("Sala17").type(roomTypes.get(8)).build(),
+				Room.builder().name("Sala18").type(roomTypes.get(9)).build(),
+				Room.builder().name("Sala19").type(roomTypes.get(10)).build(),
+				Room.builder().name("Sala20").type(roomTypes.get(11)).build(),
+				Room.builder().name("Sala21").type(roomTypes.get(11)).build(),
+				Room.builder().name("Sala22").type(roomTypes.get(11)).build()
+		);
 
-		RoomType roomType4 = new RoomType();
-		roomType4.setName("Hospitalizacion");
-		roomTypeRepository.save(roomType4);
-
-		RoomType roomType5 = new RoomType();
-		roomType5.setName("Laboratorio");
-		roomTypeRepository.save(roomType5);
-
-		Room room1 = new Room();
-		room1.setName("Sala1");
-		room1.setType(roomType1);
-		roomRepository.save(room1);
-
-		Room room2 = new Room();
-		room2.setName("Sala2");
-		room2.setType(roomType1);
-		roomRepository.save(room2);
-
-		Room room3 = new Room();
-		room3.setName("Sala3");
-		room3.setType(roomType2);
-		roomRepository.save(room3);
-
-		Room room4 = new Room();
-		room4.setName("Sala4");
-		room4.setType(roomType2);
-		roomRepository.save(room4);
-
-		Room room5 = new Room();
-		room5.setName("Sala5");
-		room5.setType(roomType3);
-		roomRepository.save(room5);
-
-		Room room6 = new Room();
-		room6.setName("Sala6");
-		room6.setType(roomType3);
-		roomRepository.save(room6);
-
-		Room room7 = new Room();
-		room7.setName("Sala7");
-		room7.setType(roomType4);
-		roomRepository.save(room7);
-
-		Room room8 = new Room();
-		room8.setName("Sala8");
-		room8.setType(roomType4);
-		roomRepository.save(room8);
-
-		Room room9 = new Room();
-		room9.setName("Sala9");
-		room9.setType(roomType5);
-		roomRepository.save(room9);
-
-		Room room10 = new Room();
-		room10.setName("Sala10");
-		room10.setType(roomType5);
-		roomRepository.save(room10);
+		roomRepository.saveAll(rooms);
 	}
 
 	private void createUsers() {

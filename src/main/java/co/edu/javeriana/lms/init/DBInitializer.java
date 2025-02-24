@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import co.edu.javeriana.lms.models.Room;
@@ -40,6 +41,9 @@ public class DBInitializer implements CommandLineRunner {
 	private UserRepository userRepository;
 
 	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+  @Autowired
 	private CourseRepository courseRepository;
 
 	@Override
@@ -100,15 +104,15 @@ public class DBInitializer implements CommandLineRunner {
 		// crear usuarios profesores
 		User professor1 = new User();
 		User professor2 = new User();
-		professor1.setEmail("saristizabal10@gamil.com");
-		professor1.setPassword("123456");
+		professor1.setEmail("saristizabal10@javeriana.edu.co");
+		professor1.setPassword(passwordEncoder.encode("123456"));
 		professor1.setName("Santiago");
 		professor1.setLastName("Aristizabal");
 		professor1.setInstitutionalId(123456);
 		professor1.setRoles(Set.of(Role.PROFESOR));
 
-		professor2.setEmail("pedro10@gamil.com");
-		professor2.setPassword("123456");
+		professor2.setEmail("pedro10@javeriana.edu.co");
+		professor2.setPassword(passwordEncoder.encode("123456"));
 		professor2.setName("Pepo");
 		professor2.setLastName("Pascal");
 		professor2.setInstitutionalId(1256);
@@ -118,15 +122,15 @@ public class DBInitializer implements CommandLineRunner {
 		User coord1 = new User();
 		User coord2 = new User();
 
-		coord1.setEmail("saabal10@gamil.com");
-		coord1.setPassword("123456");
+		coord1.setEmail("saabal10@javeriana.edu.co");
+		coord1.setPassword(passwordEncoder.encode("123456"));
 		coord1.setName("Salomon");
 		coord1.setLastName("Pira");
 		coord1.setInstitutionalId(456);
 		coord1.setRoles(Set.of(Role.COORDINADOR));
 
-		coord2.setEmail("pucoeocents0@gamil.com");
-		coord2.setPassword("13456");
+		coord2.setEmail("pucoeocents0@javeriana.edu.co");
+		coord2.setPassword(passwordEncoder.encode("123456"));
 		coord2.setName("Pedro");
 		coord2.setLastName("Puentes");
 		coord2.setInstitutionalId(56);
@@ -136,19 +140,28 @@ public class DBInitializer implements CommandLineRunner {
 		User both1 = new User();
 		User both2 = new User();
 
-		both1.setEmail("saaal10@gamil.com");
-		both1.setPassword("123456");
+		both1.setEmail("saaal10@javeriana.edu.co");
+		both1.setPassword(passwordEncoder.encode("123456"));
 		both1.setName("Salomon ndienid");
 		both1.setLastName("Pira");
 		both1.setInstitutionalId(45996);
 		both1.setRoles(new HashSet<>(Arrays.asList(Role.PROFESOR, Role.COORDINADOR)));
 
-		both2.setEmail("puenjnjnts0@gamil.com");
-		both2.setPassword("13456");
+		both2.setEmail("puenjnjnts0@javeriana.edu.co");
+		both2.setPassword(passwordEncoder.encode("123456"));
 		both2.setName("Pedro idjei");
 		both2.setLastName("Puentes");
 		both2.setInstitutionalId(5690);
 		both2.setRoles(new HashSet<>(Arrays.asList(Role.PROFESOR, Role.COORDINADOR)));
+
+		// Admin
+		User admin = new User();
+		admin.setEmail("andresgarciam@javeriana.edu.co");
+		admin.setPassword(passwordEncoder.encode("Peter2010?"));
+		admin.setName("Andres");
+		admin.setLastName("Garcia");
+		admin.setInstitutionalId(98675);
+		admin.setRoles(Set.of(Role.ADMIN));
 
 		userRepository.save(professor1);
 		userRepository.save(professor2);
@@ -156,6 +169,7 @@ public class DBInitializer implements CommandLineRunner {
 		userRepository.save(coord2);
 		userRepository.save(both1);
 		userRepository.save(both2);
+		userRepository.save(admin);
 	}
 
 	private void insertVideos() throws ParseException {

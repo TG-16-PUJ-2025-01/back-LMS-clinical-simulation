@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
-import co.edu.javeriana.lms.dtos.EditVideoDTO;
+import co.edu.javeriana.lms.dtos.EditVideoDto;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.models.Video;
 import co.edu.javeriana.lms.services.VideoService;
@@ -36,7 +36,7 @@ public class VideoController {
     private VideoService videoService;
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponseDto<?>> getAllSimulations(
+    public ResponseEntity<ApiResponseDto<?>> getAllVideos(
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
             @Min(1) @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "videoId") String sort,
@@ -48,33 +48,28 @@ public class VideoController {
         String host = request.getHeader("Host");
         String scheme = request.getScheme();
 
-        Page<Video> simulationsPage = videoService.searchVideos(filter, page, size, sort, asc);
-
-        if (simulationsPage.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No simulations found", null, null));
-        }
+        Page<Video> videosPage = videoService.searchVideos(filter, page, size, sort, asc);
 
         String previous = null;
-        if (simulationsPage.hasPrevious()) {
+        if (videosPage.hasPrevious()) {
             previous = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page - 1, size);
         }
 
         String next = null;
-        if (simulationsPage.hasNext()) {
+        if (videosPage.hasNext()) {
             next = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page + 1, size);
         }
 
-        PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),
-                simulationsPage.getTotalElements(), simulationsPage.getTotalPages(), next,
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, videosPage.getNumberOfElements(),
+                videosPage.getTotalElements(), videosPage.getTotalPages(), next,
                 previous);
 
         return ResponseEntity.ok(
-                new ApiResponseDto<List<Video>>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(), metadata));
+                new ApiResponseDto<List<Video>>(HttpStatus.OK.value(), "ok", videosPage.getContent(), metadata));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<?>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDTO dto) {
+    public ResponseEntity<ApiResponseDto<?>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDto dto) {
         log.info("Editing video with id: {}", id);
 
         Video video = videoService.editVideo(id, dto);

@@ -5,7 +5,11 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class ValidationErrorDTO {
-    private String field;
+public class ErrorDto {
     private String message;
+    private Object data = null;
+
+    public ErrorDto(String message) {
+        this.message = message;
+    }
 }

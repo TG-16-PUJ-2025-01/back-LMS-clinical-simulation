@@ -1,14 +1,19 @@
 package co.edu.javeriana.lms.services;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import co.edu.javeriana.lms.dtos.CourseDTO;
+import co.edu.javeriana.lms.dtos.CourseDto;
 import co.edu.javeriana.lms.models.Course;
-import co.edu.javeriana.lms.repositories.ClassModelRepository;
+import co.edu.javeriana.lms.models.Role;
+import co.edu.javeriana.lms.models.User;
+import co.edu.javeriana.lms.repositories.ClassRepository;
 import co.edu.javeriana.lms.repositories.CourseRepository;
 import co.edu.javeriana.lms.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,10 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class CourseService {
-    
-    @Autowired
-    private ClassModelRepository classRepository;
 
+    @Autowired
+    private ClassRepository classRepository;
 
     @Autowired
     private CourseRepository courseRepository;
@@ -28,23 +32,16 @@ public class CourseService {
     @Autowired
     private UserRepository userRepository;
 
-    public Page<Course> findAll(Integer page, Integer size)
-    {
-        Pageable pageable = PageRequest.of(page, size);
-        return courseRepository.findAll(pageable); //.map(this::mapToDTO);
+    public Page<Course> findAll(String filter, Integer page, Integer size, String sort, Boolean asc) {
+        Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+        if (filter == "coordinator") {
+            sortOrder = asc ? Sort.by("coordinator.name", "coordinator.lastName").ascending()
+                    : Sort.by("coordinator.name", "coordinator.lastName").descending();
+        }
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        return courseRepository.findByNameOrJaverianaIdContaining(filter, pageable);
     }
 
-    /*private CourseDTO mapToDTO(Course course) {
-        return new CourseDTO(
-            course.getId(),  // Pass id here
-            course.getIdJaveriana(),
-            course.getName(),
-            course.getCoordinator().getId(),
-            course.getCoordinator().getName()
-        );
-    }*/
-
-        
     public Long countClasses() {
         return classRepository.count();
     }
@@ -53,65 +50,41 @@ public class CourseService {
 
         return courseRepository.findById(id).get();
     }
-        
-    /*private CourseDTO createDTO(Course course) {
-        return new CourseDTO(
-            course.getId(),  // Pass id here
-            course.getIdJaveriana(),
-            course.getName(),
-            course.getCoordinator().getId(),
-            course.getCoordinator().getName()
-        );
-    }*/
-        
-    public Course save(CourseDTO course) {
 
-        Course newCourse = new Course(course.getName(), course.getIdJaveriana(), userRepository.findById(course.getCoordinatorId()).get());
-        
-        
+    public Course save(CourseDto course) {
+        Optional<User> coordinator = userRepository.findById(course.getCoordinatorId());
+
+        if (coordinator.isEmpty()
+                || coordinator.get().getRoles().stream().noneMatch(role -> role.equals(Role.COORDINADOR))) {
+            throw new EntityNotFoundException("Coordinator with ID " + course.getCoordinatorId() + " not found");
+        }
+
+        Course newCourse = new Course(course.getName(), course.getJaverianaId(),
+                userRepository.findById(course.getCoordinatorId()).get());
+
         courseRepository.save(newCourse);
         return newCourse;
     }
 
     public void deleteById(Long id) {
-       
         courseRepository.deleteById(id);
     }
 
-    public Course update(CourseDTO course, Long id) {
+    public Course update(CourseDto course, Long id) {
 
-        log.info("Updating course with ID: " + id); 
+        log.info("Updating course with ID: " + id);
 
         Course currentCourseModel = courseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Course with ID " + id + " not found"));
 
-
-        //log.info("Updating course with ID: " + course); 
-
-
-        // Check for null values before updating
-        if (course.getCoordinatorId() == null ||
-            course.getName() == null ||
-            course.getIdJaveriana() == null ||
-            id == null ||
-            course.getCoordinatorName() == null
-            ) {
-            
-            throw new IllegalArgumentException("Error: All fields must have values. Null values are not allowed.");
-        }
-
-        //log.info("Updating course with ID: " + course); 
-        // Update fields
-        currentCourseModel.setCoordinator(userRepository.findById(course.getCoordinatorId()).get());
         currentCourseModel.setName(course.getName());
-        currentCourseModel.setIdJaveriana(course.getIdJaveriana());
+        currentCourseModel.setJaverianaId(course.getJaverianaId());
+        currentCourseModel.setCoordinator(userRepository.findById(course.getCoordinatorId()).get());
 
         courseRepository.save(currentCourseModel);
 
-        //log.info("Updating course with ID: " + currentCourseModel); 
+        // log.info("Updating course with ID: " + currentCourseModel);
         return currentCourseModel;
     }
-
-
 
 }

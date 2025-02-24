@@ -53,6 +53,10 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonIgnore
+    private List<StudentClass> studentlassses;
+
     @OneToMany(mappedBy = "professor", cascade = CascadeType.PERSIST)
     @JsonIgnore
     private List<ClassModel> professorClasses;
@@ -62,10 +66,7 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Course> courses;
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
-    private List<StudentClass> studentlassses;
-
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -74,30 +75,35 @@ public class User implements UserDetails {
                 .collect(Collectors.toList());
     }
 
+    @JsonIgnore
     @Override
     @JsonIgnore
     public String getUsername() {
         return email;
     }
 
+    @JsonIgnore
     @Override
     @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     @JsonIgnore
     public boolean isEnabled() {

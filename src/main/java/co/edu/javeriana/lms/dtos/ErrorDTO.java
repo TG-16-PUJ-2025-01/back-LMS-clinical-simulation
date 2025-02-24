@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class ErrorDTO {
+public class ErrorDto {
     private String message;
     private Object data = null;
 
-    public ErrorDTO(String message) {
+    public ErrorDto(String message) {
         this.message = message;
     }
 }

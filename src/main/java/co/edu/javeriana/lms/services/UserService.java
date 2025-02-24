@@ -3,6 +3,10 @@ package co.edu.javeriana.lms.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,8 +32,21 @@ public class UserService implements UserDetailsService {
     @Autowired
     private EmailService emailService;
 
-    public User createUser(User user) {
+    public Page<User> getAllUsers(String filter, Integer page, Integer size, String sort, Boolean asc) {
+        log.info("Getting all users");
+        Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+        if (filter == "email") {
+            sortOrder = asc ? Sort.by("email").ascending() : Sort.by("email").descending();
+        }
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        return userRepository.findAllFiltered(filter, pageable);
+    }
+
+    public User addUser(User user) {
         log.info("Creating user: " + user.getEmail());
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("User already exists");
+        }
         String password = PasswordGenerator.generatePassword();
         user.setPassword(passwordEncoder.encode(password));
         User savedUser =  userRepository.save(user);
@@ -42,10 +59,22 @@ public class UserService implements UserDetailsService {
         return savedUser;
     }
 
-    public User getUserByEmail(String email) {
-        log.info("Getting user by email: " + email);
-        return userRepository.findByEmail(email)
+    public User getUserById(Long id) {
+        log.info("Getting user by id: " + id);
+        return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public User updateUserById(Long id, User user) {
+        log.info("Updating user by id: " + id);
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        existingUser.setName(user.getName());
+        existingUser.setLastName(user.getLastName());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setInstitutionalId(user.getInstitutionalId());
+        existingUser.setRoles(user.getRoles());
+        return userRepository.save(existingUser);
     }
 
     @Override
@@ -56,13 +85,12 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void deleteByEmail(String email) {
-        log.info("Deleting user by email: " + email);
-        if (!userRepository.existsByEmail(email)) {
+    public void deleteById(Long id) {
+        log.info("Deleting user by id: " + id);
+        if (!userRepository.existsById(id)) {
             throw new RuntimeException("User not found");
         }
-
-        userRepository.deleteByEmail(email);
+        userRepository.deleteById(id);
     }
 
     public List<User> findAllCoordinators() {

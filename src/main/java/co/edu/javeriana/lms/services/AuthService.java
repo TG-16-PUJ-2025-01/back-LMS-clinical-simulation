@@ -37,21 +37,21 @@ public class AuthService {
         return token;
     }
 
-    public String changePassword(String email, String password) {
-        log.info("Changing password for user: " + email);
+    public String changePassword(String token, String password, String newPassword) {
+        log.info("Changing password for token: " + token);
+        String email = jwtService.extractUserName(token);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        user.setPassword(passwordEncoder.encode(password));
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-        String token = jwtService.generateToken(user);
-
         String subject = "Cambio de contraseña LMS";
         String body = "Hola " + user.getEmail() + ",\n\nTu contraseña ha sido cambiada con éxito.\n" +
-                  "Si no fuiste tú, por favor, contacta al administrador.";
+                    "Si no fuiste tú, por favor, contacta al administrador.";
         emailService.sendEmail(user.getEmail(), subject, body);
-
-        return token;
+        String newToken = jwtService.generateToken(user);
+        return newToken;
     }
-    
 }

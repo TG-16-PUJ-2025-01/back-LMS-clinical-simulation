@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CourseDTO {
+public class CourseDto {
     @NotNull(message = "Id Javeriana is required")
     @Positive(message = "Id Javeriana must be a positive number")
     private Long javerianaId;

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
-import co.edu.javeriana.lms.dtos.ClassDTO;
+import co.edu.javeriana.lms.dtos.ClassDto;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.models.ClassModel;
 import co.edu.javeriana.lms.services.ClassService;
@@ -100,7 +100,7 @@ public class ClassController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateClass(@RequestBody ClassDTO classModel, @PathVariable Long id) {
+    public ResponseEntity<?> updateClass(@RequestBody ClassDto classModel, @PathVariable Long id) {
         log.info("Updating course with ID: " + id);
 
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
@@ -109,7 +109,7 @@ public class ClassController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addClass(@Valid @RequestBody ClassDTO classModel) {
+    public ResponseEntity<?> addClass(@Valid @RequestBody ClassDto classModel) {
        
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<ClassModel>(
                 HttpStatus.CREATED.value(), "Class added successfully.", classService.save(classModel), null));

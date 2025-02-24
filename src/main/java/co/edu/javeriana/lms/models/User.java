@@ -66,7 +66,6 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Course> courses;
 
-    @JsonIgnore
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -75,35 +74,30 @@ public class User implements UserDetails {
                 .collect(Collectors.toList());
     }
 
-    @JsonIgnore
     @Override
     @JsonIgnore
     public String getUsername() {
         return email;
     }
 
-    @JsonIgnore
     @Override
     @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     @JsonIgnore
     public boolean isEnabled() {

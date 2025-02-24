@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
-import co.edu.javeriana.lms.dtos.EditVideoDTO;
+import co.edu.javeriana.lms.dtos.EditVideoDto;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.models.Video;
 import co.edu.javeriana.lms.services.VideoService;
@@ -69,7 +69,7 @@ public class VideoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<?>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDTO dto) {
+    public ResponseEntity<ApiResponseDto<?>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDto dto) {
         log.info("Editing video with id: {}", id);
 
         Video video = videoService.editVideo(id, dto);

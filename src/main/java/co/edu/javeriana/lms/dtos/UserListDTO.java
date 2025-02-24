@@ -7,7 +7,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserListDTO {
+public class UserListDto {
     
     Long id;
     String name;

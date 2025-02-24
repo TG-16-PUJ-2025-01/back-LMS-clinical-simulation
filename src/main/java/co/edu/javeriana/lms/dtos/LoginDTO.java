@@ -2,15 +2,16 @@ package co.edu.javeriana.lms.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginDto {
     @NotBlank(message = "Email is required")
     private String email;
+
     @NotBlank(message = "Password is required")
     private String password;
 }

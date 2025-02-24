@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public enum Role {
-    ADMIN, 
-    PROFESOR, 
-    ESTUDIANTE, 
+    ADMIN,
+    PROFESOR,
+    ESTUDIANTE,
     COORDINADOR;
 }

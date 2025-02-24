@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.support.WebExchangeBindException;
 
+
 import co.edu.javeriana.lms.dtos.ErrorDto;
 import co.edu.javeriana.lms.dtos.ValidationErrorDto;
 import jakarta.persistence.EntityNotFoundException;
@@ -64,8 +65,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+    public ResponseEntity<ErrorDTO> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.warn("Business validation failed: {}", ex.getMessage());
+        ErrorDTO errorDTO = new ErrorDTO(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        log.warn("Invalid request structure: {}", ex.getMessage());
+
+        return new ResponseEntity<>(new ErrorDTO("Request body error", "Invalid request structure: " + ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
 
         return new ResponseEntity<>(new ErrorDto("Business validation error", ex.getMessage()), HttpStatus.BAD_REQUEST);
     }

@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import co.edu.javeriana.lms.dtos.EditVideoDto;
+import co.edu.javeriana.lms.dtos.EditVideoDtos;
 import co.edu.javeriana.lms.models.Video;
 import co.edu.javeriana.lms.repositories.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class VideoService {
         return videoRepository.findByNameContainingIgnoreCase(filter, pageable);
     }
 
-    public Video editVideo(Long id, EditVideoDto video) {
+    public Video editVideo(Long id, EditVideoDtos video) {
         Video videoToEdit = videoRepository.findById(id).orElse(null);
         if (videoToEdit == null) {
             return null;

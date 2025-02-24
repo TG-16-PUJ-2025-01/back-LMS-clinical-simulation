@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.edu.javeriana.lms.dtos.PasswordResetDto;
-import co.edu.javeriana.lms.dtos.UsernameDto;
+import co.edu.javeriana.lms.dtos.PasswordResetDtos;
+import co.edu.javeriana.lms.dtos.UsernameDtos;
 import co.edu.javeriana.lms.models.PasswordResetToken;
 import co.edu.javeriana.lms.services.ResetPasswordService;
 import jakarta.validation.Valid;
@@ -22,7 +22,7 @@ public class ResetPasswordController {
     private ResetPasswordService resetPasswordService;
 
     @PostMapping("/request")
-    public ResponseEntity<?> requestPasswordReset(@Valid @RequestBody UsernameDto usernameDTO) {
+    public ResponseEntity<?> requestPasswordReset(@Valid @RequestBody UsernameDtos usernameDTO) {
         String email = usernameDTO.getEmail();
         PasswordResetToken passwordResetToken = resetPasswordService.createPasswordResetToken(email);
         resetPasswordService.sentPasswordResetEmail(email, passwordResetToken.getToken());
@@ -30,7 +30,7 @@ public class ResetPasswordController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<?> verifyPasswordReset(@Valid @RequestBody PasswordResetDto passwordResetDTO) {
+    public ResponseEntity<?> verifyPasswordReset(@Valid @RequestBody PasswordResetDtos passwordResetDTO) {
         String email = passwordResetDTO.getEmail();
         String token = passwordResetDTO.getToken();
         if(resetPasswordService.verifyResetToken(email, token)) {
@@ -40,7 +40,7 @@ public class ResetPasswordController {
     }
 
     @PostMapping("/reset")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetDto passwordResetDTO) {
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetDtos passwordResetDTO) {
         
         String email = passwordResetDTO.getEmail();
         String token = passwordResetDTO.getToken();

@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterUserDto {
+public class RegisterUserDtos {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email must end in javeriana.edu.co", regexp = ".*javeriana.edu.co$")

@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.edu.javeriana.lms.dtos.ApiResponseDto;
-import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
+import co.edu.javeriana.lms.dtos.ApiResponseDtos;
+import co.edu.javeriana.lms.dtos.PaginationMetadataDtos;
 import co.edu.javeriana.lms.models.Simulation;
 import co.edu.javeriana.lms.services.SimulationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +29,7 @@ public class SimulationController {
     private SimulationService simulationService;
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponseDto<?>> getAllSimulations(
+    public ResponseEntity<ApiResponseDtos<?>> getAllSimulations(
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
             @Min(1) @RequestParam(defaultValue = "10") Integer size,
             HttpServletRequest request) {
@@ -42,7 +42,7 @@ public class SimulationController {
 
         if (simulationsPage.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No simulations found", null, null));
+                    .body(new ApiResponseDtos<>(HttpStatus.NOT_FOUND.value(), "No simulations found", null, null));
         }
 
         String previous = null;
@@ -55,12 +55,12 @@ public class SimulationController {
             next = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page + 1, size);
         }
 
-        PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),
+        PaginationMetadataDtos metadata = new PaginationMetadataDtos(page, simulationsPage.getNumberOfElements(),
                 simulationsPage.getTotalElements(), simulationsPage.getTotalPages(), next,
                 previous);
 
         return ResponseEntity.ok(
-                new ApiResponseDto<List<Simulation>>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(),
+                new ApiResponseDtos<List<Simulation>>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(),
                         metadata));
     }
 

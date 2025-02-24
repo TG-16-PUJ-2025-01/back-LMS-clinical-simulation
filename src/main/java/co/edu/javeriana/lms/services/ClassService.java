@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import co.edu.javeriana.lms.dtos.ClassDto;
+import co.edu.javeriana.lms.dtos.ClassDtos;
 import co.edu.javeriana.lms.models.ClassModel;
 import co.edu.javeriana.lms.repositories.ClassRepository;
 import co.edu.javeriana.lms.repositories.CourseRepository;
@@ -38,7 +38,7 @@ public class ClassService {
         return classRepository.findById(id).get();
     }
 
-    public ClassModel save(ClassDto entity) {
+    public ClassModel save(ClassDtos entity) {
 
         log.info("unicornio aa "+ entity);
         
@@ -61,7 +61,7 @@ public class ClassService {
         classRepository.deleteById(id);
     }
 
-    public ClassModel update(ClassDto classModel, Long id) {
+    public ClassModel update(ClassDtos classModel, Long id) {
 
         ClassModel currentClassModel = classRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));

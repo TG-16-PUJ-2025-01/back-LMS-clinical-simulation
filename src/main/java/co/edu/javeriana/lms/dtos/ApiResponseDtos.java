@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class ApiResponseDto<T> {
+public class ApiResponseDtos<T> {
     private Integer status;
     private String message;
     private T data;

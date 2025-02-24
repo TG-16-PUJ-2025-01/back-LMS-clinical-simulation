@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class PaginationMetadataDto {
+public class PaginationMetadataDtos {
     private Integer page;
     private Integer size;
     private Long total;

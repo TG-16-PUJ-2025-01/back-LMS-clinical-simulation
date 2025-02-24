@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class TokenWithEmailDto {
+public class TokenWithEmailDtos {
     @NotBlank(message = "Token is required")
     private String token;
     @NotBlank(message = "Email is required")

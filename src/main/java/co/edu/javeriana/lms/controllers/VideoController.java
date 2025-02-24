@@ -4,9 +4,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.edu.javeriana.lms.dtos.ApiResponseDto;
-import co.edu.javeriana.lms.dtos.EditVideoDto;
-import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
+import co.edu.javeriana.lms.dtos.ApiResponseDtos;
+import co.edu.javeriana.lms.dtos.EditVideoDtos;
+import co.edu.javeriana.lms.dtos.PaginationMetadataDtos;
 import co.edu.javeriana.lms.models.Video;
 import co.edu.javeriana.lms.services.VideoService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +36,7 @@ public class VideoController {
     private VideoService videoService;
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponseDto<?>> getAllVideos(
+    public ResponseEntity<ApiResponseDtos<?>> getAllVideos(
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
             @Min(1) @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "videoId") String sort,
@@ -60,40 +60,40 @@ public class VideoController {
             next = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page + 1, size);
         }
 
-        PaginationMetadataDto metadata = new PaginationMetadataDto(page, videosPage.getNumberOfElements(),
+        PaginationMetadataDtos metadata = new PaginationMetadataDtos(page, videosPage.getNumberOfElements(),
                 videosPage.getTotalElements(), videosPage.getTotalPages(), next,
                 previous);
 
         return ResponseEntity.ok(
-                new ApiResponseDto<List<Video>>(HttpStatus.OK.value(), "ok", videosPage.getContent(), metadata));
+                new ApiResponseDtos<List<Video>>(HttpStatus.OK.value(), "ok", videosPage.getContent(), metadata));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<?>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDto dto) {
+    public ResponseEntity<ApiResponseDtos<?>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDtos dto) {
         log.info("Editing video with id: {}", id);
 
         Video video = videoService.editVideo(id, dto);
 
         if (video == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Video not found", null, null));
+                    .body(new ApiResponseDtos<>(HttpStatus.NOT_FOUND.value(), "Video not found", null, null));
         }
 
-        return ResponseEntity.ok(new ApiResponseDto<Video>(HttpStatus.OK.value(), "ok", video, null));
+        return ResponseEntity.ok(new ApiResponseDtos<Video>(HttpStatus.OK.value(), "ok", video, null));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<?>> deleteVideo(@PathVariable Long id) {
+    public ResponseEntity<ApiResponseDtos<?>> deleteVideo(@PathVariable Long id) {
         log.info("Deleting video with id: {}", id);
 
         Video video = videoService.deleteVideo(id);
 
         if (video == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Video not found", null, null));
+                    .body(new ApiResponseDtos<>(HttpStatus.NOT_FOUND.value(), "Video not found", null, null));
         }
 
-        return ResponseEntity.ok(new ApiResponseDto<Video>(HttpStatus.OK.value(), "ok", video, null));
+        return ResponseEntity.ok(new ApiResponseDtos<Video>(HttpStatus.OK.value(), "ok", video, null));
     }
 
 }

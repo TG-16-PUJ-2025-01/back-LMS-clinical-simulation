@@ -10,12 +10,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoomDto {
+public class RoomDtos {
     @NotBlank(message = "Room name is mandatory")
     private String name;
 
     @NotNull(message = "Room type is mandatory")
-    private RoomTypeDto type;
+    private RoomTypeDtos type;
 
     public Room toEntity(Long id){
         Room room = new Room();

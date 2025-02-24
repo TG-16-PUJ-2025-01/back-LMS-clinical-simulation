@@ -83,9 +83,6 @@ public class StreamingServiceTest {
         String range = null;
 
         when(mockPath.toFile()).thenReturn(mockFile);
-        System.out.println("HEREEE");
-        System.out.println(mockFile);
-        System.out.println("HEREEE");
         System.out.println(mockPath.toFile());
         filesMock.when(() -> Files.exists(mockPath)).thenReturn(true);
         filesMock.when(() -> Files.size(mockPath)).thenReturn(2048L);

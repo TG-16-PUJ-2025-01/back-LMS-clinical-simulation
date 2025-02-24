@@ -4,12 +4,14 @@ import co.edu.javeriana.lms.models.Room;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class RoomDto {
     @NotBlank(message = "Room name is mandatory")
     private String name;

@@ -85,7 +85,7 @@ public class RoomController {
         }
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room found", roomService.findById(id), null));
+                .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room found", room, null));
     }
 
     @GetMapping("/types")

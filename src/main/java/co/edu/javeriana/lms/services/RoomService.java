@@ -119,7 +119,18 @@ public class RoomService {
     }
 
     public void deleteById(Long id) {
-        roomRepository.deleteById(id);
+        // Check if the room type trying to be deleted is the last one
+        Room room = roomRepository.findById(id).orElse(null);
+
+        if (room != null) {
+            RoomType type = room.getType();
+            roomRepository.deleteById(id);
+
+            // If it is the last one, delete the room type
+            if (roomRepository.countByType(type) == 0) {
+                roomTypeRepository.delete(type);
+            }
+        }
     }
 
     public Room findByName(String name) {

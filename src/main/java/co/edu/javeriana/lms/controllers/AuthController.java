@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import co.edu.javeriana.lms.dtos.ChangePasswordDtos;
-import co.edu.javeriana.lms.dtos.LoginDtos;
+import co.edu.javeriana.lms.dtos.ChangePasswordDto;
+import co.edu.javeriana.lms.dtos.LoginDto;
 import co.edu.javeriana.lms.services.AuthService;
 
 import jakarta.validation.Valid;
@@ -20,7 +20,7 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginDtos loginDTO) {
+    public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDTO) {
         String email = loginDTO.getEmail();
         String password = loginDTO.getPassword();
         
@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<String> changePassword(@RequestHeader("Authorization") String token, @Valid @RequestBody ChangePasswordDtos changePasswordDto) {
+    public ResponseEntity<String> changePassword(@RequestHeader("Authorization") String token, @Valid @RequestBody ChangePasswordDto changePasswordDto) {
         String password = changePasswordDto.getPassword();
         String newPassword = changePasswordDto.getNewPassword();
         log.info("Token: " + token);

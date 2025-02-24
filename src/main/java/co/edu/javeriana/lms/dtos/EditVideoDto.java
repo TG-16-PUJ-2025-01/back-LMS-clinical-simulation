@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EditVideoDtos {
+public class EditVideoDto {
 
     @NotBlank(message = "The name is required")
     private String name;

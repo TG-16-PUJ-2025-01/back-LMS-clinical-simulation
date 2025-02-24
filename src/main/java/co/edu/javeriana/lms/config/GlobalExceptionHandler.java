@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.support.WebExchangeBindException;
 
 
-import co.edu.javeriana.lms.dtos.ErrorDtos;
-import co.edu.javeriana.lms.dtos.ValidationErrorDtos;
+import co.edu.javeriana.lms.dtos.ErrorDto;
+import co.edu.javeriana.lms.dtos.ValidationErrorDto;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -27,47 +27,47 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        List<ValidationErrorDtos> errors = ex.getBindingResult().getAllErrors().stream().map(error -> {
+        List<ValidationErrorDto> errors = ex.getBindingResult().getAllErrors().stream().map(error -> {
             String fieldName = error instanceof FieldError ? ((FieldError) error).getField() : error.getObjectName();
             String message = error.getDefaultMessage();
-            return new ValidationErrorDtos(fieldName, message);
+            return new ValidationErrorDto(fieldName, message);
         }).collect(Collectors.toList());
 
         log.info("Validation failed: {}", errors);
 
-        return new ResponseEntity<>(new ErrorDtos("Validation failed", errors), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Validation failed", errors), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BindException.class)
     public ResponseEntity<Object> handleBindException(BindException ex) {
-        List<ValidationErrorDtos> errors = ex.getBindingResult().getAllErrors().stream().map(error -> {
+        List<ValidationErrorDto> errors = ex.getBindingResult().getAllErrors().stream().map(error -> {
             String fieldName = error instanceof FieldError ? ((FieldError) error).getField() : error.getObjectName();
             String message = error.getDefaultMessage();
-            return new ValidationErrorDtos(fieldName, message);
+            return new ValidationErrorDto(fieldName, message);
         }).collect(Collectors.toList());
 
         log.info("Validation failed: {}", errors);
 
-        return new ResponseEntity<>(new ErrorDtos("Validation failed", errors), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Validation failed", errors), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(WebExchangeBindException.class)
     public ResponseEntity<Object> handleWebExchangeBindException(WebExchangeBindException ex) {
-        List<ValidationErrorDtos> errors = ex.getBindingResult().getAllErrors().stream().map(error -> {
+        List<ValidationErrorDto> errors = ex.getBindingResult().getAllErrors().stream().map(error -> {
             String fieldName = error instanceof FieldError ? ((FieldError) error).getField() : error.getObjectName();
             String message = error.getDefaultMessage();
-            return new ValidationErrorDtos(fieldName, message);
+            return new ValidationErrorDto(fieldName, message);
         }).collect(Collectors.toList());
 
         log.info("Validation failed: {}", errors);
 
-        return new ResponseEntity<>(new ErrorDtos("Validation failed", errors), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Validation failed", errors), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorDtos> handleIllegalArgumentException(IllegalArgumentException ex) {
+    public ResponseEntity<ErrorDto> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.warn("Business validation failed: {}", ex.getMessage());
-        ErrorDtos errorDto = new ErrorDtos(ex.getMessage());
+        ErrorDto errorDto = new ErrorDto(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
     }
 
@@ -75,27 +75,27 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         log.warn("Invalid request structure: {}", ex.getMessage());
 
-        return new ResponseEntity<>(new ErrorDtos("Request body error", "Invalid request structure: " + ex.getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Request body error", "Invalid request structure: " + ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
         log.warn("Entity not found: {}", ex.getMessage());
 
-        return new ResponseEntity<>(new ErrorDtos("Entity not found", ex.getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Entity not found", ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         log.warn("Invalid data or duplicate entry: {}", ex.getMostSpecificCause().getMessage());
 
-        return new ResponseEntity<>(new ErrorDtos("Invalid data or duplicate entry", ex.getMostSpecificCause().getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Invalid data or duplicate entry", ex.getMostSpecificCause().getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
         log.warn("Validation failed: {}", ex.getMessage());
 
-        return new ResponseEntity<>(new ErrorDtos("Validation failed", ex.getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Validation failed", ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }

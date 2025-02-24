@@ -5,6 +5,6 @@ import lombok.Data;
 
 @AllArgsConstructor
 @Data
-public class UsernameDtos {
+public class UsernameDto {
     private String email;
 }

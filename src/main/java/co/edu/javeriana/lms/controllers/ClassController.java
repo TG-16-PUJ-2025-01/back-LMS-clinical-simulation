@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.edu.javeriana.lms.dtos.ApiResponseDtos;
-import co.edu.javeriana.lms.dtos.ClassDtos;
-import co.edu.javeriana.lms.dtos.PaginationMetadataDtos;
+import co.edu.javeriana.lms.dtos.ApiResponseDto;
+import co.edu.javeriana.lms.dtos.ClassDto;
+import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.models.ClassModel;
 import co.edu.javeriana.lms.services.ClassService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -62,12 +62,12 @@ public class ClassController {
             next = String.format("%s://%s/class/all?page=%d&size=%d", scheme, host, page + 1, size);
         }
 
-        PaginationMetadataDtos metadata = new PaginationMetadataDtos(page, classModelPage.getNumberOfElements(),
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
                 classModelPage.getTotalElements(),
                 classModelPage.getTotalPages(), next,
                 previous);
 
-        return ResponseEntity.ok(new ApiResponseDtos<List<ClassModel>>(HttpStatus.OK.value(), "ok",
+        return ResponseEntity.ok(new ApiResponseDto<List<ClassModel>>(HttpStatus.OK.value(), "ok",
                 classModelPage.getContent(), metadata));
     }
 
@@ -80,10 +80,10 @@ public class ClassController {
 
         if (classModel == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDtos<>(HttpStatus.NOT_FOUND.value(), "No class found", null, null));
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No class found", null, null));
         }
 
-        return ResponseEntity.ok(new ApiResponseDtos<ClassModel>(HttpStatus.OK.value(), "ok", classModel, null));
+        return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(), "ok", classModel, null));
 
     }
 
@@ -94,24 +94,24 @@ public class ClassController {
         ClassModel classModel = classService.findById(id);
         classService.deleteById(id);
 
-        return ResponseEntity.ok(new ApiResponseDtos<ClassModel>(HttpStatus.OK.value(),
+        return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
                 "Clase deleted successfully.", classModel, null));
         
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateClass(@RequestBody ClassDtos classModel, @PathVariable Long id) {
+    public ResponseEntity<?> updateClass(@RequestBody ClassDto classModel, @PathVariable Long id) {
         log.info("Updating course with ID: " + id);
 
-        return ResponseEntity.ok(new ApiResponseDtos<ClassModel>(HttpStatus.OK.value(),
+        return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
                     "Class updated successfully.", classService.update(classModel, id), null));
         
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addClass(@Valid @RequestBody ClassDtos classModel) {
+    public ResponseEntity<?> addClass(@Valid @RequestBody ClassDto classModel) {
        
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDtos<ClassModel>(
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<ClassModel>(
                 HttpStatus.CREATED.value(), "Class added successfully.", classService.save(classModel), null));
     }
 }

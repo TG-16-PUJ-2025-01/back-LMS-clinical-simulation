@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoomTypeDtos {
+public class RoomTypeDto {
     private String name;
 
     public RoomType toEntity(){

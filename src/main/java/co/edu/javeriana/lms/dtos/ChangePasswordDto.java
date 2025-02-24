@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChangePasswordDtos {
+public class ChangePasswordDto {
     private String password;
 
     @Pattern(

@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/estudiante/**").hasAuthority("estudiante") // Estudiante-only
                         .requestMatchers("/coordinador/**").hasAuthority("coordinador") // Coordinador-only
                         .requestMatchers("/auth/login").permitAll() // Public endpoint
-                        .requestMatchers("/auth/change-password").authenticated() // Authenticated endpoint
+                        .requestMatchers("/auth/change-password").permitAll() // Authenticated endpoint
                         .requestMatchers("/reset-password/**").permitAll() // Public endpoint
                         .requestMatchers("/user/**").permitAll() // Public endpoint
                         .anyRequest().permitAll()) // All other requests require authentication

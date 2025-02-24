@@ -4,12 +4,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.models.PasswordResetToken;
+import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.repositories.PasswordResetTokenRepository;
 import co.edu.javeriana.lms.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -26,7 +28,7 @@ public class ResetPasswordService {
     private PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Autowired
-    private AuthService authService;
+    private PasswordEncoder passwordEncoder;
 
     public PasswordResetToken createPasswordResetToken (String email) {
         log.info("Creating password reset token for user: " + email);
@@ -66,17 +68,20 @@ public class ResetPasswordService {
         return true;
     }
 
+    @Transactional
     public void resetPassword(String email, String token, String password) {
         log.info("Resetting password for user: " + email);
         if (!verifyResetToken(email, token)) {
             throw new RuntimeException("Invalid token");
         }
-        authService.changePassword(email, password);
-    }
-
-    @Scheduled(fixedRate = 1)
-    public void deleteExpiredTokens() {
-        log.info("Deleting expired password reset tokens");
-        passwordResetTokenRepository.deleteAllExpiredTokens(LocalDateTime.now());
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        passwordResetTokenRepository.deleteByToken(token);
+        String subject = "Cambio de contraseña LMS";
+        String body = "Hola " + user.getEmail() + ",\n\nTu contraseña ha sido cambiada con éxito.\n" +
+                    "Si no fuiste tú, por favor, contacta al administrador.";
+        emailService.sendEmail(user.getEmail(), subject, body);
     }
 }

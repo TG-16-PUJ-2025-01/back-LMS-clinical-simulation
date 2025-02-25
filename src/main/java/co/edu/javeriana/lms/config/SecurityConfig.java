@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import co.edu.javeriana.lms.models.Role;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -49,15 +50,11 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
                         .access((authentication, context) -> new AuthorizationDecision(env.matchesProfiles("dev")))
                         .requestMatchers("/streaming/**").permitAll() // Public endpoint
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN") // Admin-only
-                        .requestMatchers("/profesor/**").hasAuthority("profesor") // Profesor-only
-                        .requestMatchers("/estudiante/**").hasAuthority("estudiante") // Estudiante-only
-                        .requestMatchers("/coordinador/**").hasAuthority("coordinador") // Coordinador-only
                         .requestMatchers("/auth/login").permitAll() // Public endpoint
-                        .requestMatchers("/auth/change-password").permitAll() // Authenticated endpoint
+                        .requestMatchers("/auth/change-password").authenticated() // Authenticated endpoint
                         .requestMatchers("/reset-password/**").permitAll() // Public endpoint
-                        .requestMatchers("/user/**").permitAll() // Public endpoint
-                        .anyRequest().permitAll()) // All other requests require authentication
+                        .requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())// Authenticated endpoint
+                        .anyRequest().permitAll()) 
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

@@ -54,4 +54,12 @@ public class AuthService {
         String newToken = jwtService.generateToken(user);
         return newToken;
     }
+
+    public String[] getRolesByToken(String token) {
+        log.info("Getting roles for token: " + token);
+        String email = jwtService.extractUserName(token);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getRoles().stream().map(role -> role.name()).toArray(String[]::new);
+    }
 }

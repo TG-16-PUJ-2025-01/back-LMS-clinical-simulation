@@ -1,7 +1,6 @@
 package co.edu.javeriana.lms.services;
 
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 
@@ -101,24 +100,24 @@ public class RoomServiceTest {
     @Test
     public void testDeleteRoomSuccess() {
         Long id = 1L;
-        when(roomRepository.findById(id)).thenReturn(Optional.empty());
-        doNothing().when(roomRepository).deleteById(id);
-
-        roomService.deleteById(id);
-
-        verify(roomRepository, times(1)).deleteById(id);
-        assert (roomRepository.findById(id).isEmpty());
-    }
-
-    @Test
-    public void testDeleteRoomFailure() {
-        Long id = 1L;
         when(roomRepository.findById(id)).thenReturn(Optional.of(mockRoom));
 
         roomService.deleteById(id);
 
         verify(roomRepository, times(1)).deleteById(id);
         assert (roomRepository.findById(id).isPresent());
+    }
+
+    @Test
+    public void testDeleteRoomFailure() {
+        Long id = 1L;
+        when(roomRepository.findById(id)).thenReturn(Optional.empty());
+
+        roomService.deleteById(id);
+
+        verify(roomRepository, times(0)).deleteById(id);
+        assert (roomRepository.findById(id).isEmpty());
+
     }
 
 }

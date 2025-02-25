@@ -99,7 +99,7 @@ public class RoomControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validRoomJson))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("El nombre de la sala ya existe"));
+                .andExpect(jsonPath("$.message").value("Invalid data or duplicate entry"));
     }
 
     @Test

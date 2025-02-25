@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -44,7 +45,7 @@ public class RoomService {
         // Search for the room name in the database
         // If it does not exist, create it, if it does, return error
         if (roomRepository.findByName(formattedName) != null) {
-            throw new IllegalArgumentException("El nombre de la sala ya existe");
+            throw new DataIntegrityViolationException("El nombre de la sala ya existe");
         }
 
         // Search for the room type in the database
@@ -74,7 +75,7 @@ public class RoomService {
 
             // Check if the name changed and if the new name already exists
             if (!roomToUpdate.getName().equals(formattedName) && roomRepository.findByName(formattedName) != null) {
-                throw new IllegalArgumentException("El nombre de la sala ya existe");
+                throw new DataIntegrityViolationException("El nombre de la sala ya existe");
             }
 
             // Check if the room type changed
@@ -92,7 +93,7 @@ public class RoomService {
 
         // If the room does not exist, proceed with the creation logic
         if (roomRepository.findByName(formattedName) != null) {
-            throw new IllegalArgumentException("Nombre de la sala ya existe");
+            throw new DataIntegrityViolationException("El nombre de la sala ya existe");
         }
 
         RoomType type = roomTypeRepository.findByName(room.getType().getName());

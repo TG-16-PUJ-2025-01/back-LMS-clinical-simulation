@@ -82,14 +82,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
         log.warn("Entity not found: {}", ex.getMessage());
 
-        return new ResponseEntity<>(new ErrorDto("Entity not found", ex.getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Entity not found", ex.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         log.warn("Invalid data or duplicate entry: {}", ex.getMostSpecificCause().getMessage());
 
-        return new ResponseEntity<>(new ErrorDto("Invalid data or duplicate entry", ex.getMostSpecificCause().getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Invalid data or duplicate entry", ex.getMostSpecificCause().getMessage()), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

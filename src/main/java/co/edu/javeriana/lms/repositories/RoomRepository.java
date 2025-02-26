@@ -5,8 +5,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import co.edu.javeriana.lms.models.Room;
-import co.edu.javeriana.lms.models.RoomType;
+import co.edu.javeriana.lms.booking.models.Room;
+import co.edu.javeriana.lms.booking.models.RoomType;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {

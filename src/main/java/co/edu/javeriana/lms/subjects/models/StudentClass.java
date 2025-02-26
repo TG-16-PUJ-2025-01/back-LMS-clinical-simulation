@@ -1,5 +1,6 @@
-package co.edu.javeriana.lms.models;
+package co.edu.javeriana.lms.subjects.models;
 
+import co.edu.javeriana.lms.accounts.models.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

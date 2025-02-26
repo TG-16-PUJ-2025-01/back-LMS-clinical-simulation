@@ -17,8 +17,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import co.edu.javeriana.lms.models.Room;
-import co.edu.javeriana.lms.models.RoomType;
+import co.edu.javeriana.lms.booking.models.Room;
+import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.repositories.RoomRepository;
 import co.edu.javeriana.lms.repositories.RoomTypeRepository;
 

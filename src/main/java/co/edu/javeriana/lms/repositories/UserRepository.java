@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import co.edu.javeriana.lms.models.User;
+import co.edu.javeriana.lms.accounts.models.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {

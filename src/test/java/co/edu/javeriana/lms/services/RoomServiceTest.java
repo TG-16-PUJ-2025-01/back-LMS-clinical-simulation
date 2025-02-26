@@ -20,8 +20,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import co.edu.javeriana.lms.models.Room;
-import co.edu.javeriana.lms.models.RoomType;
+import co.edu.javeriana.lms.booking.models.Room;
+import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.repositories.RoomRepository;
 import co.edu.javeriana.lms.repositories.RoomTypeRepository;
 

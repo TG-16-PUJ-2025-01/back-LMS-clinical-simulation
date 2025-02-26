@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.models;
+package co.edu.javeriana.lms.accounts.models;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,6 +11,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import co.edu.javeriana.lms.practices.models.GroupPerSimulation;
+import co.edu.javeriana.lms.subjects.models.ClassModel;
+import co.edu.javeriana.lms.subjects.models.Course;
+import co.edu.javeriana.lms.subjects.models.StudentClass;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

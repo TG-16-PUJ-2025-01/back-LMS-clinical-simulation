@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.dtos.RegisterUserDto;
-import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.services.UserService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import jakarta.servlet.http.HttpServletRequest;

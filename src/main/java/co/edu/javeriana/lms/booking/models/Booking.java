@@ -1,7 +1,8 @@
-package co.edu.javeriana.lms.models;
+package co.edu.javeriana.lms.booking.models;
 
 import java.time.LocalDateTime;
 
+import co.edu.javeriana.lms.practices.models.GroupPerSimulation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

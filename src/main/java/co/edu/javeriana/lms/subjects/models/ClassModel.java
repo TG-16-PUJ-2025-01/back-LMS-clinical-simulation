@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.models;
+package co.edu.javeriana.lms.subjects.models;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import co.edu.javeriana.lms.accounts.models.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

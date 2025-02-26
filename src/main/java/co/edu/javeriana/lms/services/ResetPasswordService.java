@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import co.edu.javeriana.lms.models.PasswordResetToken;
-import co.edu.javeriana.lms.models.User;
+import co.edu.javeriana.lms.accounts.models.PasswordResetToken;
+import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.repositories.PasswordResetTokenRepository;
 import co.edu.javeriana.lms.repositories.UserRepository;
 import jakarta.transaction.Transactional;

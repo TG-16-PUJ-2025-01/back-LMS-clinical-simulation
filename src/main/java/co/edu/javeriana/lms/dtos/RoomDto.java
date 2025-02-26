@@ -1,6 +1,6 @@
 package co.edu.javeriana.lms.dtos;
 
-import co.edu.javeriana.lms.models.Room;
+import co.edu.javeriana.lms.booking.models.Room;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

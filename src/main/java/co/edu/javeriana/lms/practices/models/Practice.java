@@ -1,7 +1,8 @@
-package co.edu.javeriana.lms.models;
+package co.edu.javeriana.lms.practices.models;
 
 import java.util.List;
 
+import co.edu.javeriana.lms.booking.models.TimeSlot;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

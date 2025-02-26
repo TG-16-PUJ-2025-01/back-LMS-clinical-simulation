@@ -2,8 +2,8 @@ package co.edu.javeriana.lms.dtos;
 
 import java.util.Set;
 
-import co.edu.javeriana.lms.models.Role;
-import co.edu.javeriana.lms.models.User;
+import co.edu.javeriana.lms.accounts.models.Role;
+import co.edu.javeriana.lms.accounts.models.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

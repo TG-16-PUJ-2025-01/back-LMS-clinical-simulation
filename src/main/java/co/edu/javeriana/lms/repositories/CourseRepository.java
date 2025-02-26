@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import co.edu.javeriana.lms.models.Course;
+import co.edu.javeriana.lms.subjects.models.Course;
 
 public interface CourseRepository extends JpaRepository <Course, Long> {
     @Query("""

@@ -7,10 +7,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import co.edu.javeriana.lms.dtos.ClassDto;
-import co.edu.javeriana.lms.models.ClassModel;
 import co.edu.javeriana.lms.repositories.ClassRepository;
 import co.edu.javeriana.lms.repositories.CourseRepository;
 import co.edu.javeriana.lms.repositories.UserRepository;
+import co.edu.javeriana.lms.subjects.models.ClassModel;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 

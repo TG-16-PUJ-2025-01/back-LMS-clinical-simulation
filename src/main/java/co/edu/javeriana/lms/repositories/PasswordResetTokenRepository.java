@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import co.edu.javeriana.lms.models.PasswordResetToken;
+import co.edu.javeriana.lms.accounts.models.PasswordResetToken;
 import jakarta.transaction.Transactional;
 
 @Repository

@@ -12,8 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import co.edu.javeriana.lms.models.Role;
-import co.edu.javeriana.lms.models.User;
+import co.edu.javeriana.lms.accounts.models.Role;
+import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.repositories.UserRepository;
 
 @Service

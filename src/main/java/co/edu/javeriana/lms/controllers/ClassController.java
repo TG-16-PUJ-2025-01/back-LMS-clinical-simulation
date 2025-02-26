@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.dtos.ClassDto;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
-import co.edu.javeriana.lms.models.ClassModel;
 import co.edu.javeriana.lms.services.ClassService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
+import co.edu.javeriana.lms.subjects.models.ClassModel;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;

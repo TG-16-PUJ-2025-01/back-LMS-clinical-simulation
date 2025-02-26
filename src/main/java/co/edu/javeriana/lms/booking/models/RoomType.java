@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.models;
+package co.edu.javeriana.lms.booking.models;
 
 import java.util.List;
 

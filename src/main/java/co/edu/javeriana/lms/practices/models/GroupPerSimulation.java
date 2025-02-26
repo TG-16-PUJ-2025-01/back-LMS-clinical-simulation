@@ -1,13 +1,15 @@
-package co.edu.javeriana.lms.models;
+package co.edu.javeriana.lms.practices.models;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
-import jakarta.persistence.Column;
+import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.booking.models.Booking;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,25 +21,25 @@ import lombok.RequiredArgsConstructor;
 @Data
 @Builder
 @Entity
-@Table(name = "time_slot")
+@Table(name = "group_per_simulation")
 @RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
-public class TimeSlot {
+public class GroupPerSimulation {
     @Id
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Long id;
 
     @NonNull
-    @Column(nullable = false)
-    private LocalDateTime startDate;
-
-    @NonNull
-    @Column(nullable = false)
-    private LocalDateTime finishDate;
+    @ManyToOne
+    private Simulation simulation;
 
     @NonNull
     @ManyToOne
-    private Practice practice;
+    private User user;
+
+    @NonNull
+    @OneToMany(mappedBy = "groupPerSimulation")
+    private List<Booking> bookings;
     
 }

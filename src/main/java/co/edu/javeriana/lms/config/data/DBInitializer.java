@@ -14,15 +14,15 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import co.edu.javeriana.lms.models.Room;
-import co.edu.javeriana.lms.models.RoomType;
-import co.edu.javeriana.lms.models.Course;
-import co.edu.javeriana.lms.models.Role;
-import co.edu.javeriana.lms.models.User;
+import co.edu.javeriana.lms.accounts.models.Role;
+import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.booking.models.Room;
+import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.repositories.CourseRepository;
 import co.edu.javeriana.lms.repositories.RoomRepository;
 import co.edu.javeriana.lms.repositories.RoomTypeRepository;
 import co.edu.javeriana.lms.repositories.UserRepository;
+import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.videos.models.Video;
 import co.edu.javeriana.lms.videos.repositories.VideoRepository;
 

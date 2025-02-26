@@ -1,12 +1,14 @@
 package co.edu.javeriana.lms.repositories;
 
 import org.springframework.stereotype.Repository;
+
+import co.edu.javeriana.lms.subjects.models.ClassModel;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import co.edu.javeriana.lms.models.ClassModel;
 
 @Repository
 public interface ClassRepository extends JpaRepository <ClassModel, Long> {

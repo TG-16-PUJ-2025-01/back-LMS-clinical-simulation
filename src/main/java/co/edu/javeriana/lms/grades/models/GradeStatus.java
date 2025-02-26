@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.models;
+package co.edu.javeriana.lms.grades.models;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

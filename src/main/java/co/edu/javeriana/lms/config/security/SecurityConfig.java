@@ -24,7 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import co.edu.javeriana.lms.models.Role;
+import co.edu.javeriana.lms.accounts.models.Role;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

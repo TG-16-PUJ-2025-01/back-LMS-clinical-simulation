@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.models;
+package co.edu.javeriana.lms.accounts.models;
 
 import java.time.LocalDateTime;
 

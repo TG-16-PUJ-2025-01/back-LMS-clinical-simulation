@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import co.edu.javeriana.lms.models.Simulation;
+import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.repositories.SimulationRepository;
 import lombok.extern.slf4j.Slf4j;
 

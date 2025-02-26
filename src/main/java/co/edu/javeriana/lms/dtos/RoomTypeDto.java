@@ -1,6 +1,6 @@
 package co.edu.javeriana.lms.dtos;
 
-import co.edu.javeriana.lms.models.RoomType;
+import co.edu.javeriana.lms.booking.models.RoomType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

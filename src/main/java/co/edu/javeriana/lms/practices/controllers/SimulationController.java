@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.controllers;
+package co.edu.javeriana.lms.practices.controllers;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

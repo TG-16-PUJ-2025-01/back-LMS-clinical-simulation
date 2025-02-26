@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.controllers;
+package co.edu.javeriana.lms.subjects.controllers;
 
 import java.util.List;
 

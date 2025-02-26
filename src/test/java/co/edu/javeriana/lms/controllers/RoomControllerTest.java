@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 
+import co.edu.javeriana.lms.booking.controllers.RoomController;
 import co.edu.javeriana.lms.booking.dtos.RoomDto;
 import co.edu.javeriana.lms.booking.dtos.RoomTypeDto;
 import co.edu.javeriana.lms.booking.models.Room;

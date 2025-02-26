@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.controllers;
+package co.edu.javeriana.lms.booking.controllers;
 
 import java.util.Optional;
 

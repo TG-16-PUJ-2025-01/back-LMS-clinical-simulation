@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.controllers;
+package co.edu.javeriana.lms.accounts.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

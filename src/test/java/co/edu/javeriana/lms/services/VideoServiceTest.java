@@ -22,9 +22,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
-import co.edu.javeriana.lms.dtos.EditVideoDto;
-import co.edu.javeriana.lms.models.Video;
-import co.edu.javeriana.lms.repositories.VideoRepository;
+import co.edu.javeriana.lms.videos.dtos.EditVideoDto;
+import co.edu.javeriana.lms.videos.models.Video;
+import co.edu.javeriana.lms.videos.repositories.VideoRepository;
+import co.edu.javeriana.lms.videos.services.VideoService;
 
 @SpringBootTest
 @ActiveProfiles("test")

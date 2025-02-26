@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.config;
+package co.edu.javeriana.lms.config.docs;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile("dev")  // Only load Swagger in 'dev' environment
+@Profile("dev") // Only load Swagger in 'dev' environment
 public class SwaggerConfig {
 
     @Bean

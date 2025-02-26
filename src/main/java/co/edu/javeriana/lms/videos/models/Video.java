@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.models;
+package co.edu.javeriana.lms.videos.models;
 
 import java.util.Date;
 

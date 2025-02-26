@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.controllers;
+package co.edu.javeriana.lms.videos.controllers;
 
 import java.io.IOException;
 
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.edu.javeriana.lms.services.StreamingService;
+import co.edu.javeriana.lms.videos.services.StreamingService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 

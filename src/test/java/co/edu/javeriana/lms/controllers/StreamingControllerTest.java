@@ -20,7 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
-import co.edu.javeriana.lms.services.StreamingService;
+import co.edu.javeriana.lms.videos.controllers.StreamingController;
+import co.edu.javeriana.lms.videos.services.StreamingService;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)

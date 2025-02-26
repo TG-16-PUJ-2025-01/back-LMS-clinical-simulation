@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.init;
+package co.edu.javeriana.lms.config.data;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,12 +19,12 @@ import co.edu.javeriana.lms.models.RoomType;
 import co.edu.javeriana.lms.models.Course;
 import co.edu.javeriana.lms.models.Role;
 import co.edu.javeriana.lms.models.User;
-import co.edu.javeriana.lms.models.Video;
 import co.edu.javeriana.lms.repositories.CourseRepository;
 import co.edu.javeriana.lms.repositories.RoomRepository;
 import co.edu.javeriana.lms.repositories.RoomTypeRepository;
 import co.edu.javeriana.lms.repositories.UserRepository;
-import co.edu.javeriana.lms.repositories.VideoRepository;
+import co.edu.javeriana.lms.videos.models.Video;
+import co.edu.javeriana.lms.videos.repositories.VideoRepository;
 
 @Component
 @Profile({"dev", "test"})

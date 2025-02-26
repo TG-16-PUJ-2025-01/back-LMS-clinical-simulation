@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.config;
+package co.edu.javeriana.lms.config.security;
 
 import java.io.IOException;
 

@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.services;
+package co.edu.javeriana.lms.videos.services;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

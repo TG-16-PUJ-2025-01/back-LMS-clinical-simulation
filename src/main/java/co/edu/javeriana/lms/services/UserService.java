@@ -13,9 +13,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import co.edu.javeriana.lms.config.security.PasswordGenerator;
 import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.repositories.UserRepository;
-import co.edu.javeriana.lms.utils.PasswordGenerator;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 

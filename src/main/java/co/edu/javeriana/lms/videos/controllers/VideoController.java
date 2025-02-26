@@ -1,14 +1,14 @@
-package co.edu.javeriana.lms.controllers;
+package co.edu.javeriana.lms.videos.controllers;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
-import co.edu.javeriana.lms.dtos.EditVideoDto;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
-import co.edu.javeriana.lms.models.Video;
-import co.edu.javeriana.lms.services.VideoService;
+import co.edu.javeriana.lms.videos.dtos.EditVideoDto;
+import co.edu.javeriana.lms.videos.models.Video;
+import co.edu.javeriana.lms.videos.services.VideoService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;

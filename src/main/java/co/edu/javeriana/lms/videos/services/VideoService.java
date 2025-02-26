@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.services;
+package co.edu.javeriana.lms.videos.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -7,9 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import co.edu.javeriana.lms.dtos.EditVideoDto;
-import co.edu.javeriana.lms.models.Video;
-import co.edu.javeriana.lms.repositories.VideoRepository;
+import co.edu.javeriana.lms.videos.dtos.EditVideoDto;
+import co.edu.javeriana.lms.videos.models.Video;
+import co.edu.javeriana.lms.videos.repositories.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

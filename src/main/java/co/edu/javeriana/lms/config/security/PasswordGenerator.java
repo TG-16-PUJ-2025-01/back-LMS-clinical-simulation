@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.utils;
+package co.edu.javeriana.lms.config.security;
 
 import java.security.SecureRandom;
 import java.util.Random;

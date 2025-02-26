@@ -24,10 +24,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
-import co.edu.javeriana.lms.dtos.EditVideoDto;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
-import co.edu.javeriana.lms.models.Video;
-import co.edu.javeriana.lms.services.VideoService;
+import co.edu.javeriana.lms.videos.controllers.VideoController;
+import co.edu.javeriana.lms.videos.dtos.EditVideoDto;
+import co.edu.javeriana.lms.videos.models.Video;
+import co.edu.javeriana.lms.videos.services.VideoService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @SpringBootTest

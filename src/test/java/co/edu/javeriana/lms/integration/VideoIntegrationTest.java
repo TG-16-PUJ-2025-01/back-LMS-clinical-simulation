@@ -28,7 +28,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import co.edu.javeriana.lms.services.VideoService;
+import co.edu.javeriana.lms.videos.services.VideoService;
 
 @SpringBootTest
 @Testcontainers

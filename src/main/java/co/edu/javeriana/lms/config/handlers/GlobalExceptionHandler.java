@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.config;
+package co.edu.javeriana.lms.config.handlers;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -22,7 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
-import co.edu.javeriana.lms.dtos.EditVideoDTO;
+import co.edu.javeriana.lms.dtos.EditVideoDto;
 import co.edu.javeriana.lms.models.Video;
 import co.edu.javeriana.lms.repositories.VideoRepository;
 
@@ -66,7 +66,7 @@ public class VideoServiceTest {
 
     @Test
     public void testSearchVideos() {
-        when(videoRepository.findByNameContaining("", mockVideosPage.getPageable())).thenReturn(mockVideosPage);
+        when(videoRepository.findByNameContainingIgnoreCase("", mockVideosPage.getPageable())).thenReturn(mockVideosPage);
 
         Page<Video> videosPage = videoService.searchVideos("", 0, 10, "name", true);
 
@@ -86,7 +86,7 @@ public class VideoServiceTest {
     public void testSearchVideosMultiplePages() {
         Page<Video> filteredVideosPage = new PageImpl<>(mockVideosPage.getContent(), PageRequest.of(0, 1, Sort.by("name").ascending()), mockVideosPage.getTotalElements());
 
-        when(videoRepository.findByNameContaining("", PageRequest.of(0, 1, Sort.by("name").ascending()))).thenReturn(filteredVideosPage);
+        when(videoRepository.findByNameContainingIgnoreCase("", PageRequest.of(0, 1, Sort.by("name").ascending()))).thenReturn(filteredVideosPage);
 
         Page<Video> videosPage = videoService.searchVideos("", 0, 1, "name", true);
 
@@ -109,7 +109,7 @@ public class VideoServiceTest {
         when(videoRepository.save(mockVideo)).thenReturn(mockVideo);
 
         Video editedVideo = videoService.editVideo(id,
-                new EditVideoDTO(mockVideo.getName(), mockVideo.getExpirationDate()));
+                new EditVideoDto(mockVideo.getName(), mockVideo.getExpirationDate()));
 
         assert (editedVideo.equals(mockVideo));
     }
@@ -120,7 +120,7 @@ public class VideoServiceTest {
         when(videoRepository.findById(id)).thenReturn(Optional.empty());
 
         Video editedVideo = videoService.editVideo(id,
-                new EditVideoDTO(mockVideo.getName(), mockVideo.getExpirationDate()));
+                new EditVideoDto(mockVideo.getName(), mockVideo.getExpirationDate()));
 
         assert (editedVideo == null);
     }

@@ -69,7 +69,7 @@ public class VideoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<Video>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDTO dto) {
+    public ResponseEntity<ApiResponseDto<Video>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDto dto) {
         log.info("Editing video with id: {}", id);
 
         Video video = videoService.editVideo(id, dto);

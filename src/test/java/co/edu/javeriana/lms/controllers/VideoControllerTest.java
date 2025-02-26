@@ -24,7 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import co.edu.javeriana.lms.dtos.ApiResponseDto;
-import co.edu.javeriana.lms.dtos.EditVideoDTO;
+import co.edu.javeriana.lms.dtos.EditVideoDto;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.models.Video;
 import co.edu.javeriana.lms.services.VideoService;
@@ -113,9 +113,9 @@ public class VideoControllerTest {
     @Test
     public void testEditVideoSuccess() {
         Long id = 1L;
-        when(videoService.editVideo(id, new EditVideoDTO(mockVideo.getName(), mockVideo.getExpirationDate()))).thenReturn(mockVideo);
+        when(videoService.editVideo(id, new EditVideoDto(mockVideo.getName(), mockVideo.getExpirationDate()))).thenReturn(mockVideo);
 
-        ResponseEntity<ApiResponseDto<Video>> editedVideo = videoController.editVideo(id, new EditVideoDTO(mockVideo.getName(), mockVideo.getExpirationDate()));
+        ResponseEntity<ApiResponseDto<Video>> editedVideo = videoController.editVideo(id, new EditVideoDto(mockVideo.getName(), mockVideo.getExpirationDate()));
 
         assert (editedVideo.getBody().getData().equals(mockVideo));
         assert (editedVideo.getBody().getMetadata() == null);
@@ -124,9 +124,9 @@ public class VideoControllerTest {
     @Test
     public void testEditVideoFailure() {
         Long id = 1L;
-        when(videoService.editVideo(id, new EditVideoDTO(mockVideo.getName(), mockVideo.getExpirationDate()))).thenReturn(null);
+        when(videoService.editVideo(id, new EditVideoDto(mockVideo.getName(), mockVideo.getExpirationDate()))).thenReturn(null);
 
-        ResponseEntity<ApiResponseDto<Video>> editedVideo = videoController.editVideo(id, new EditVideoDTO(mockVideo.getName(), mockVideo.getExpirationDate()));
+        ResponseEntity<ApiResponseDto<Video>> editedVideo = videoController.editVideo(id, new EditVideoDto(mockVideo.getName(), mockVideo.getExpirationDate()));
 
         assert (editedVideo.getBody().getData() == null);
         assert (editedVideo.getStatusCode() == HttpStatusCode.valueOf(404));

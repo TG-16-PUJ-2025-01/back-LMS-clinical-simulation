@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.javeriana.lms.accounts.dtos.PasswordResetDto;
+import co.edu.javeriana.lms.accounts.dtos.UsernameDto;
 import co.edu.javeriana.lms.accounts.models.PasswordResetToken;
-import co.edu.javeriana.lms.dtos.PasswordResetDto;
-import co.edu.javeriana.lms.dtos.UsernameDto;
 import co.edu.javeriana.lms.services.ResetPasswordService;
 import jakarta.validation.Valid;
 

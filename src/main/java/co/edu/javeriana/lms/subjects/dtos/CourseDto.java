@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.dtos;
+package co.edu.javeriana.lms.subjects.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

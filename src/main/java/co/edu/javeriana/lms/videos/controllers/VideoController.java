@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
+import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.videos.dtos.EditVideoDto;
 import co.edu.javeriana.lms.videos.models.Video;
 import co.edu.javeriana.lms.videos.services.VideoService;

@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.dtos;
+package co.edu.javeriana.lms.subjects.dtos;
 import java.sql.Date;
 
 import jakarta.validation.constraints.NotBlank;

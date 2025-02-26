@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.dtos;
+package co.edu.javeriana.lms.accounts.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

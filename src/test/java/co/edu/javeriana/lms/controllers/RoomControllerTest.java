@@ -20,10 +20,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 
+import co.edu.javeriana.lms.booking.dtos.RoomDto;
+import co.edu.javeriana.lms.booking.dtos.RoomTypeDto;
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
-import co.edu.javeriana.lms.dtos.RoomDto;
-import co.edu.javeriana.lms.dtos.RoomTypeDto;
 import co.edu.javeriana.lms.services.RoomService;
 import co.edu.javeriana.lms.services.RoomTypeService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;

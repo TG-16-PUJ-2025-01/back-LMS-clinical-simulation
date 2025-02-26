@@ -23,8 +23,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
-import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
+import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.videos.controllers.VideoController;
 import co.edu.javeriana.lms.videos.dtos.EditVideoDto;
 import co.edu.javeriana.lms.videos.models.Video;

@@ -36,7 +36,7 @@ public class VideoController {
     private VideoService videoService;
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponseDto<?>> getAllVideos(
+    public ResponseEntity<ApiResponseDto<List<Video>>> searchVideos(
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
             @Min(1) @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "videoId") String sort,
@@ -52,12 +52,12 @@ public class VideoController {
 
         String previous = null;
         if (videosPage.hasPrevious()) {
-            previous = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page - 1, size);
+            previous = String.format("%s://%s/video/all?page=%d&size=%d&sort=%s&asc=%b&filter=%s", scheme, host, page - 1, size, sort, asc, filter);
         }
 
         String next = null;
         if (videosPage.hasNext()) {
-            next = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page + 1, size);
+            next = String.format("%s://%s/video/all?page=%d&size=%d&sort=%s&asc=%b&filter=%s", scheme, host, page + 1, size, sort, asc, filter);
         }
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, videosPage.getNumberOfElements(),
@@ -69,7 +69,7 @@ public class VideoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<?>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDto dto) {
+    public ResponseEntity<ApiResponseDto<Video>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDTO dto) {
         log.info("Editing video with id: {}", id);
 
         Video video = videoService.editVideo(id, dto);
@@ -83,7 +83,7 @@ public class VideoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<?>> deleteVideo(@PathVariable Long id) {
+    public ResponseEntity<ApiResponseDto<Video>> deleteVideo(@PathVariable Long id) {
         log.info("Deleting video with id: {}", id);
 
         Video video = videoService.deleteVideo(id);

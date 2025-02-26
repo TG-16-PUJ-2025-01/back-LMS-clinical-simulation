@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,7 @@ import co.edu.javeriana.lms.repositories.UserRepository;
 import co.edu.javeriana.lms.repositories.VideoRepository;
 
 @Component
+@Profile({"dev", "test"})
 public class DBInitializer implements CommandLineRunner {
 
 	@Autowired
@@ -173,55 +175,40 @@ public class DBInitializer implements CommandLineRunner {
 	}
 
 	private void insertVideos() throws ParseException {
-		Video video1 = new Video("javatechie.mp4",
-				new SimpleDateFormat("yyyy-MM-dd").parse("2023-01-31"),
-				new Date(), 62L, 8.3);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-		Video video2 = new Video("10350-224234500_small.mp4",
-				new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
-				new Date(), 600L, 31.2);
+		Video video1 = Video.builder().name("javatechie.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				.expirationDate(new Date()).duration(62L).size(8.3).build();
 
-		Video video3 = new Video("unavailable1.mp4",
-				new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
-				new Date(), 210L, 300.0);
-		video3.setAvailable(false);
+		Video video2 = Video.builder().name("10350-224234500_small.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				.expirationDate(new Date()).duration(600L).size(31.2).build();
 
-		Video video4 = new Video("unavailable2.mp4",
-				new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
-				new Date(), 450L, 420.0);
-		video4.setAvailable(false);
+		Video video3 = Video.builder().name("unavailable1.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				.expirationDate(new Date()).duration(210L).size(300.0).available(false).build();
 
-		Video video5 = new Video("unavailable3.mp4",
-				new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
-				new Date(), 600L, 500.0);
-		video5.setAvailable(false);
+		Video video4 = Video.builder().name("unavailable2.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				.expirationDate(new Date()).duration(450L).size(420.0).available(false).build();
 
-		Video video6 = new Video("unavailable4.mp4",
-				new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
-				new Date(), 780L, 780.0);
-		video6.setAvailable(false);
+		Video video5 = Video.builder().name("unavailable3.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				.expirationDate(new Date()).duration(600L).size(500.0).available(false).build();
 
-		Video video7 = new Video("unavailable5.mp4",
-				new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
-				new Date(), 6000L, 6000.0);
-		video7.setAvailable(false);
+		Video video6 = Video.builder().name("unavailable4.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				.expirationDate(new Date()).duration(780L).size(780.0).available(false).build();
 
-		Video video8 = new Video("unavailable6.mp4",
-				new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
-				new Date(), 620L, 500.0);
-		video8.setAvailable(false);
-		Video video9 = new Video("unavailable7.mp4",
-				new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
-				new Date(), 620L, 500.0);
-		video9.setAvailable(false);
-		Video video10 = new Video("unavailable8.mp4",
-				new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
-				new Date(), 620L, 500.0);
-		video10.setAvailable(false);
-		Video video11 = new Video("unavailable9.mp4",
-				new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-31"),
-				new Date(), 620L, 500.0);
-		video11.setAvailable(false);
+		Video video7 = Video.builder().name("unavailable5.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				.expirationDate(new Date()).duration(6000L).size(6000.0).available(false).build();
+
+		Video video8 = Video.builder().name("unavailable6.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				.expirationDate(new Date()).duration(620L).size(500.0).available(false).build();
+
+		Video video9 = Video.builder().name("unavailable7.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				.expirationDate(new Date()).duration(620L).size(500.0).available(false).build();
+
+		Video video10 = Video.builder().name("unavailable8.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				.expirationDate(new Date()).duration(620L).size(500.0).available(false).build();
+
+		Video video11 = Video.builder().name("unavailable9.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				.expirationDate(new Date()).duration(620L).size(500.0).available(false).build();
 
 		videoRepository.save(video1);
 		videoRepository.save(video2);

@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
-import co.edu.javeriana.lms.repositories.ClassRepository;
-import co.edu.javeriana.lms.repositories.CourseRepository;
-import co.edu.javeriana.lms.repositories.UserRepository;
+import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.subjects.dtos.CourseDto;
 import co.edu.javeriana.lms.subjects.models.Course;
+import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
+import co.edu.javeriana.lms.subjects.repositories.CourseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.repositories;
+package co.edu.javeriana.lms.subjects.repositories;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

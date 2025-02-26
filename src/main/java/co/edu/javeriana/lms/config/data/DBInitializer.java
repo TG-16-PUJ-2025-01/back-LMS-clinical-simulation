@@ -16,13 +16,13 @@ import org.springframework.stereotype.Component;
 
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
-import co.edu.javeriana.lms.repositories.CourseRepository;
-import co.edu.javeriana.lms.repositories.RoomRepository;
-import co.edu.javeriana.lms.repositories.RoomTypeRepository;
-import co.edu.javeriana.lms.repositories.UserRepository;
+import co.edu.javeriana.lms.booking.repositories.RoomRepository;
+import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
 import co.edu.javeriana.lms.subjects.models.Course;
+import co.edu.javeriana.lms.subjects.repositories.CourseRepository;
 import co.edu.javeriana.lms.videos.models.Video;
 import co.edu.javeriana.lms.videos.repositories.VideoRepository;
 

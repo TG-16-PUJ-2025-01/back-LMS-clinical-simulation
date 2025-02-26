@@ -14,8 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.config.security.PasswordGenerator;
-import co.edu.javeriana.lms.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 

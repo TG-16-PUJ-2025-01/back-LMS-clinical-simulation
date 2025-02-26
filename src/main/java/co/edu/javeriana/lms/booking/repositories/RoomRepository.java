@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.repositories;
+package co.edu.javeriana.lms.booking.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

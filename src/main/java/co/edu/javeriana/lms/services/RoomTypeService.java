@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.booking.models.RoomType;
-import co.edu.javeriana.lms.repositories.RoomTypeRepository;
+import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
 
 @Service
 public class RoomTypeService {

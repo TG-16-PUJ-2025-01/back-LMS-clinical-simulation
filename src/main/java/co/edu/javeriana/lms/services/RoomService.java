@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
-import co.edu.javeriana.lms.repositories.RoomRepository;
-import co.edu.javeriana.lms.repositories.RoomTypeRepository;
+import co.edu.javeriana.lms.booking.repositories.RoomRepository;
+import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
 
 @Service
 public class RoomService {

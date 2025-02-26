@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.repositories;
+package co.edu.javeriana.lms.accounts.repositories;
 
 import java.util.List;
 import java.util.Optional;

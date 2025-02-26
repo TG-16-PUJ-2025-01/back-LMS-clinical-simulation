@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.accounts.models.User;
-import co.edu.javeriana.lms.repositories.UserRepository;
+import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

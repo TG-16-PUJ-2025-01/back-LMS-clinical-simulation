@@ -1,7 +1,8 @@
-package co.edu.javeriana.lms.services;
+package co.edu.javeriana.lms.shared.services;
 
 import java.util.List;
 
+// FIXME
 public interface CrudService<T, ID> {
     T save(T entity);
     T findById(ID id);

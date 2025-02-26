@@ -14,9 +14,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.support.WebExchangeBindException;
 
-
-import co.edu.javeriana.lms.dtos.ErrorDto;
-import co.edu.javeriana.lms.dtos.ValidationErrorDto;
+import co.edu.javeriana.lms.shared.dtos.ErrorDto;
+import co.edu.javeriana.lms.shared.dtos.ValidationErrorDto;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;

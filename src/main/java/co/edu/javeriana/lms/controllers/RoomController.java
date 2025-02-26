@@ -8,13 +8,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.edu.javeriana.lms.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.dtos.RoomDto;
 import co.edu.javeriana.lms.models.Room;
 import co.edu.javeriana.lms.models.RoomType;
 import co.edu.javeriana.lms.services.RoomService;
 import co.edu.javeriana.lms.services.RoomTypeService;
+import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;

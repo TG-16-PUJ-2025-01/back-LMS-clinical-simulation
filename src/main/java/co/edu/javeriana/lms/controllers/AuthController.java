@@ -5,10 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import co.edu.javeriana.lms.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.dtos.ChangePasswordDto;
 import co.edu.javeriana.lms.dtos.LoginDto;
 import co.edu.javeriana.lms.services.AuthService;
+import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 

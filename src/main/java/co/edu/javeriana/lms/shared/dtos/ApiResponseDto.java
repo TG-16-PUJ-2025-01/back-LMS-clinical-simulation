@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.dtos;
+package co.edu.javeriana.lms.shared.dtos;
 
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;

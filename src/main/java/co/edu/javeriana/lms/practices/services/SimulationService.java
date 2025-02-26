@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.services;
+package co.edu.javeriana.lms.practices.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

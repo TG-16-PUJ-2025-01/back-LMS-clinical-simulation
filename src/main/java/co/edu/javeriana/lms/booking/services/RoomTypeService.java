@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.services;
+package co.edu.javeriana.lms.booking.services;
 
 import java.util.List;
 import java.util.Optional;

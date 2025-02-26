@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.services;
+package co.edu.javeriana.lms.accounts.services;
 
 import java.util.Collection;
 import java.util.Set;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
+import co.edu.javeriana.lms.shared.services.JwtService;
 
 @Service
 public class CustomUserDetailService implements UserDetailsService {

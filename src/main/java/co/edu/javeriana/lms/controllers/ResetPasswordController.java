@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import co.edu.javeriana.lms.accounts.dtos.PasswordResetDto;
 import co.edu.javeriana.lms.accounts.dtos.UsernameDto;
 import co.edu.javeriana.lms.accounts.models.PasswordResetToken;
-import co.edu.javeriana.lms.services.ResetPasswordService;
+import co.edu.javeriana.lms.accounts.services.ResetPasswordService;
 import jakarta.validation.Valid;
 
 @RestController

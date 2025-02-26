@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import co.edu.javeriana.lms.services.JwtService;
-import co.edu.javeriana.lms.services.CustomUserDetailService;
+import co.edu.javeriana.lms.accounts.services.CustomUserDetailService;
+import co.edu.javeriana.lms.shared.services.JwtService;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 

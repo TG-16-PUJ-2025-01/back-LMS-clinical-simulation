@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.services;
+package co.edu.javeriana.lms.accounts.services;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

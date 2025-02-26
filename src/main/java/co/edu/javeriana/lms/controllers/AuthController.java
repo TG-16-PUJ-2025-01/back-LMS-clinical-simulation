@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import co.edu.javeriana.lms.accounts.dtos.ChangePasswordDto;
 import co.edu.javeriana.lms.accounts.dtos.LoginDto;
-import co.edu.javeriana.lms.services.AuthService;
+import co.edu.javeriana.lms.accounts.services.AuthService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;

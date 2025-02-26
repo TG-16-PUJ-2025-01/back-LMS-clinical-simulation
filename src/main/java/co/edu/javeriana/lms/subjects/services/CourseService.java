@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.services;
+package co.edu.javeriana.lms.subjects.services;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.services;
+package co.edu.javeriana.lms.shared.services;
 
 import java.time.Duration;
 import java.util.Date;

@@ -66,6 +66,10 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Course> courses;
 
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<GroupPerSimulation> groups;
+
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -2,8 +2,6 @@ package co.edu.javeriana.lms.models;
 
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,36 +9,35 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import lombok.NonNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Data
-@Entity
-@Table(name = "Room", uniqueConstraints = @UniqueConstraint(columnNames = { "name" }))
-@NoArgsConstructor
-@RequiredArgsConstructor
-@AllArgsConstructor
 @Builder
-public class Room {
-
+@Entity
+@Table(name = "group_per_simulation")
+@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
+public class GroupPerSimulation {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Long id;
 
     @NonNull
-    @Column(nullable = false, unique = true)
-    private String name;
-
     @ManyToOne
+    private Simulation simulation;
+
     @NonNull
-    private RoomType type;
+    @ManyToOne
+    private User user;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @NonNull
+    @OneToMany(mappedBy = "groupPerSimulation")
     private List<Booking> bookings;
-
+    
 }

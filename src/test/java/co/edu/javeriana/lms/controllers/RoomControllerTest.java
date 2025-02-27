@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import co.edu.javeriana.lms.booking.controllers.RoomController;
 import co.edu.javeriana.lms.booking.dtos.RoomDto;
@@ -31,6 +32,7 @@ import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class RoomControllerTest {
 
     @InjectMocks

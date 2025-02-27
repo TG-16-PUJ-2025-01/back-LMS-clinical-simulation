@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.context.ActiveProfiles;
 
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
@@ -27,6 +28,7 @@ import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
 import co.edu.javeriana.lms.booking.services.RoomService;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class RoomServiceTest {
 
     @InjectMocks
@@ -78,20 +80,21 @@ public class RoomServiceTest {
     public void testEditRoomSuccess() {
         Long id = 1L;
         when(roomRepository.findById(id)).thenReturn(Optional.of(mockRoom));
+        when(roomTypeRepository.findByName(mockRoom.getType().getName())).thenReturn(mockRoomType);
         when(roomRepository.save(mockRoom)).thenReturn(mockRoom);
 
         Room editedRoom = roomService.update(mockRoom);
 
-        assert (editedRoom != null);
-        assert (editedRoom.getName().equals(mockRoom.getName()));
+        assert (editedRoom.equals(mockRoom));
     }
 
     @Test
     public void testEditRoomFailure() {
         Long id = 1L;
         Room roomWithNullType = Room.builder().id(id).name("Updated Room")
-                .type(RoomType.builder().name("Cirugia").build()).build();
+                .type(mockRoomType).build();
         when(roomRepository.findById(id)).thenReturn(Optional.empty());
+        when(roomTypeRepository.findByName(mockRoom.getType().getName())).thenReturn(mockRoomType);
 
         Room editedRoom = roomService.update(roomWithNullType);
 

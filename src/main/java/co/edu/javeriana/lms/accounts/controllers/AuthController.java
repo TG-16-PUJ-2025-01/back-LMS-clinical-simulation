@@ -44,4 +44,16 @@ public class AuthController {
         token = token.substring(7);
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Roles retrieved successfully", authService.getRolesByToken(token), null));
     }
+
+    @GetMapping("/email")
+    public ResponseEntity<?> getEmailByToken(@RequestHeader("Authorization") String token) {
+        token = token.substring(7);
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Email retrieved successfully", authService.getEmailByToken(token), null));
+    }
+
+    @GetMapping("/name")
+    public ResponseEntity<?> getNameByToken(@RequestHeader("Authorization") String token) {
+        token = token.substring(7);
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Name retrieved successfully", authService.getNameByToken(token), null));
+    }
 }

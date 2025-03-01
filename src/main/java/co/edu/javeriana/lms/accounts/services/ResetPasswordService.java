@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +34,7 @@ public class ResetPasswordService {
     public PasswordResetToken createPasswordResetToken (String email) {
         log.info("Creating password reset token for user: " + email);
         if (!userRepository.existsByEmail(email)) {
-            throw new RuntimeException("User not found");
+            throw new UsernameNotFoundException("User not found with email: " + email);
         }
         
         String token = UUID.randomUUID().toString().substring(0, 6);
@@ -47,7 +48,7 @@ public class ResetPasswordService {
     public void sentPasswordResetEmail(String email, String token) {
         log.info("Sending password reset email to: " + email);
         if (!userRepository.existsByEmail(email)) {
-            throw new RuntimeException("User not found");
+            throw new UsernameNotFoundException("User not found with email: " + email);
         }
         String subject = "Restablecer contraseña LMS";
         String body = "Hola " + email + ",\n\nPara restablecer tu contraseña, utiliza el siguiente código: " + token + "\n\n" +
@@ -75,7 +76,7 @@ public class ResetPasswordService {
             throw new RuntimeException("Invalid token");
         }
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
         passwordResetTokenRepository.deleteByToken(token);

@@ -13,12 +13,10 @@ import co.edu.javeriana.lms.models.User;
 public interface ClassRepository extends JpaRepository <ClassModel, Long> {
     @Query("""
         SELECT c FROM ClassModel c 
-        WHERE CAST(c.javerianaId AS string) LIKE %:filter% 
-        OR LOWER(TRANSLATE(c.name, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
+        WHERE CAST(c.javerianaId AS string) LIKE %:filter%
     """)
-    Page<ClassModel> findByNameOrJaverianaIdContaining(@Param("filter") String filter, Pageable pageable);
-
-
+    Page<ClassModel> findByJaverianaId(@Param("filter") String filter, Pageable pageable);
+    
     //obtener todos los miembros de una clase
     @Query("""
         SELECT u FROM User u 
@@ -39,6 +37,7 @@ public interface ClassRepository extends JpaRepository <ClassModel, Long> {
         AND u.id NOT IN (
             SELECT p.id FROM ClassModel c JOIN c.professors p WHERE c.classId = :classId
         )
+
     """)
     Page<User> findUsersNotInClass(@Param("classId") Long classId, Pageable pageable);
     

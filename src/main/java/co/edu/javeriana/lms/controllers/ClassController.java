@@ -1,6 +1,4 @@
 package co.edu.javeriana.lms.controllers;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,6 +195,15 @@ public class ClassController {
         
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
                     "Class updated successfully.", classService.update(classService.fromDtoToClass(classModel), id), null));
+        
+    }
+
+    @PutMapping("/update/{id}/members")
+    public ResponseEntity<?> updateClassMembers(@RequestBody List<User> members, @PathVariable Long id) {
+        log.info("Updating class members with ID: " + id);
+        
+        return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
+                    "Class updated successfully.", classService.updateMembers(members, id), null));
         
     }
 

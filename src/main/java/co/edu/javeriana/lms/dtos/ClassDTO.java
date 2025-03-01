@@ -18,9 +18,6 @@ public class ClassDTO {
     @NotNull(message = "Id Javeriana is required")
     @Positive(message = "Id Javeriana must be a positive number")
     private Long javerianaId;
-     
-    @NotBlank(message = "Name is required")
-    private String name;
 
     @NotNull(message = "Id Professor is required")
     private List<Long> professorsIds;

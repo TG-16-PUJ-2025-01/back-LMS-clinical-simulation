@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import co.edu.javeriana.lms.dtos.ClassDTO;
 import co.edu.javeriana.lms.models.ClassModel;
+import co.edu.javeriana.lms.models.Role;
 import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.repositories.ClassRepository;
 import co.edu.javeriana.lms.repositories.CourseRepository;
@@ -34,7 +35,7 @@ public class ClassService {
     public Page<ClassModel> findAll(String filter, Integer page, Integer size, String sort, Boolean asc) {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        return classRepository.findByNameOrJaverianaIdContaining(filter, pageable);
+        return classRepository.findByJaverianaId(filter, pageable);
     }
 
     public Page<User>findAllMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id)
@@ -65,7 +66,7 @@ public class ClassService {
             professors.add(userRepository.findById(professorId).get());
         });
         
-        ClassModel classModel = new ClassModel(entity.getName(), entity.getBeginningDate(),
+        ClassModel classModel = new ClassModel(entity.getBeginningDate(),
                 professors,
                 courseRepository.findById(entity.getCourseId()).get(), entity.getJaverianaId());
        
@@ -102,10 +103,32 @@ public class ClassService {
 
         // Update fields
         classModel.setBeginningDate(classModel.getBeginningDate());
-        classModel.setName(classModel.getName());
         classModel.setProfessors(professors);
         classModel.setCourse(courseRepository.findById(classModeldto.getCourseId()).get());
 
+        return classModel;
+    }
+
+    public ClassModel updateMembers(List<User> members, Long id) {
+        // TODO Auto-generated method stub
+
+        ClassModel classModel = classRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
+
+        //anadir los profesores a la clase en members buscando precisamente los profesores con role
+        members.stream().forEach(member -> {
+            if(member.getRoles().contains(Role.PROFESOR))
+            {
+                classModel.getProfessors().add(userRepository.findById(member.getId()).get());
+            }
+            else if(member.getRoles().contains(Role.ESTUDIANTE))
+            {
+                classModel.getStudents().add(userRepository.findById(member.getId()).get());
+            }
+        });
+
+        classRepository.save(classModel);
+        
         return classModel;
     }
 

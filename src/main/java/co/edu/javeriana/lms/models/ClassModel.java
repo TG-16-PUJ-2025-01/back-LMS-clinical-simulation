@@ -28,8 +28,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ClassModel {
 
-    public ClassModel(String name2, Date beginningDate, List<User> professor, Course course, Long javerianaId) {
-        this.name = name2;
+    public ClassModel(Date beginningDate, List<User> professor, Course course, Long javerianaId) {
         this.beginningDate = beginningDate;
         this.professors = professor;
         this.course = course;
@@ -42,9 +41,6 @@ public class ClassModel {
 
     @Column(unique = true, nullable = false)
     private Long javerianaId;
-
-    @Column(nullable = false)
-    private String name;
 
     @Column(nullable = false)
     private Date beginningDate;

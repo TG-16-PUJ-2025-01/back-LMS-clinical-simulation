@@ -1,5 +1,8 @@
 package co.edu.javeriana.lms.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -8,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import co.edu.javeriana.lms.dtos.ClassDTO;
 import co.edu.javeriana.lms.models.ClassModel;
+import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.repositories.ClassRepository;
 import co.edu.javeriana.lms.repositories.CourseRepository;
 import co.edu.javeriana.lms.repositories.UserRepository;
@@ -30,7 +34,21 @@ public class ClassService {
     public Page<ClassModel> findAll(String filter, Integer page, Integer size, String sort, Boolean asc) {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        return classRepository.findAll(pageable);
+        return classRepository.findByNameOrJaverianaIdContaining(filter, pageable);
+    }
+
+    public Page<User>findAllMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id)
+    {
+        Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        return classRepository.findMembers(id, pageable);
+    }
+
+    public Page<User>findAllNonMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id)
+    {
+        Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        return classRepository.findUsersNotInClass(id, pageable);
     }
 
     public ClassModel findById(Long id) {
@@ -41,17 +59,19 @@ public class ClassService {
     public ClassModel save(ClassDTO entity) {
 
         log.info("unicornio aa "+ entity);
+        List <User> professors = new ArrayList<>();
+        //mappeo de profesores por stream
+        entity.getProfessorsIds().stream().forEach(professorId -> {
+            professors.add(userRepository.findById(professorId).get());
+        });
         
         ClassModel classModel = new ClassModel(entity.getName(), entity.getBeginningDate(),
-                userRepository.findById(entity.getProfessorId()).get(),
+                professors,
                 courseRepository.findById(entity.getCourseId()).get(), entity.getJaverianaId());
        
        // log.info("unicornio aa2 "+ classModel.getJaverianaId(), classModel.getName(), classModel.getBeginningDate(), classModel.getProfessor().getName(), classModel.getCourse().getCourseId());
 
         classRepository.save(classModel);
-
-
-        log.info("unicornio aa3 "+ entity);
 
         return classModel;
     }
@@ -61,20 +81,32 @@ public class ClassService {
         classRepository.deleteById(id);
     }
 
-    public ClassModel update(ClassDTO classModel, Long id) {
+    public ClassModel update(ClassModel classModel, Long id) {
 
         ClassModel currentClassModel = classRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
 
-        // Update fields
-        currentClassModel.setBeginningDate(classModel.getBeginningDate());
-        currentClassModel.setName(classModel.getName());
-        currentClassModel.setProfessor(userRepository.findById(classModel.getProfessorId()).get());
-        currentClassModel.setCourse(courseRepository.findById(classModel.getCourseId()).get());
-
         classRepository.save(currentClassModel);
 
         return currentClassModel;
+    }
+
+    public ClassModel fromDtoToClass(ClassDTO classModeldto)
+    {
+        ClassModel classModel = new ClassModel();
+        List <User> professors = new ArrayList<>();
+        //mappeo de profesores por stream
+        classModeldto.getProfessorsIds().stream().forEach(professorId -> {
+            professors.add(userRepository.findById(professorId).get());
+        });
+
+        // Update fields
+        classModel.setBeginningDate(classModel.getBeginningDate());
+        classModel.setName(classModel.getName());
+        classModel.setProfessors(professors);
+        classModel.setCourse(courseRepository.findById(classModeldto.getCourseId()).get());
+
+        return classModel;
     }
 
 }

@@ -175,6 +175,13 @@ public class DBInitializer implements CommandLineRunner {
 		both2.setInstitutionalId(5690);
 		both2.setRoles(new HashSet<>(Arrays.asList(Role.PROFESOR, Role.COORDINADOR)));
 
+		both2.setEmail("estudiante0@gamil.com");
+		both2.setPassword("13456");
+		both2.setName("Pedro student");
+		both2.setLastName("Pacheco");
+		both2.setInstitutionalId(1001090713);
+		both2.setRoles(new HashSet<>(Arrays.asList(Role.ESTUDIANTE)));
+
 		userRepository.save(professor1);
 		userRepository.save(professor2);
 		userRepository.save(coord1);

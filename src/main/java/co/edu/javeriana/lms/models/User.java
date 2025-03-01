@@ -53,7 +53,8 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
-    @OneToMany(mappedBy = "professor", cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "professor_classes", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "classId"))  
     @JsonIgnore
     private List<ClassModel> professorClasses;
 
@@ -62,9 +63,10 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Course> courses;
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "class_students", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "classId"))
     @JsonIgnore
-    private List<StudentClass> studentlassses;
+    private List<ClassModel> studentClassses;
 
     @Override
     @JsonIgnore

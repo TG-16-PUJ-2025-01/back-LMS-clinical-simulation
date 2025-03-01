@@ -1,6 +1,8 @@
 package co.edu.javeriana.lms.dtos;
 import java.sql.Date;
+import java.util.List;
 
+import co.edu.javeriana.lms.models.ClassModel;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -21,8 +23,7 @@ public class ClassDTO {
     private String name;
 
     @NotNull(message = "Id Professor is required")
-    @Positive(message = "Id Professor must be a positive number")
-    private Long professorId;
+    private List<Long> professorsIds;
 
     @NotNull(message = "Id course is required")
     @Positive(message = "Id course must be a positive number")

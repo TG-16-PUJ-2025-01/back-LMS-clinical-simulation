@@ -1,9 +1,9 @@
 package co.edu.javeriana.lms.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +21,8 @@ import co.edu.javeriana.lms.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.dtos.ClassDTO;
 import co.edu.javeriana.lms.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.models.ClassModel;
+import co.edu.javeriana.lms.models.User;
 import co.edu.javeriana.lms.services.ClassService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -73,6 +73,81 @@ public class ClassController {
                 classModelPage.getContent(), metadata));
     }
 
+    @GetMapping("/{id}/member/all")
+    public ResponseEntity<?> getAllClassMembers(
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            HttpServletRequest request,
+            @PathVariable Long id) {
+
+        log.info("Requesting all members of the class");
+
+        String host = request.getHeader("Host");
+        String scheme = request.getScheme();
+
+        Page<User> classModelPage = classService.findAllMembers(filter, page, size, sort, asc, id);
+
+
+        String previous = null;
+        if (classModelPage.hasPrevious()) {
+            previous = String.format("%s://%s/class/all?page=%d&size=%d", scheme, host, page - 1, size);
+        }
+
+        String next = null;
+        if (classModelPage.hasNext()) {
+            next = String.format("%s://%s/class/all?page=%d&size=%d", scheme, host, page + 1, size);
+        }
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
+                classModelPage.getTotalElements(),
+                classModelPage.getTotalPages(), next,
+                previous);
+
+        return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok",
+                classModelPage.getContent(), metadata));
+    }
+
+    @GetMapping("/{id}/member/all/outside")
+    public ResponseEntity<?> getAllClassMembersNotInClass(
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            HttpServletRequest request,
+            @PathVariable Long id) {
+
+        log.info("Requesting all members out of the class");
+
+        String host = request.getHeader("Host");
+        String scheme = request.getScheme();
+
+        Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id);
+
+
+        String previous = null;
+        if (classModelPage.hasPrevious()) {
+            previous = String.format("%s://%s/class/all?page=%d&size=%d", scheme, host, page - 1, size);
+        }
+
+        String next = null;
+        if (classModelPage.hasNext()) {
+            next = String.format("%s://%s/class/all?page=%d&size=%d", scheme, host, page + 1, size);
+        }
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
+                classModelPage.getTotalElements(),
+                classModelPage.getTotalPages(), next,
+                previous);
+
+        return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok",
+                classModelPage.getContent(), metadata));
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getClassById(@PathVariable Long id) {
 
@@ -101,12 +176,27 @@ public class ClassController {
         
     }
 
+    @DeleteMapping("/delete/{idClass}/member/{idMember}")
+    public ResponseEntity<?> deleteClassMemberById(@PathVariable Long idClass, @PathVariable Long idMember) {
+        log.info("Deleting class memver with ID: " + idMember);
+
+        ClassModel classModel = classService.findById(idClass);
+        classModel.getProfessors().removeIf(user -> user.getId().equals(idMember));
+        classModel.getStudents().removeIf(user -> user.getId().equals(idMember));
+        
+        classService.update(classModel, idClass);
+
+        return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
+                "Member class deleted successfully.", classModel, null));
+        
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateClass(@RequestBody ClassDTO classModel, @PathVariable Long id) {
         log.info("Updating course with ID: " + id);
-
+        
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
-                    "Class updated successfully.", classService.update(classModel, id), null));
+                    "Class updated successfully.", classService.update(classService.fromDtoToClass(classModel), id), null));
         
     }
 

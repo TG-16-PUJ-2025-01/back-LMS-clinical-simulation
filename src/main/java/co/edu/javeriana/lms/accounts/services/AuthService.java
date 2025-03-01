@@ -1,6 +1,7 @@
 package co.edu.javeriana.lms.accounts.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -62,5 +63,20 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return user.getRoles().stream().map(role -> role.name()).toArray(String[]::new);
+    }
+
+    public String getEmailByToken (String token) {
+        log.info("Getting email for token: " + token);
+        return jwtService.extractUserName(token);
+    }
+
+    public String getNameByToken (String token) {
+        log.info("Getting name for token: " + token);
+        String email = jwtService.extractUserName(token);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        String firstName = user.getName();
+        String lastName = user.getLastName();
+        return firstName + " " + lastName;
     }
 }

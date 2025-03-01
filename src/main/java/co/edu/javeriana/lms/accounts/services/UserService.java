@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.config.security.PasswordGenerator;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,13 +63,13 @@ public class UserService implements UserDetailsService {
     public User getUserById(Long id) {
         log.info("Getting user by id: " + id);
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
     }
 
     public User updateUserById(Long id, User user) {
         log.info("Updating user by id: " + id);
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found wirth id: " + id));
         existingUser.setName(user.getName());
         existingUser.setLastName(user.getLastName());
         existingUser.setEmail(user.getEmail());
@@ -88,7 +89,7 @@ public class UserService implements UserDetailsService {
     public void deleteById(Long id) {
         log.info("Deleting user by id: " + id);
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found");
+            throw new EntityNotFoundException("User not found with id: " + id);
         }
         userRepository.deleteById(id);
     }
@@ -100,10 +101,6 @@ public class UserService implements UserDetailsService {
 
     public List<User> findAllProfessors() {
         log.info("Getting all professors");
-
         return userRepository.findAllProfessors();
-
     }
-
 }
-

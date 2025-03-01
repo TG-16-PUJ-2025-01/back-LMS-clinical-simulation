@@ -49,7 +49,11 @@ public class ClassService {
     {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        return classRepository.findUsersNotInClass(id, pageable);
+        return classRepository.findUsersNotInClass(id, pageable).map(user -> {
+            user.getRoles().remove(Role.COORDINADOR);
+            user.setRoles(user.getRoles());
+            return user;
+        });
     }
 
     public ClassModel findById(Long id) {
@@ -59,7 +63,6 @@ public class ClassService {
 
     public ClassModel save(ClassDTO entity) {
 
-        log.info("unicornio aa "+ entity);
         List <User> professors = new ArrayList<>();
         //mappeo de profesores por stream
         entity.getProfessorsIds().stream().forEach(professorId -> {
@@ -110,7 +113,6 @@ public class ClassService {
     }
 
     public ClassModel updateMembers(List<User> members, Long id) {
-        // TODO Auto-generated method stub
 
         ClassModel classModel = classRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));

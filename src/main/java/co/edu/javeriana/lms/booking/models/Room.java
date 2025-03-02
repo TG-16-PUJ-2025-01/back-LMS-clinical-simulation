@@ -36,6 +36,10 @@ public class Room {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @NonNull
+    @Column(nullable = false)
+    private Integer capacity;
+
     @ManyToOne
     @NonNull
     private RoomType type;

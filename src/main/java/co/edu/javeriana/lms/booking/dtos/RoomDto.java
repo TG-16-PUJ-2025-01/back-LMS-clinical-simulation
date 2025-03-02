@@ -16,6 +16,9 @@ public class RoomDto {
     @NotBlank(message = "Room name is mandatory")
     private String name;
 
+    @NotBlank(message = "Room capacity is mandatory")
+    private Integer capacity;
+
     @NotNull(message = "Room type is mandatory")
     private RoomTypeDto type;
 
@@ -23,6 +26,7 @@ public class RoomDto {
         Room room = new Room();
         room.setId(id);
         room.setName(this.name);
+        room.setCapacity(this.capacity);
         room.setType(this.type.toEntity());
 
         return room;

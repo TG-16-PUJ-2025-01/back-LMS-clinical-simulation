@@ -27,6 +27,6 @@ public class ClassDTO {
     private Long courseId;
 
 
-    @NotNull(message = "Beginning date is required")
-    private Date beginningDate;
+    @NotNull(message = "Period is required")
+    private String period;
 }

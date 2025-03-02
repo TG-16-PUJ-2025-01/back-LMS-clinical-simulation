@@ -35,21 +35,21 @@ public class ClassService {
     public Page<ClassModel> findAll(String filter, Integer page, Integer size, String sort, Boolean asc) {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        return classRepository.findByJaverianaId(filter, pageable);
+        return classRepository.searchClasses(filter, pageable);
     }
 
     public Page<User>findAllMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id)
     {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        return classRepository.findMembers(id, pageable);
+        return classRepository.findMembers(id, filter, pageable);
     }
 
     public Page<User>findAllNonMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id)
     {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        return classRepository.findUsersNotInClass(id, pageable).map(user -> {
+        return classRepository.findUsersNotInClass(id, filter, pageable).map(user -> {
             user.getRoles().remove(Role.COORDINADOR);
             user.setRoles(user.getRoles());
             return user;
@@ -69,7 +69,7 @@ public class ClassService {
             professors.add(userRepository.findById(professorId).get());
         });
         
-        ClassModel classModel = new ClassModel(entity.getBeginningDate(),
+        ClassModel classModel = new ClassModel(entity.getPeriod(),
                 professors,
                 courseRepository.findById(entity.getCourseId()).get(), entity.getJaverianaId());
        
@@ -85,31 +85,26 @@ public class ClassService {
         classRepository.deleteById(id);
     }
 
-    public ClassModel update(ClassModel classModel, Long id) {
+    public ClassModel update(ClassModel classModel) {
 
-        ClassModel currentClassModel = classRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
-
-        classRepository.save(currentClassModel);
-
-        return currentClassModel;
-    }
-
-    public ClassModel fromDtoToClass(ClassDTO classModeldto)
-    {
-        ClassModel classModel = new ClassModel();
-        List <User> professors = new ArrayList<>();
-        //mappeo de profesores por stream
-        classModeldto.getProfessorsIds().stream().forEach(professorId -> {
-            professors.add(userRepository.findById(professorId).get());
-        });
-
-        // Update fields
-        classModel.setBeginningDate(classModel.getBeginningDate());
-        classModel.setProfessors(professors);
-        classModel.setCourse(courseRepository.findById(classModeldto.getCourseId()).get());
+        
+        classRepository.save(classModel);
 
         return classModel;
+    }
+
+    public ClassModel fromDtoToClass(ClassDTO classModeldto, Long id)
+    {
+        ClassModel currentClassModel = classRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
+       
+
+        currentClassModel.setJaverianaId(classModeldto.getJaverianaId());
+        // Update fields
+        currentClassModel.setPeriod(classModeldto.getPeriod());
+        currentClassModel.setCourse(courseRepository.findById(classModeldto.getCourseId()).get());
+
+        return currentClassModel;
     }
 
     public ClassModel updateMembers(List<User> members, Long id) {

@@ -165,12 +165,11 @@ public class ClassController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteClassById(@PathVariable Long id) {
         log.info("Deleting course with ID: " + id);
-
-        ClassModel classModel = classService.findById(id);
+        
         classService.deleteById(id);
 
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
-                "Clase deleted successfully.", classModel, null));
+                "Clase deleted successfully.", new ClassModel(), null));
         
     }
 
@@ -182,7 +181,7 @@ public class ClassController {
         classModel.getProfessors().removeIf(user -> user.getId().equals(idMember));
         classModel.getStudents().removeIf(user -> user.getId().equals(idMember));
         
-        classService.update(classModel, idClass);
+        classService.update(classModel);
 
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
                 "Member class deleted successfully.", classModel, null));
@@ -191,10 +190,10 @@ public class ClassController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateClass(@RequestBody ClassDTO classModel, @PathVariable Long id) {
-        log.info("Updating course with ID: " + id);
+        log.info("Updating course with ID: " + id+ " "+classModel.toString());
         
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
-                    "Class updated successfully.", classService.update(classService.fromDtoToClass(classModel), id), null));
+                    "Class updated successfully.", classService.update(classService.fromDtoToClass(classModel, id)), null));
         
     }
 

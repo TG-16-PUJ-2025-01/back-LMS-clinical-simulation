@@ -53,7 +53,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany
     @JoinTable(name = "professor_classes", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "classId"))  
     @JsonIgnore
     private List<ClassModel> professorClasses;
@@ -63,7 +63,7 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Course> courses;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "class_students", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "classId"))
     @JsonIgnore
     private List<ClassModel> studentClassses;

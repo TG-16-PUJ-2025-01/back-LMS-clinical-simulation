@@ -48,8 +48,8 @@ public class User implements UserDetails {
     @Column
     private String lastName;
 
-    @Column // Unique?
-    private int institutionalId;
+    @Column
+    private String institutionalId;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
@@ -66,10 +66,10 @@ public class User implements UserDetails {
     private List<ClassModel> professorClasses;
 
 
-    @OneToMany(mappedBy = "coordinator", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "coordinator", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
     private List<Course> courses;
-
+ 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<GroupPerSimulation> groups;

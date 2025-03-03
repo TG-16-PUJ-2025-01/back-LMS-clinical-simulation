@@ -7,6 +7,7 @@ import co.edu.javeriana.lms.accounts.models.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,7 +28,10 @@ public class RegisterUserDto {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
-    private int institutionalId;
+    @NotBlank(message = "Institutional ID is required")
+    @Size(min = 11, max = 11, message = "Institutional ID must be 11 characters long")
+    @Pattern(regexp = "\\d{11}", message = "Institutional ID must be numeric")
+    private String institutionalId;
 
     @NotNull(message = "Roles are required")
     @Size(min = 1, message = "At least one role is required")

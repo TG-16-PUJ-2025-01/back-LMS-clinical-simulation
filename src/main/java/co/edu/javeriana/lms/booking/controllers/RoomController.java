@@ -32,7 +32,7 @@ import org.springframework.data.domain.Page;
 
 @Slf4j
 @RestController
-@RequestMapping("/rooms")
+@RequestMapping("/room")
 public class RoomController {
 
     @Autowired
@@ -121,6 +121,9 @@ public class RoomController {
 
         log.info("Requesting update of room with id={}", room.getId());
 
+        log.info("Room: id={}, name={}, capacity={}, type={}", room.getId(), room.getName(), room.getCapacity(),
+                room.getType().getName());
+
         // Check if room exists
         Optional<Room> roomEntity = roomService.findById(room.getId());
 
@@ -133,7 +136,7 @@ public class RoomController {
         // Update room using the save method
         try {
             Room updatedRoom = roomService.update(room);
-            log.info("Updated room: id={}, name={}, type={}", updatedRoom.getId(), updatedRoom.getName(),
+            log.info("Updated room: id={}, name={}, capacity={}, type={}", updatedRoom.getId(), updatedRoom.getName(), updatedRoom.getCapacity(),
                     updatedRoom.getType().getName());
 
             // Return updated room

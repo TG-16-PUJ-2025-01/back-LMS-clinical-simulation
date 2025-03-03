@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -43,13 +44,25 @@ public class RoomControllerIntegrationTest {
     }
 
     static final RoomType mockRoomType = RoomType.builder().name("Cirugia").build();
-    static final Room mockRoom = Room.builder().name("RoomA").type(mockRoomType).build();
+    static final Room mockRoom = Room.builder().name("RoomA").type(mockRoomType).capacity(10).build();
+    private static String jwtToken;
 
     @BeforeAll
-    static void BeforeAll(@Autowired RoomRepository roomRepository, @Autowired RoomTypeRepository roomTypeRepository) {
+    static void BeforeAll(@Autowired RoomRepository roomRepository, @Autowired RoomTypeRepository roomTypeRepository,
+            @Autowired MockMvc mockMvc) throws Exception {
         postgres.start();
         roomTypeRepository.save(mockRoomType);
         roomRepository.save(mockRoom);
+
+        // Authenticate and get JWT token
+        String loginJson = "{\"email\":\"andresgarciam@javeriana.edu.co\", \"password\":\"Peter2010?\"}";
+        MvcResult result = mockMvc.perform(post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(loginJson))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        jwtToken = result.getResponse().getContentAsString();
     }
 
     @AfterAll
@@ -59,7 +72,8 @@ public class RoomControllerIntegrationTest {
 
     @Test
     public void testGetAllRooms_Integration() throws Exception {
-        mockMvc.perform(get("/rooms/all?page=0&size=10"))
+        mockMvc.perform(get("/room/all?page=0&size=10")
+                .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("ok"));
     }
@@ -67,8 +81,9 @@ public class RoomControllerIntegrationTest {
     @Test
     public void testAddRoom_Integration_Success() throws Exception {
         // Send a JSON with valid data to create a new room
-        String validRoomJson = "{\"name\":\"Room2X\", \"type\": {\"name\":\"UCI2\"}}";
-        mockMvc.perform(post("/rooms/add")
+        String validRoomJson = "{\"name\":\"Room2X\", \"capacity\":\"10\", \"type\": {\"name\":\"UCI2\"}}";
+        mockMvc.perform(post("/room/add")
+                .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validRoomJson))
                 .andExpect(status().isCreated())
@@ -78,9 +93,10 @@ public class RoomControllerIntegrationTest {
     @Test
     public void testAddRoom_InvalidData() throws Exception {
         // Send a JSON with an empty name, which is invalid
-        String invalidRoomJson = "{\"name\":\"\", \"type\": {\"name\":\"Cirugia\"}}";
+        String invalidRoomJson = "{\"name\":\"\", \"capacity\":\"10\", \"type\": {\"name\":\"Cirugia\"}}";
 
-        mockMvc.perform(post("/rooms/add")
+        mockMvc.perform(post("/room/add")
+                .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRoomJson))
                 .andExpect(status().isBadRequest())
@@ -90,14 +106,16 @@ public class RoomControllerIntegrationTest {
     @Test
     public void testAddRoom_Integration_NameConflict() throws Exception {
         // First, create a room with a specific name
-        String validRoomJson = "{\"name\":\"RoomX\", \"type\": {\"name\":\"Urgencias\"}}";
-        mockMvc.perform(post("/rooms/add")
+        String validRoomJson = "{\"name\":\"RoomX\", \"capacity\":\"10\", \"type\": {\"name\":\"Urgencias\"}}";
+        mockMvc.perform(post("/room/add")
+                .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validRoomJson))
                 .andExpect(status().isCreated());
 
         // Then, try to create another room with the same name, it should fail
-        mockMvc.perform(post("/rooms/add")
+        mockMvc.perform(post("/room/add")
+                .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validRoomJson))
                 .andExpect(status().isConflict())
@@ -108,7 +126,8 @@ public class RoomControllerIntegrationTest {
     public void testAddRoom_InvalidData_Integration() throws Exception {
         // Send a JSON with invalid data (empty name)
         String invalidRoomJson = "{\"name\":\"\", \"type\": {\"name\":\"Cirugia\"}}";
-        mockMvc.perform(post("/rooms/add")
+        mockMvc.perform(post("/room/add")
+                .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRoomJson))
                 .andExpect(status().isBadRequest())

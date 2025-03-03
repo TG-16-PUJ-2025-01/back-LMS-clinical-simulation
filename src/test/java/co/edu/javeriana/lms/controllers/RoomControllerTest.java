@@ -295,6 +295,7 @@ public class RoomControllerTest {
         RoomDto roomDto = new RoomDto();
         roomDto.setName("Room A");
         roomDto.setType(roomTypeDto);
+        roomDto.setCapacity(10);
 
         RoomType roomType = new RoomType();
         roomType.setName("Cirugia");
@@ -303,6 +304,7 @@ public class RoomControllerTest {
         roomA.setId(null);
         roomA.setName("Room A");
         roomA.setType(roomType);
+        roomA.setCapacity(10);
 
         when(roomService.save(roomA)).thenReturn(roomA);
 

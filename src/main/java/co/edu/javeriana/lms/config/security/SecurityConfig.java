@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/change-password").authenticated() // Authenticated endpoint
                         .requestMatchers("/reset-password/**").permitAll() // Public endpoint
                         .requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())// Authenticated endpoint
+                        .requestMatchers("/room/**").hasAuthority(Role.ADMIN.name())
                         .anyRequest().permitAll()) 
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {

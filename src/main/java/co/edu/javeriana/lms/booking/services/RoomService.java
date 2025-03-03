@@ -87,6 +87,7 @@ public class RoomService {
             // Update the values
             roomToUpdate.setName(formattedName);
             roomToUpdate.setType(newType);
+            roomToUpdate.setCapacity(room.getCapacity());
 
             return roomRepository.save(roomToUpdate);
         }

@@ -16,7 +16,7 @@ public class RoomDto {
     @NotBlank(message = "Room name is mandatory")
     private String name;
 
-    @NotBlank(message = "Room capacity is mandatory")
+    @NotNull(message = "Room capacity is mandatory")
     private Integer capacity;
 
     @NotNull(message = "Room type is mandatory")

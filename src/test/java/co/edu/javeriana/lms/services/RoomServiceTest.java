@@ -53,8 +53,8 @@ public class RoomServiceTest {
     public static void setUpAll() {
         mockRoomType = RoomType.builder().id(1L).name("Cirugia").build();
 
-        Room room1 = Room.builder().id(1L).name("Room A").type(mockRoomType).build();
-        Room room2 = Room.builder().id(2L).name("Room B").type(mockRoomType).build();
+        Room room1 = Room.builder().id(1L).name("Room A").type(mockRoomType).capacity(10).build();
+        Room room2 = Room.builder().id(2L).name("Room B").type(mockRoomType).capacity(15).build();
 
         mockRoom = room1;
 
@@ -92,7 +92,7 @@ public class RoomServiceTest {
     public void testEditRoomFailure() {
         Long id = 1L;
         Room roomWithNullType = Room.builder().id(id).name("Updated Room")
-                .type(mockRoomType).build();
+                .type(mockRoomType).capacity(20).build();
         when(roomRepository.findById(id)).thenReturn(Optional.empty());
         when(roomTypeRepository.findByName(mockRoom.getType().getName())).thenReturn(mockRoomType);
 

@@ -32,7 +32,7 @@ import org.springframework.data.domain.Page;
 
 @Slf4j
 @RestController
-@RequestMapping("/rooms")
+@RequestMapping("/room")
 public class RoomController {
 
     @Autowired

@@ -1,9 +1,6 @@
 package co.edu.javeriana.lms.subjects.dtos;
-import java.sql.Date;
 import java.util.List;
 
-import co.edu.javeriana.lms.models.ClassModel;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;

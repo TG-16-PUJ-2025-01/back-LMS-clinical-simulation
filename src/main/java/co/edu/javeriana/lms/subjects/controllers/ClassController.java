@@ -21,7 +21,6 @@ import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.subjects.dtos.ClassDto;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
-import co.edu.javeriana.lms.subjects.services.ClassDTO;
 import co.edu.javeriana.lms.subjects.services.ClassService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -191,7 +190,7 @@ public class ClassController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateClass(@RequestBody ClassDTO classModel, @PathVariable Long id) {
+    public ResponseEntity<?> updateClass(@RequestBody ClassDto classModel, @PathVariable Long id) {
         log.info("Updating course with ID: " + id+ " "+classModel.toString());
         
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),

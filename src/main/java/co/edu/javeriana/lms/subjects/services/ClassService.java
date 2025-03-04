@@ -92,7 +92,7 @@ public class ClassService {
         return classModel;
     }
 
-    public ClassModel fromDtoToClass(ClassDTO classModeldto, Long id)
+    public ClassModel fromDtoToClass(ClassDto classModeldto, Long id)
     {
         ClassModel currentClassModel = classRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));

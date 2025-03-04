@@ -59,19 +59,20 @@ public class SecurityConfig {
                         .requestMatchers("/course/update/**").hasAuthority("ADMIN") // Coordinador-only
                         .requestMatchers("/course/all").hasAuthority("ADMIN") // Coordinador-only
                         .requestMatchers("/course/{id}").hasAnyAuthority("ADMIN", "coordinador") // Coordinador-only
-                        
-                        .requestMatchers("/class/all").hasAnyAuthority("ADMIN") 
+
+                        .requestMatchers("/class/all").hasAnyAuthority("ADMIN")
                         .requestMatchers("/class/{id}").authenticated()
                         .requestMatchers("/class/add").hasAnyAuthority("ADMIN", "profesor", "coordinador")
                         .requestMatchers("/class/update/{id}").hasAnyAuthority("ADMIN", "profesor", "coordinador")
                         .requestMatchers("/class/delete/{id}").hasAnyAuthority("ADMIN", "coordinador")
                         .requestMatchers("/class/{id}/member/all").authenticated()
-                        .requestMatchers("/class/{id}/member/all/outside").hasAnyAuthority("ADMIN", "profesor", "coordinador")
-                        .requestMatchers("/class/delete/{id}/member/{idMember}").hasAnyAuthority("ADMIN", "coordinador", "profesor")
-                        .requestMatchers("/class/update/{id}/members").hasAnyAuthority("ADMIN", "profesor", "coordinador")
+                        .requestMatchers("/class/{id}/member/all/outside")
+                        .hasAnyAuthority("ADMIN", "profesor", "coordinador")
+                        .requestMatchers("/class/delete/{id}/member/{idMember}")
+                        .hasAnyAuthority("ADMIN", "coordinador", "profesor")
+                        .requestMatchers("/class/update/{id}/members")
+                        .hasAnyAuthority("ADMIN", "profesor", "coordinador")
                         .requestMatchers("/class/add").hasAnyAuthority("ADMIN", "profesor", "coordinador")
-
-                        
 
                         .requestMatchers("/auth/login").permitAll() // Public endpoint
                         .requestMatchers("/auth/change-password").authenticated() // Authenticated endpoint

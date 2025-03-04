@@ -1,7 +1,5 @@
 package co.edu.javeriana.lms.practices.controllers;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -15,6 +13,7 @@ import co.edu.javeriana.lms.practices.services.PracticeService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,53 +72,36 @@ public class PracticeController {
     public ResponseEntity<ApiResponseDto<?>> getPracticeById(@PathVariable Long id) {
         log.info("Requesting practice with id: {}", id);
 
-        Optional<Practice> practice = practiceService.findById(id);
+        Practice practice = practiceService.findById(id);
 
-        if (practice.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Practice not found", null, null));
-        }
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice found", practice.get(), null));
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice retrieved successfully", practice, null));
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponseDto<?>> addPractice(@RequestBody PracticeDto practice) {
+    public ResponseEntity<ApiResponseDto<?>> addPractice(@Valid @RequestBody PracticeDto practiceDto) {
         log.info("Adding practice");
 
-        Practice newPractice = practiceService.save(practice.toEntity());
+        Practice newPractice = practiceService.save(practiceDto.toEntity());
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Practice created successfully", newPractice, null));
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Practice created successfully", newPractice, null));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ApiResponseDto<?>> updatePractice(@RequestBody Practice practice) {
-        log.info("Updating practice with id: {}", practice.getId());
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponseDto<?>> updatePractice(@PathVariable Long id, @Valid @RequestBody PracticeDto practiceDto) {
+        log.info("Updating practice with id: {}", id);
 
-        Practice updatedPractice = practiceService.update(practice);
+        Practice updatedPractice = practiceService.update(id, practiceDto.toEntity());
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice updated successfully", updatedPractice, null));
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice updated successfully", updatedPractice, null));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponseDto<?>> deletePracticeById(@PathVariable Long id) {
-        log.info("Requestion deletion of practice with id: {}", id);
-
-        // Check if practice exists
-        Optional<Practice> practice = practiceService.findById(id);
-
-        if (practice.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Practice not found", null, null));
-        }
+        log.info("Deleting practice with id: {}", id);
 
         practiceService.deleteById(id);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice deleted successfully", null, null));
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice deleted successfully", null, null));
     }
 
 }

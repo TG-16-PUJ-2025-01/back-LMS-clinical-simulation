@@ -90,7 +90,7 @@ public class PracticeController {
 
     @PostMapping("/add/{classId}")
     public ResponseEntity<ApiResponseDto<?>> addPractice(@PathVariable Long classId, @Valid @RequestBody PracticeDto practiceDto) {
-        log.info("Adding practice");        
+        log.info("Adding practice to class with id: {}", classId);        
 
         Practice newPractice = practiceService.save(classId, practiceDto.toEntity());
 

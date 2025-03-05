@@ -38,7 +38,6 @@ public class PracticeService {
     }
 
     public Practice save(Long id, Practice practice) {
-        log.info("Saving class: {}", id);
 
         classRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class not found with id: " + id));

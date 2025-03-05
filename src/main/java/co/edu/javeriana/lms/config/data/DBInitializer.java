@@ -21,7 +21,9 @@ import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
+import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
+import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
 import co.edu.javeriana.lms.subjects.repositories.CourseRepository;
 import co.edu.javeriana.lms.videos.models.Video;
 import co.edu.javeriana.lms.videos.repositories.VideoRepository;
@@ -47,6 +49,9 @@ public class DBInitializer implements CommandLineRunner {
 
 	@Autowired
 	private CourseRepository courseRepository;
+
+	@Autowired
+	private ClassRepository classRepository;
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -210,5 +215,17 @@ public class DBInitializer implements CommandLineRunner {
 		courseRepository.save(course1);
 		courseRepository.save(course2);
 		courseRepository.save(course3);
+
+		ClassModel class1 = new ClassModel("2023-1", List.of(userRepository.findById(1L).get()), course1, 1001L);
+		ClassModel class2 = new ClassModel("2023-1", List.of(userRepository.findById(2L).get()), course2, 1002L);
+		ClassModel class3 = new ClassModel("2023-1", List.of(userRepository.findById(3L).get()), course3, 1003L);
+		ClassModel class4 = new ClassModel("2023-1", List.of(userRepository.findById(1L).get(), userRepository.findById(2L).get()), course1, 1004L);
+		ClassModel class5 = new ClassModel("2023-1", List.of(userRepository.findById(2L).get(), userRepository.findById(3L).get()), course2, 1005L);
+
+		classRepository.save(class1);
+		classRepository.save(class2);
+		classRepository.save(class3);
+		classRepository.save(class4);
+		classRepository.save(class5);
 	}
 }

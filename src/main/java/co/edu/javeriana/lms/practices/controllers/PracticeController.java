@@ -1,5 +1,7 @@
 package co.edu.javeriana.lms.practices.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -77,11 +79,20 @@ public class PracticeController {
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice retrieved successfully", practice, null));
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<ApiResponseDto<?>> addPractice(@Valid @RequestBody PracticeDto practiceDto) {
-        log.info("Adding practice");
+    @GetMapping("/class/{classId}")
+    public ResponseEntity<ApiResponseDto<?>> getPracticesByClass(@PathVariable Long classId) {
+        log.info("Requesting practices by class with id: {}", classId);
 
-        Practice newPractice = practiceService.save(practiceDto.toEntity());
+        List<Practice> practices = practiceService.findByClassId(classId);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practices retrieved successfully", practices, null));
+    }
+
+    @PostMapping("/add/{classId}")
+    public ResponseEntity<ApiResponseDto<?>> addPractice(@PathVariable Long classId, @Valid @RequestBody PracticeDto practiceDto) {
+        log.info("Adding practice");        
+
+        Practice newPractice = practiceService.save(classId, practiceDto.toEntity());
 
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Practice created successfully", newPractice, null));
     }

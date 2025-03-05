@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
+                       .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
                         .access((authentication, context) -> new AuthorizationDecision(env.matchesProfiles("dev")))
                         .requestMatchers("/streaming/**").permitAll() // Public endpoint
                         .requestMatchers("/admin/**").hasAuthority(Role.ADMIN.name()) // Admin-only
@@ -55,7 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/estudiante/**").hasAuthority("estudiante") // Estudiante-only
                         .requestMatchers("/coordinador/**").hasAuthority("coordinador") // Coordinador-only
 
-                        .requestMatchers("/course/delete/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
+                     .requestMatchers("/course/delete/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
                         .requestMatchers("/course/add/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
                         .requestMatchers("/course/update/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
                         .requestMatchers("/course/all").hasAuthority(Role.ADMIN.name()) // Coordinador-only
@@ -74,6 +74,7 @@ public class SecurityConfig {
                         .requestMatchers("/class/update/{id}/members")
                         .hasAnyAuthority(Role.ADMIN.name(), "profesor", "coordinador")
                         .requestMatchers("/class/add").hasAnyAuthority(Role.ADMIN.name(), "profesor", "coordinador")
+                    
 
                         .requestMatchers("/auth/login").permitAll() // Public endpoint
                         .requestMatchers("/auth/change-password").authenticated() // Authenticated endpoint

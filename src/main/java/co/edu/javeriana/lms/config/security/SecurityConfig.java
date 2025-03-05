@@ -47,13 +47,40 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
+                       .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
                         .access((authentication, context) -> new AuthorizationDecision(env.matchesProfiles("dev")))
                         .requestMatchers("/streaming/**").permitAll() // Public endpoint
+                        .requestMatchers("/admin/**").hasAuthority(Role.ADMIN.name()) // Admin-only
+                        .requestMatchers("/profesor/**").hasAuthority("profesor") // Profesor-only
+                        .requestMatchers("/estudiante/**").hasAuthority("estudiante") // Estudiante-only
+                        .requestMatchers("/coordinador/**").hasAuthority("coordinador") // Coordinador-only
+
+                     .requestMatchers("/course/delete/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
+                        .requestMatchers("/course/add/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
+                        .requestMatchers("/course/update/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
+                        .requestMatchers("/course/all").hasAuthority(Role.ADMIN.name()) // Coordinador-only
+                        .requestMatchers("/course/{id}").hasAnyAuthority(Role.ADMIN.name(), "coordinador") // Coordinador-only
+
+                        .requestMatchers("/class/all").hasAnyAuthority(Role.ADMIN.name())
+                        .requestMatchers("/class/{id}").authenticated()
+                        .requestMatchers("/class/add").hasAnyAuthority(Role.ADMIN.name(), "profesor", "coordinador")
+                        .requestMatchers("/class/update/{id}").hasAnyAuthority(Role.ADMIN.name(), "profesor", "coordinador")
+                        .requestMatchers("/class/delete/{id}").hasAnyAuthority(Role.ADMIN.name(), "coordinador")
+                        .requestMatchers("/class/{id}/member/all").authenticated()
+                        .requestMatchers("/class/{id}/member/all/outside")
+                        .hasAnyAuthority(Role.ADMIN.name(), "profesor", "coordinador")
+                        .requestMatchers("/class/delete/{id}/member/{idMember}")
+                        .hasAnyAuthority(Role.ADMIN.name(), "coordinador", "profesor")
+                        .requestMatchers("/class/update/{id}/members")
+                        .hasAnyAuthority(Role.ADMIN.name(), "profesor", "coordinador")
+                        .requestMatchers("/class/add").hasAnyAuthority(Role.ADMIN.name(), "profesor", "coordinador")
+                    
+
                         .requestMatchers("/auth/login").permitAll() // Public endpoint
                         .requestMatchers("/auth/change-password").authenticated() // Authenticated endpoint
                         .requestMatchers("/reset-password/**").permitAll() // Public endpoint
                         .requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())// Authenticated endpoint
+                        .requestMatchers("/room/**").hasAuthority(Role.ADMIN.name())
                         .anyRequest().permitAll()) 
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {

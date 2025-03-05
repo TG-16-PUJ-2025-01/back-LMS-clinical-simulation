@@ -14,7 +14,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import co.edu.javeriana.lms.practices.models.GroupPerSimulation;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
-import co.edu.javeriana.lms.subjects.models.StudentClass;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,8 +47,8 @@ public class User implements UserDetails {
     @Column
     private String lastName;
 
-    @Column // Unique?
-    private int institutionalId;
+    @Column
+    private String institutionalId;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
@@ -57,22 +56,25 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL,orphanRemoval = true)
-    @JsonIgnore
-    private List<StudentClass> studentlassses;
-
-    @OneToMany(mappedBy = "professor", cascade = CascadeType.PERSIST)
+    @ManyToMany
+    @JoinTable(name = "professor_classes", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "classId"))  
     @JsonIgnore
     private List<ClassModel> professorClasses;
 
 
-    @OneToMany(mappedBy = "coordinator", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "coordinator", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
     private List<Course> courses;
+    @ManyToMany
+    @JoinTable(name = "class_students", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "classId"))
+    @JsonIgnore
+    private List<ClassModel> studentClassses;
 
+ 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<GroupPerSimulation> groups;
+
 
     @Override
     @JsonIgnore

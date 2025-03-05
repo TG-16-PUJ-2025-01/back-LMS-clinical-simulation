@@ -2,6 +2,8 @@ package co.edu.javeriana.lms.booking.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,11 +38,16 @@ public class Room {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @NonNull
+    @Column(nullable = false)
+    private Integer capacity;
+
     @ManyToOne
     @NonNull
     private RoomType type;
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Booking> bookings;
 
 }

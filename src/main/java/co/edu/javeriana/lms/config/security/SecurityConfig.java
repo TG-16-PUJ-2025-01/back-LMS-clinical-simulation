@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/estudiante/**").hasAuthority("estudiante") // Estudiante-only
                         .requestMatchers("/coordinador/**").hasAuthority("coordinador") // Coordinador-only
 
+                        /*
                         .requestMatchers("/course/delete/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
                         .requestMatchers("/course/add/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
                         .requestMatchers("/course/update/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
@@ -74,11 +75,12 @@ public class SecurityConfig {
                         .requestMatchers("/class/update/{id}/members")
                         .hasAnyAuthority(Role.ADMIN.name(), "profesor", "coordinador")
                         .requestMatchers("/class/add").hasAnyAuthority(Role.ADMIN.name(), "profesor", "coordinador")
+                        */
 
                         .requestMatchers("/auth/login").permitAll() // Public endpoint
                         .requestMatchers("/auth/change-password").authenticated() // Authenticated endpoint
                         .requestMatchers("/reset-password/**").permitAll() // Public endpoint
-                        .requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())// Authenticated endpoint
+                        //.requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())// Authenticated endpoint
                         .requestMatchers("/room/**").hasAuthority(Role.ADMIN.name())
                         .anyRequest().permitAll()) 
                 .exceptionHandling(exception -> exception

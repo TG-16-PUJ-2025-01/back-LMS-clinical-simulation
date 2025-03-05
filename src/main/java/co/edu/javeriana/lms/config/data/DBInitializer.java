@@ -22,7 +22,9 @@ import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
+import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
+import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
 import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
 import co.edu.javeriana.lms.subjects.repositories.CourseRepository;
 import co.edu.javeriana.lms.videos.models.Video;
@@ -58,7 +60,8 @@ public class DBInitializer implements CommandLineRunner {
 		insertRoomsAndTypes();
 		createUsers();
 		insertVideos();
-		insertCourses();
+		insertCoursesAndClasses();
+		
 	}
 
 	private void insertRoomsAndTypes() {
@@ -207,7 +210,7 @@ public class DBInitializer implements CommandLineRunner {
 		videoRepository.saveAll(videos);
 	}
 
-	private void insertCourses() {
+	private void insertCoursesAndClasses() {
 		Course course1 = new Course("Cálculo Diferencial", 123456L, userRepository.findById(1L).get());
 		Course course2 = new Course("Cálculo Integral", 123455L, userRepository.findById(2L).get());
 		Course course3 = new Course("Cálculo Vectorial", 123454L, userRepository.findById(3L).get());
@@ -216,16 +219,12 @@ public class DBInitializer implements CommandLineRunner {
 		courseRepository.save(course2);
 		courseRepository.save(course3);
 
-		ClassModel class1 = new ClassModel("2023-1", List.of(userRepository.findById(1L).get()), course1, 1001L);
-		ClassModel class2 = new ClassModel("2023-1", List.of(userRepository.findById(2L).get()), course2, 1002L);
-		ClassModel class3 = new ClassModel("2023-1", List.of(userRepository.findById(3L).get()), course3, 1003L);
-		ClassModel class4 = new ClassModel("2023-1", List.of(userRepository.findById(1L).get(), userRepository.findById(2L).get()), course1, 1004L);
-		ClassModel class5 = new ClassModel("2023-1", List.of(userRepository.findById(2L).get(), userRepository.findById(3L).get()), course2, 1005L);
+		
+
+		ClassModel class1 = new ClassModel("2024-1", userRepository.findAllProfessors(), course1, 12L);
+		ClassModel class2 = new ClassModel("2026-1", userRepository.findAllProfessors(), course2, 13L);
 
 		classRepository.save(class1);
 		classRepository.save(class2);
-		classRepository.save(class3);
-		classRepository.save(class4);
-		classRepository.save(class5);
 	}
 }

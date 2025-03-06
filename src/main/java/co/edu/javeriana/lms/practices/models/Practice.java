@@ -1,14 +1,15 @@
 package co.edu.javeriana.lms.practices.models;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import co.edu.javeriana.lms.booking.models.TimeSlot;
+import co.edu.javeriana.lms.subjects.models.ClassModel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class Practice {
 
     @Id
-    @GeneratedValue(strategy =  GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NonNull
@@ -42,14 +43,14 @@ public class Practice {
     @Column(nullable = false)
     private Boolean gradeable;
 
-    @NonNull
-    @Column(nullable = false)
-    private String maxStudentsGroup;
+    @Column(nullable = true)
+    private Integer numberOfGroups;
 
-    @NonNull
-    @OneToMany(mappedBy = "practice")
-    private List<TimeSlot> timeSlot;
+    @Column(nullable = true)
+    private Integer maxStudentsGroup;
 
-    //TODO: Missing attribute for practice type?
-    
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    @JsonIgnore
+    private ClassModel classModel;
 }

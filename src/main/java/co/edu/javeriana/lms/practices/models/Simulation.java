@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import co.edu.javeriana.lms.grades.models.GradeStatus;
+import co.edu.javeriana.lms.grades.models.Rubric;
 import co.edu.javeriana.lms.videos.models.Video;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,4 +55,8 @@ public class Simulation {
     @OneToMany(mappedBy = "simulation")
     @JsonIgnore
     private List<GroupPerSimulation> groups;
+
+    @OneToOne
+    @JoinColumn(nullable = false)
+    private Rubric rubric;
 }

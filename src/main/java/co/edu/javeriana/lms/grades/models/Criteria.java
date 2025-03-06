@@ -17,6 +17,6 @@ public class Criteria {
     private int points;
     private List<Pair<Long, Long>> scoringScale;
     private List<String> scoringScaleDescription;
-    //private Long score;
+    private Long score;
 
 }

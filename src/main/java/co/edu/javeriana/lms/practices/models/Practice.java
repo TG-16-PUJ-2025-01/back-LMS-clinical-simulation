@@ -2,12 +2,16 @@ package co.edu.javeriana.lms.practices.models;
 
 import java.util.List;
 
+import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.booking.models.TimeSlot;
+import co.edu.javeriana.lms.grades.models.RubricTemplate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -50,6 +54,8 @@ public class Practice {
     @OneToMany(mappedBy = "practice")
     private List<TimeSlot> timeSlot;
 
-    //TODO: Missing attribute for practice type?
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private RubricTemplate rubricTemplate;
     
 }

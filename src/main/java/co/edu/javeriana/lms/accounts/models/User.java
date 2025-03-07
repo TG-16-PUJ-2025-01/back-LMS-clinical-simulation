@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import co.edu.javeriana.lms.grades.models.Rubric;
+import co.edu.javeriana.lms.grades.models.RubricTemplate;
 import co.edu.javeriana.lms.practices.models.GroupPerSimulation;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
@@ -113,4 +115,8 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    @OneToMany(mappedBy = "creator")
+    @JsonIgnore
+    private List<RubricTemplate> rubricTemplates;
 }

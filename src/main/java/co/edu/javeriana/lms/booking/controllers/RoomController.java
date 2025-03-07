@@ -1,7 +1,5 @@
 package co.edu.javeriana.lms.booking.controllers;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -111,14 +109,6 @@ public class RoomController {
         log.info("Room: id={}, name={}, capacity={}, type={}", room.getId(), room.getName(), room.getCapacity(),
                 room.getType().getName());
 
-        // Check if room exists
-        Optional<Room> roomEntity = roomService.findById(room.getId());
-
-        if (roomEntity.isEmpty()) {
-            log.error("Room not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Room not found", null, null));
-        }
 
         // Update room using the save method
         try {

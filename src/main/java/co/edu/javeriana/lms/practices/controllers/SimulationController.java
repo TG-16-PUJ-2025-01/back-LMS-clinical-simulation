@@ -44,7 +44,7 @@ public class SimulationController {
         String host = request.getHeader("Host");
         String scheme = request.getScheme();
 
-        Page<Simulation> simulationsPage = simulationService.getAllSimulations(page, size);
+        Page<Simulation> simulationsPage = simulationService.findAllSimulations(page, size);
 
         if (simulationsPage.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

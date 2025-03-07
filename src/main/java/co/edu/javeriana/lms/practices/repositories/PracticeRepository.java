@@ -16,5 +16,4 @@ public interface PracticeRepository extends JpaRepository<Practice, Long> {
     Page<Practice> findByNameContaining(String name, Pageable pageable);
     
     List<Practice> findByClassModel_ClassId(Long classId);
-
 }

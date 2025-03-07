@@ -1,5 +1,7 @@
 package co.edu.javeriana.lms.practices.models;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import co.edu.javeriana.lms.subjects.models.ClassModel;
@@ -10,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,4 +56,8 @@ public class Practice {
     @JoinColumn(nullable = false)
     @JsonIgnore
     private ClassModel classModel;
+
+    @OneToMany(mappedBy = "practice")
+    @JsonIgnore
+    private List<Simulation> simulations;
 }

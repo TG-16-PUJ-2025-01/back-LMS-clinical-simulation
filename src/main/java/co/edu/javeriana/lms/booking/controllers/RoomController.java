@@ -77,12 +77,7 @@ public class RoomController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseDto<?>> getRoomById(@PathVariable Long id) {
         log.info("Requesting room with id={}", id);
-        Optional<Room> room = roomService.findById(id);
-
-        if (room.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Room not found", null, null));
-        }
+        Room room = roomService.findById(id);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room found", room, null));
@@ -101,14 +96,6 @@ public class RoomController {
     public ResponseEntity<ApiResponseDto<?>> deleteRoomById(@PathVariable("idRoom") Long id) {
 
         log.info("Requesting deletion of room with id={}", id);
-
-        // Check if room exists
-        Optional<Room> room = roomService.findById(id);
-
-        if (room.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Room not found", null, null));
-        }
 
         roomService.deleteById(id);
 

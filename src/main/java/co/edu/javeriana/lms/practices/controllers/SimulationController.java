@@ -4,11 +4,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.javeriana.lms.practices.dtos.SimulationDto;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.services.SimulationService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,7 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @Slf4j
 @RestController
@@ -64,4 +70,37 @@ public class SimulationController {
                         metadata));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponseDto<?>> getSimulationById(@Min(1) @RequestParam Long id) {
+        log.info("Requesting simulation with id: {}", id);
+
+        Simulation simulation = simulationService.findSimulationById(id);
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulation, null));
+    }
+
+    @PostMapping()
+    public ResponseEntity<ApiResponseDto<?>> createSimulation(@Valid @RequestBody SimulationDto simulationDto) {
+        log.info("Creating simulation");
+
+        Simulation simulation = simulationService.addSimulation(simulationDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Simulation created successfully", simulation, null));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponseDto<?>> updateSimulation(@Min(1) @RequestParam Long id,
+            @Valid @RequestBody SimulationDto simulationDto) {
+        log.info("Updating simulation with id: {}", id);
+
+        Simulation simulation = simulationService.updateSimulation(id, simulationDto);
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Simulation updated successfully", simulation, null));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponseDto<?>> deleteSimulation(@Min(1) @RequestParam Long id) {
+        log.info("Deleting simulation with id: {}", id);
+
+        simulationService.deleteSimulationById(id);
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Simulation deleted successfully", null, null));
+    }
 }

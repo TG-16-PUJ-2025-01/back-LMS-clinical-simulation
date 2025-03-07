@@ -169,6 +169,14 @@ public class DBInitializer implements CommandLineRunner {
 		admin.setInstitutionalId("98675");
 		admin.setRoles(Set.of(Role.ADMIN));
 
+		User student = new User();
+		student.setEmail("sopita@javeriana.edu.co");
+		student.setPassword(passwordEncoder.encode("123"));
+		student.setName("Sophie");
+		student.setLastName("Aristi");
+		student.setInstitutionalId("19281");
+		student.setRoles(Set.of(Role.ESTUDIANTE));
+
 		userRepository.save(professor1);
 		userRepository.save(professor2);
 		userRepository.save(coord1);
@@ -176,6 +184,7 @@ public class DBInitializer implements CommandLineRunner {
 		userRepository.save(both1);
 		userRepository.save(both2);
 		userRepository.save(admin);
+		userRepository.save(student);
 	}
 
 	private void insertVideos() throws ParseException {

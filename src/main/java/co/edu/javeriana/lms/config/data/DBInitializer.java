@@ -21,6 +21,9 @@ import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
+import co.edu.javeriana.lms.practices.models.Practice;
+import co.edu.javeriana.lms.practices.models.PracticeType;
+import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
@@ -53,13 +56,16 @@ public class DBInitializer implements CommandLineRunner {
 	@Autowired
 	private ClassRepository classRepository;
 
+	@Autowired
+	private PracticeRepository practiceRepository;
+
 	@Override
 	public void run(String... args) throws Exception {
 		insertRoomsAndTypes();
 		createUsers();
 		insertVideos();
 		insertCoursesAndClasses();
-		
+		insertPractices();
 	}
 
 	private void insertRoomsAndTypes() {
@@ -169,6 +175,14 @@ public class DBInitializer implements CommandLineRunner {
 		admin.setInstitutionalId("98675");
 		admin.setRoles(Set.of(Role.ADMIN));
 
+		User student = new User();
+		student.setEmail("sopita@javeriana.edu.co");
+		student.setPassword(passwordEncoder.encode("123"));
+		student.setName("Sophie");
+		student.setLastName("Aristi");
+		student.setInstitutionalId("19281");
+		student.setRoles(Set.of(Role.ESTUDIANTE));
+
 		userRepository.save(professor1);
 		userRepository.save(professor2);
 		userRepository.save(coord1);
@@ -176,6 +190,7 @@ public class DBInitializer implements CommandLineRunner {
 		userRepository.save(both1);
 		userRepository.save(both2);
 		userRepository.save(admin);
+		userRepository.save(student);
 	}
 
 	private void insertVideos() throws ParseException {
@@ -224,5 +239,16 @@ public class DBInitializer implements CommandLineRunner {
 
 		classRepository.save(class1);
 		classRepository.save(class2);
+	}
+
+	private void insertPractices(){
+		List<Practice> practices = Arrays.asList(
+			Practice.builder().name("Practica 1").description("Descripcion de la practica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
+			Practice.builder().name("Practica 2").description("Descripcion de la practica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(2).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
+			Practice.builder().name("Practica 3").description("Descripcion de la practica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(10).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
+			Practice.builder().name("Practica 4").description("Descripcion de la practica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
+			Practice.builder().name("Practica 5").description("Descripcion de la practica 5. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build());
+
+			practiceRepository.saveAll(practices);
 	}
 }

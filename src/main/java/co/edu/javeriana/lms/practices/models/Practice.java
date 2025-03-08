@@ -5,8 +5,11 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import co.edu.javeriana.lms.subjects.models.ClassModel;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,12 +46,19 @@ public class Practice {
     private String description;
 
     @NonNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PracticeType type;
+
+    @NonNull
     @Column(nullable = false)
     private Boolean gradeable;
 
+    @Nullable
     @Column(nullable = true)
     private Integer numberOfGroups;
 
+    @Nullable
     @Column(nullable = true)
     private Integer maxStudentsGroup;
 

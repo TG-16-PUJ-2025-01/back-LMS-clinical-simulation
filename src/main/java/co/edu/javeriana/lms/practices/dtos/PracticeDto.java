@@ -1,6 +1,10 @@
 package co.edu.javeriana.lms.practices.dtos;
 
 import co.edu.javeriana.lms.practices.models.Practice;
+import co.edu.javeriana.lms.practices.models.PracticeType;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -27,10 +31,14 @@ public class PracticeDto {
     private Boolean gradeable;
 
     @NonNull
+    @Enumerated(EnumType.STRING)
+    private PracticeType type;
+
+    @Nullable
     @Min(value = 1, message = "Number of groups must be greater than 0")
     private Integer numberOfGroups;
 
-    @NonNull
+    @Nullable
     @Min(value = 1, message = "Max students per group must be greater than 0")
     private Integer maxStudentsGroup;
 
@@ -40,6 +48,7 @@ public class PracticeDto {
                 .name(this.name)
                 .description(this.description)
                 .gradeable(this.gradeable)
+                .type(this.type)
                 .numberOfGroups(this.numberOfGroups)
                 .maxStudentsGroup(this.maxStudentsGroup)
                 .build();

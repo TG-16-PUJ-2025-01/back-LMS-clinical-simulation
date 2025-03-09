@@ -29,7 +29,6 @@ import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.services.RoomService;
 import co.edu.javeriana.lms.booking.services.RoomTypeService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
-import jakarta.servlet.http.HttpServletRequest;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -43,9 +42,6 @@ public class RoomControllerTest {
 
     @Mock
     private RoomTypeService roomTypeService;
-
-    @Mock
-    private HttpServletRequest request;
 
     @BeforeEach
     public void setUp() {
@@ -78,11 +74,9 @@ public class RoomControllerTest {
         Page<Room> roomPage = new PageImpl<>(rooms, PageRequest.of(0, 10), rooms.size());
 
         when(roomService.searchRooms("", 0, 10, "id", true)).thenReturn(roomPage);
-        when(request.getHeader("Host")).thenReturn("localhost:8080");
-        when(request.getScheme()).thenReturn("http");
 
         // Act
-        ResponseEntity<ApiResponseDto<?>> response = roomController.getAllRooms(0, 10, "id", true, "", request);
+        ResponseEntity<ApiResponseDto<?>> response = roomController.getAllRooms(0, 10, "id", true, "");
 
         // Assert
         assertNotNull(response);

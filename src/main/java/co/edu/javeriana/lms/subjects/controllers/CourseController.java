@@ -20,7 +20,6 @@ import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.subjects.dtos.CourseDto;
 import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.subjects.services.CourseService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
@@ -39,29 +38,14 @@ public class CourseController {
             @Min(1) @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "courseId") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
-            @RequestParam(defaultValue = "") String filter,
-            HttpServletRequest request) {
+            @RequestParam(defaultValue = "") String filter) {
         log.info("Requesting all courses");
-
-        String host = request.getHeader("Host");
-        String scheme = request.getScheme();
 
         Page<Course> coursesPage = courseService.findAll(filter, page, size, sort, asc);
 
-        String previous = null;
-        if (coursesPage.hasPrevious()) {
-            previous = String.format("%s://%s/course/all?page=%d&size=%d", scheme, host, page - 1, size);
-        }
-
-        String next = null;
-        if (coursesPage.hasNext()) {
-            next = String.format("%s://%s/course/all?page=%d&size=%d", scheme, host, page + 1, size);
-        }
-
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, coursesPage.getNumberOfElements(),
                 coursesPage.getTotalElements(),
-                coursesPage.getTotalPages(), next,
-                previous);
+                coursesPage.getTotalPages());
 
         return ResponseEntity
                 .ok(new ApiResponseDto<List<Course>>(HttpStatus.OK.value(), "ok", coursesPage.getContent(), metadata));

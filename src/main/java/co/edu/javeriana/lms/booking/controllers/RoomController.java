@@ -15,7 +15,6 @@ import co.edu.javeriana.lms.booking.services.RoomService;
 import co.edu.javeriana.lms.booking.services.RoomTypeService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
@@ -47,28 +46,13 @@ public class RoomController {
             @Min(1) @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "id") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
-            @RequestParam(defaultValue = "") String filter,
-            HttpServletRequest request) {
-
+            @RequestParam(defaultValue = "") String filter) {
         log.info("Requesting all rooms");
-
-        String host = request.getHeader("Host");
-        String scheme = request.getScheme();
 
         Page<Room> roomsPage = roomService.searchRooms(filter, page, size, sort, asc);
 
-        String previous = null;
-        if (roomsPage.hasPrevious()) {
-            previous = String.format("%s://%s/rooms/all?page=%d&size=%d", scheme, host, page - 1, size);
-        }
-
-        String next = null;
-        if (roomsPage.hasNext()) {
-            next = String.format("%s://%s/rooms/all?page=%d&size=%d", scheme, host, page + 1, size);
-        }
-
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, roomsPage.getNumberOfElements(),
-                roomsPage.getTotalElements(), roomsPage.getTotalPages(), next, previous);
+                roomsPage.getTotalElements(), roomsPage.getTotalPages());
 
         return ResponseEntity.ok(
                 new ApiResponseDto<>(HttpStatus.OK.value(), "ok", roomsPage.getContent(), metadata));

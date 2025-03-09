@@ -44,7 +44,7 @@ public class UserController {
             HttpServletRequest request
     ) {
         Page<User> users = userService.getAllUsers(filter, page, size, sort, asc);
-        PaginationMetadataDto metadata = new PaginationMetadataDto(page, users.getNumberOfElements(), users.getTotalElements(), users.getTotalPages() , null, null);
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, users.getNumberOfElements(), users.getTotalElements(), users.getTotalPages());
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Users retrieved successfully", users.getContent(), metadata));
     }
 

@@ -138,7 +138,7 @@ public class RoomController {
     public ResponseEntity<ApiResponseDto<?>> addRoom(@Valid @RequestBody RoomDto roomDto) {
         log.info("Requesting creation of room: name={}, type={}", roomDto.getName(), roomDto.getType());
 
-        Room roomEntity = roomDto.toEntity(null);
+        Room roomEntity = roomDto.toEntity();
         Room savedRoom = roomService.save(roomEntity);
 
         return ResponseEntity.status(HttpStatus.CREATED)

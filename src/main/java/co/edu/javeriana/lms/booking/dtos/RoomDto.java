@@ -22,9 +22,9 @@ public class RoomDto {
     @NotNull(message = "Room type is mandatory")
     private RoomTypeDto type;
 
-    public Room toEntity(Long id){
+    public Room toEntity(){
         Room room = new Room();
-        room.setId(id);
+        room.setId(null);
         room.setName(this.name);
         room.setCapacity(this.capacity);
         room.setType(this.type.toEntity());

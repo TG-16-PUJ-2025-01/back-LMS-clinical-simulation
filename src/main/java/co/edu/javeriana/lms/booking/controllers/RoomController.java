@@ -1,7 +1,5 @@
 package co.edu.javeriana.lms.booking.controllers;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,12 +57,12 @@ public class RoomController {
 
         String previous = null;
         if (roomsPage.hasPrevious()) {
-            previous = String.format("%s://%s/rooms/all?page=%d&size=%d", scheme, host, page - 1, size);
+            previous = String.format("%s://%s/room/all?page=%d&size=%d", scheme, host, page - 1, size);
         }
 
         String next = null;
         if (roomsPage.hasNext()) {
-            next = String.format("%s://%s/rooms/all?page=%d&size=%d", scheme, host, page + 1, size);
+            next = String.format("%s://%s/room/all?page=%d&size=%d", scheme, host, page + 1, size);
         }
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, roomsPage.getNumberOfElements(),
@@ -77,12 +75,7 @@ public class RoomController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseDto<?>> getRoomById(@PathVariable Long id) {
         log.info("Requesting room with id={}", id);
-        Optional<Room> room = roomService.findById(id);
-
-        if (room.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Room not found", null, null));
-        }
+        Room room = roomService.findById(id);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room found", room, null));
@@ -102,14 +95,6 @@ public class RoomController {
 
         log.info("Requesting deletion of room with id={}", id);
 
-        // Check if room exists
-        Optional<Room> room = roomService.findById(id);
-
-        if (room.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Room not found", null, null));
-        }
-
         roomService.deleteById(id);
 
         return ResponseEntity.status(HttpStatus.OK)
@@ -124,14 +109,6 @@ public class RoomController {
         log.info("Room: id={}, name={}, capacity={}, type={}", room.getId(), room.getName(), room.getCapacity(),
                 room.getType().getName());
 
-        // Check if room exists
-        Optional<Room> roomEntity = roomService.findById(room.getId());
-
-        if (roomEntity.isEmpty()) {
-            log.error("Room not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Room not found", null, null));
-        }
 
         // Update room using the save method
         try {
@@ -154,7 +131,7 @@ public class RoomController {
     public ResponseEntity<ApiResponseDto<?>> addRoom(@Valid @RequestBody RoomDto roomDto) {
         log.info("Requesting creation of room: name={}, type={}", roomDto.getName(), roomDto.getType());
 
-        Room roomEntity = roomDto.toEntity(null);
+        Room roomEntity = roomDto.toEntity();
         Room savedRoom = roomService.save(roomEntity);
 
         return ResponseEntity.status(HttpStatus.CREATED)

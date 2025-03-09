@@ -1,10 +1,12 @@
 package co.edu.javeriana.lms.practices.models;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.grades.models.GradeStatus;
 import co.edu.javeriana.lms.videos.models.Video;
 import jakarta.persistence.Column;
@@ -15,20 +17,21 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @Entity
-@Table(name = "simulations")
+@Table(name = "simulation")
+@Builder
 @NoArgsConstructor
-@RequiredArgsConstructor
 @AllArgsConstructor
 public class Simulation {
     @Id
@@ -36,22 +39,37 @@ public class Simulation {
     private Long simulationId;
 
     @Column(nullable = false)
-    private Float grade = 0.0f;
+    private LocalDateTime startDateTime;
 
-    @NonNull
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    private LocalDateTime endDateTime;
+
+    @Column(nullable = true)
+    private Float grade;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
     private GradeStatus gradeStatus;
 
-    @NonNull
-    @Column(nullable = false)
-    private Date gradeDate;
+    @Column(nullable = true)
+    private LocalDateTime gradeDateTime;
+
+    @ManyToOne
+    @JsonIgnore
+    private Practice practice;
 
     @OneToOne
     @JoinColumn(name = "video_id")
+    @JsonIgnore
     private Video video;
 
-    @OneToMany(mappedBy = "simulation")
+    @ManyToMany
+    @JoinTable(name = "simulation_users", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
     @JsonIgnore
-    private List<GroupPerSimulation> groups;
+    private List<User> users;
+
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    @JsonIgnore
+    private Room room;
 }

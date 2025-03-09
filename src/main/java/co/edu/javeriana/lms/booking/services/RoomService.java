@@ -107,8 +107,8 @@ public class RoomService {
         return roomRepository.save(room);
     }
 
-    public Optional<Room> findById(Long id) {
-        return roomRepository.findById(id);
+    public Room findById(Long id) {
+        return roomRepository.findById(id).orElseThrow(() -> new RuntimeException("Room not found"));
     }
 
     public List<Room> findAll(Integer page, Integer size) {

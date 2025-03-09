@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import co.edu.javeriana.lms.practices.models.GroupPerSimulation;
+import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
 import jakarta.persistence.*;
@@ -65,16 +65,16 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "coordinator", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
     private List<Course> courses;
+
     @ManyToMany
     @JoinTable(name = "class_students", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "classId"))
     @JsonIgnore
     private List<ClassModel> studentClassses;
 
- 
-    @OneToMany(mappedBy = "user")
+    @ManyToMany
+    @JoinTable(name = "simulation_users", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "simulationId"))
     @JsonIgnore
-    private List<GroupPerSimulation> groups;
-
+    private List<Simulation> simulations;
 
     @Override
     @JsonIgnore

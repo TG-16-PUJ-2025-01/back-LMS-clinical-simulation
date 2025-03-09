@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import co.edu.javeriana.lms.practices.models.Simulation;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @Entity
-@Table(name = "Room", uniqueConstraints = @UniqueConstraint(columnNames = { "name" }))
+@Table(name = "room", uniqueConstraints = @UniqueConstraint(columnNames = { "name" }))
 @NoArgsConstructor
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -46,8 +47,8 @@ public class Room {
     @NonNull
     private RoomType type;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Booking> bookings;
+    private List<Simulation> simulations;
 
 }

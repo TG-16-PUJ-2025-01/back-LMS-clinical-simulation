@@ -34,6 +34,9 @@ spring:
           auth: "${MAIL_AUTH}"
           starttls:
             enable: "${MAIL_STARTTLS}"
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
 
 jwt:
   signing:

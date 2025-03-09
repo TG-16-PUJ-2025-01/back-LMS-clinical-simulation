@@ -56,7 +56,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id);
+        User user = userService.findById(id);
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "User retrieved successfully", user, null));
     }
 

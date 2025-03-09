@@ -98,7 +98,7 @@ public class RoomControllerTest {
         roomA.setName("Room A");
         roomA.setType(roomType1);
 
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.of(roomA));
+        when(roomService.findById(1L)).thenReturn(roomA);
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.getRoomById(1L);
@@ -115,7 +115,7 @@ public class RoomControllerTest {
     @Test
     public void testGetRoomById_NotFound() {
         // Arrange
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.empty());
+        when(roomService.findById(1L)).thenReturn(null);
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.getRoomById(1L);
@@ -166,7 +166,7 @@ public class RoomControllerTest {
         roomA.setName("Room A");
         roomA.setType(roomType1);
 
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.of(roomA));
+        when(roomService.findById(1L)).thenReturn(roomA);
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.deleteRoomById(1L);
@@ -183,7 +183,7 @@ public class RoomControllerTest {
     @Test
     public void testDeleteRoom_NotFound() {
         // Arrange
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.empty());
+        when(roomService.findById(1L)).thenReturn(null);
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.deleteRoomById(1L);
@@ -212,7 +212,7 @@ public class RoomControllerTest {
         roomB.setName("Room B");
         roomB.setType(roomType1);
 
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.of(roomA));
+        when(roomService.findById(1L)).thenReturn(roomA);
         when(roomService.update(roomA)).thenReturn(roomB);
 
         // Act
@@ -238,7 +238,7 @@ public class RoomControllerTest {
         roomA.setName("Room A");
         roomA.setType(roomType1);
 
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.empty());
+        when(roomService.findById(1L)).thenReturn(null);
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.updateRoom(roomA);
@@ -263,7 +263,7 @@ public class RoomControllerTest {
         roomA.setType(roomType1);
 
         // Simula que la sala exista
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.of(roomA));
+        when(roomService.findById(1L)).thenReturn(roomA);
         // Simula el comportamiento del servicio para lanzar la excepción por conflicto
         // de nombre
         when(roomService.update(roomA)).thenThrow(new IllegalArgumentException("El nombre de la sala ya existe"));

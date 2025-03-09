@@ -94,7 +94,7 @@ public class SimulationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<?>> updateSimulation(@Min(1) @RequestParam Long id,
+    public ResponseEntity<ApiResponseDto<?>> updateSimulation(@PathVariable Long id,
             @Valid @RequestBody SimulationDto simulationDto) {
         log.info("Updating simulation with id: {}", id);
 

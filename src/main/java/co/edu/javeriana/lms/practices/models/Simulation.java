@@ -60,6 +60,7 @@ public class Simulation {
 
     @OneToOne
     @JoinColumn(name = "video_id")
+    @JsonIgnore
     private Video video;
 
     @ManyToMany

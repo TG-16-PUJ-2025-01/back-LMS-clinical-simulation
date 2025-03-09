@@ -54,6 +54,9 @@ public class Practice {
     @Column(nullable = false)
     private Boolean gradeable;
 
+    @Column(nullable = false)
+    private Integer simulationDuration;
+
     @Nullable
     @Column(nullable = true)
     private Integer numberOfGroups;

@@ -23,20 +23,13 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "simulation")
 @Builder
-@NoArgsConstructor
-@RequiredArgsConstructor
-@AllArgsConstructor
 public class Simulation {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -51,13 +44,11 @@ public class Simulation {
     @Column(nullable = true)
     private Float grade;
 
-    @NonNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private GradeStatus gradeStatus;
 
-    @NonNull
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Date gradeDate;
 
     @ManyToOne

@@ -232,8 +232,6 @@ public class DBInitializer implements CommandLineRunner {
 		courseRepository.save(course2);
 		courseRepository.save(course3);
 
-		
-
 		ClassModel class1 = new ClassModel("2024-1", userRepository.findAllProfessors(), course1, 12L);
 		ClassModel class2 = new ClassModel("2026-1", userRepository.findAllProfessors(), course2, 13L);
 
@@ -241,14 +239,28 @@ public class DBInitializer implements CommandLineRunner {
 		classRepository.save(class2);
 	}
 
-	private void insertPractices(){
+	private void insertPractices() {
 		List<Practice> practices = Arrays.asList(
-			Practice.builder().name("Practica 1").description("Descripcion de la practica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
-			Practice.builder().name("Practica 2").description("Descripcion de la practica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(2).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
-			Practice.builder().name("Practica 3").description("Descripcion de la practica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(10).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
-			Practice.builder().name("Practica 4").description("Descripcion de la practica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
-			Practice.builder().name("Practica 5").description("Descripcion de la practica 5. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build());
-
-			practiceRepository.saveAll(practices);
+				Practice.builder().name("Practica 1").description(
+						"Descripcion de la practica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(5)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(30).build(),
+				Practice.builder().name("Practica 2").description(
+						"Descripcion de la practica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(2).maxStudentsGroup(5)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build(),
+				Practice.builder().name("Practica 3").description(
+						"Descripcion de la practica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(10).maxStudentsGroup(5)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build(),
+				Practice.builder().name("Practica 4").description(
+						"Descripcion de la practica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(60).build(),
+				Practice.builder().name("Practica 5").description(
+						"Descripcion de la practica 5. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build());
+		practiceRepository.saveAll(practices);
 	}
 }

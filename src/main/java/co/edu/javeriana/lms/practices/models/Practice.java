@@ -49,7 +49,7 @@ public class Practice {
 
     @NonNull
     @Column(nullable = false)
-    private Boolean gradeable;
+    private Boolean gradeable; // se escribe gradable
 
     @NonNull
     @Column(nullable = false)

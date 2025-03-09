@@ -52,6 +52,21 @@ public class VideoController {
                 new ApiResponseDto<List<Video>>(HttpStatus.OK.value(), "ok", videosPage.getContent(), metadata));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponseDto<Video>> getVideo(@PathVariable Long id) {
+        log.info("Requesting video with id: {}", id);
+
+        Video video = videoService.getVideo(id);
+
+        if (video == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Video not found", null, null));
+        }
+
+        return ResponseEntity.ok(new ApiResponseDto<Video>(HttpStatus.OK.value(), "ok", video, null));
+    }
+    
+
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDto<Video>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDto dto) {
         log.info("Editing video with id: {}", id);

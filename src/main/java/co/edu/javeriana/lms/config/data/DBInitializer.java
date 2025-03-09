@@ -2,6 +2,7 @@ package co.edu.javeriana.lms.config.data;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -23,7 +24,9 @@ import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.PracticeType;
+import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
+import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
@@ -59,11 +62,14 @@ public class DBInitializer implements CommandLineRunner {
 	@Autowired
 	private PracticeRepository practiceRepository;
 
+	@Autowired
+	private SimulationRepository simulationRepository;
+
 	@Override
 	public void run(String... args) throws Exception {
 		insertRoomsAndTypes();
 		createUsers();
-		insertVideos();
+		insertSimulationsVideosAndComments();
 		insertCoursesAndClasses();
 		insertPractices();
 	}
@@ -193,7 +199,7 @@ public class DBInitializer implements CommandLineRunner {
 		userRepository.save(student);
 	}
 
-	private void insertVideos() throws ParseException {
+	private void insertSimulationsVideosAndComments() throws ParseException {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		List<Video> videos = Arrays.asList(
@@ -220,7 +226,15 @@ public class DBInitializer implements CommandLineRunner {
 				Video.builder().name("unavailable9.mp4").recordingDate(dateFormat.parse("2023-01-31"))
 						.expirationDate(new Date()).duration(620L).size(500.0).available(false).build());
 
-		videoRepository.saveAll(videos);
+		List<Video> newVideos = videoRepository.saveAll(videos);
+
+		Simulation simulation = Simulation.builder()
+				.startDateTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+				.endDateTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+				.grade(4.5F).gradeStatus(null).gradeDate(new Date())
+				.video(newVideos.get(1)).room(roomRepository.findById(1L).get()).build();
+
+		simulationRepository.save(simulation);
 	}
 
 	private void insertCoursesAndClasses() {

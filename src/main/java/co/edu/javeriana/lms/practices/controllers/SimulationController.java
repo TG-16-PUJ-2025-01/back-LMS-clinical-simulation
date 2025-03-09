@@ -4,8 +4,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
 import co.edu.javeriana.lms.practices.dtos.SimulationDto;
-import co.edu.javeriana.lms.practices.dtos.SimulationRequestDto;
+import co.edu.javeriana.lms.practices.dtos.CreateSimulationRequestDto;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.services.SimulationService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
@@ -82,15 +83,14 @@ public class SimulationController {
     }
 
     @PostMapping()
-    public ResponseEntity<ApiResponseDto<?>> createSimulations(@Valid @RequestBody SimulationRequestDto simulationRequestDto) {
+    public ResponseEntity<ApiResponseDto<?>> createSimulations(@Valid @RequestBody CreateSimulationRequestDto simulationRequestDto) {
         log.info("Creating simulations {} ", simulationRequestDto.getSimulations().size());
-        List<SimulationDto> SimulationsDto = new ArrayList<>();
+        List<SimulationByTimeSlotDto> SimulationsDto = new ArrayList<>();
         for (int i = 0; i < simulationRequestDto.getSimulations().size(); i++) {
             SimulationsDto.add(simulationRequestDto.getSimulations().get(i));
         }
-        simulationService.addSimulations(SimulationsDto);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Simulation created successfully", null, null));
+                .body(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Simulations created successfully", simulationService.addSimulations(SimulationsDto), null));
     }
 
     @PutMapping("/{id}")

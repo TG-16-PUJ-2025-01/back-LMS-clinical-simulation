@@ -2,6 +2,7 @@ package co.edu.javeriana.lms.config.data;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -21,9 +22,12 @@ import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
+import co.edu.javeriana.lms.grades.models.GradeStatus;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.PracticeType;
+import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
+import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
@@ -59,6 +63,9 @@ public class DBInitializer implements CommandLineRunner {
 	@Autowired
 	private PracticeRepository practiceRepository;
 
+	@Autowired
+	private SimulationRepository simulationRepository;
+
 	@Override
 	public void run(String... args) throws Exception {
 		insertRoomsAndTypes();
@@ -66,6 +73,7 @@ public class DBInitializer implements CommandLineRunner {
 		insertVideos();
 		insertCoursesAndClasses();
 		insertPractices();
+		insertSimulations();
 	}
 
 	private void insertRoomsAndTypes() {
@@ -262,5 +270,44 @@ public class DBInitializer implements CommandLineRunner {
 						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build());
 		practiceRepository.saveAll(practices);
+	}
+
+	private void insertSimulations() {
+
+		LocalDateTime startDateTime = LocalDateTime.now();
+
+		Simulation simulation1 = Simulation.builder()
+			.practice(practiceRepository.findById(1L).get())
+			.room(roomRepository.findById(1L).get())
+			.startDateTime(startDateTime)
+			.endDateTime(startDateTime.plusMinutes(30))
+			.gradeDateTime(LocalDateTime.now().plusDays(1))
+			.gradeStatus(GradeStatus.REGISTERED)
+			.grade(5.0f)
+			.build();
+
+			Simulation simulation2 = Simulation.builder()
+			.practice(practiceRepository.findById(1L).get())
+			.room(roomRepository.findById(1L).get())
+			.startDateTime(startDateTime.plusMinutes(30))
+			.endDateTime(startDateTime.plusMinutes(60))
+			.gradeDateTime(LocalDateTime.now().plusDays(1))
+			.gradeStatus(GradeStatus.REGISTERED)
+			.grade(5.0f)
+			.build();
+
+			Simulation simulation3 = Simulation.builder()
+			.practice(practiceRepository.findById(1L).get())
+			.room(roomRepository.findById(1L).get())
+			.startDateTime(startDateTime.plusMinutes(60))
+			.endDateTime(startDateTime.plusMinutes(90))
+			.gradeDateTime(LocalDateTime.now().plusDays(1))
+			.gradeStatus(GradeStatus.REGISTERED)
+			.grade(5.0f)
+			.build();
+
+			simulationRepository.save(simulation1);
+			simulationRepository.save(simulation2);
+			simulationRepository.save(simulation3);
 	}
 }

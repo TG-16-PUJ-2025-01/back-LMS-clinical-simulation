@@ -2,10 +2,8 @@ package co.edu.javeriana.lms.practices.dtos;
 
 import java.time.LocalDateTime;
 
-import co.edu.javeriana.lms.grades.models.GradeStatus;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -17,7 +15,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SimulationDto {
+public class SimulationByTimeSlotDto {
     @NotNull(message = "Practice ID is required")
     private Long practiceId; 
     
@@ -31,11 +29,4 @@ public class SimulationDto {
     @Future(message = "Start date and time must be in the future")
     @NotNull(message = "End date and time is required")
     private LocalDateTime endDateTime;
-
-    private Float grade;
-
-    private GradeStatus gradeStatus;
-
-    @Past(message = "Grade date and time must be in the past")
-    private LocalDateTime gradeDateTime;
 }

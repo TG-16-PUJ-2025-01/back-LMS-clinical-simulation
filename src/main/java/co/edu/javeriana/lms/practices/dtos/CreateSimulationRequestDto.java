@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SimulationRequestDto {
-    List<SimulationDto> simulations;
+public class CreateSimulationRequestDto {
+    List<SimulationByTimeSlotDto> simulations;
 }

@@ -1,7 +1,6 @@
 package co.edu.javeriana.lms.practices.models;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,13 +22,17 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "simulation")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Simulation {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -49,7 +52,7 @@ public class Simulation {
     private GradeStatus gradeStatus;
 
     @Column(nullable = true)
-    private Date gradeDate;
+    private LocalDateTime gradeDateTime;
 
     @ManyToOne
     @JsonIgnore
@@ -66,5 +69,6 @@ public class Simulation {
 
     @ManyToOne
     @JoinColumn(name = "room_id")
+    @JsonIgnore
     private Room room;
 }

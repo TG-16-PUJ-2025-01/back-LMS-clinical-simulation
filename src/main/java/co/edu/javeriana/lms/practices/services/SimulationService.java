@@ -1,23 +1,28 @@
 package co.edu.javeriana.lms.practices.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import co.edu.javeriana.lms.accounts.services.UserService;
-import co.edu.javeriana.lms.booking.services.RoomService;
+import co.edu.javeriana.lms.accounts.repositories.UserRepository;
+import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
 import co.edu.javeriana.lms.practices.dtos.SimulationDto;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
 import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
 import co.edu.javeriana.lms.booking.models.Room;
-
+import co.edu.javeriana.lms.booking.repositories.RoomRepository;
+import co.edu.javeriana.lms.grades.models.GradeStatus;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -31,10 +36,10 @@ public class SimulationService {
     private PracticeRepository practiceRepository;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Autowired
-    private RoomService roomService;
+    private RoomRepository roomRepository;
 
     public Page<Simulation> findAllSimulations(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -47,121 +52,111 @@ public class SimulationService {
     }
 
     public Page<Simulation> findSimulationsByPracticeId(Long practiceId, Integer page, Integer size) {
+        // TODO filtros
         Pageable pageable = PageRequest.of(page, size);
         return simulationRepository.findByPracticeId(practiceId, pageable);
     }
 
-    public void addSimulations(List<SimulationDto> simulationsDto) {
-        
-         // TODO Change this to a custom exception
-        if (!enoughSimulations(simulationsDto)) {
-            throw new RuntimeException("Not enough simulations for all the students");
-        }
+    @Transactional
+    public List<Simulation> addSimulations(List<SimulationByTimeSlotDto> simulationsDto) {
 
-        for (SimulationDto simulation : simulationsDto) {
-            addSimulationsPerTimeSlot(simulation);
+        if (!enoughSimulations(simulationsDto)) {
+            throw new IllegalArgumentException("Not enough simulations for all the students");
         }
+        List<Simulation> createdSimulations = new ArrayList<>();
+        for (SimulationByTimeSlotDto simulation : simulationsDto) {
+            createdSimulations.addAll(addSimulationsPerTimeSlot(simulation));
+        }
+        log.info("Simulations created: {}", createdSimulations.size());
+        return createdSimulations;
     }
 
-    private boolean enoughSimulations(List<SimulationDto> simulationsDto) {
+    private boolean enoughSimulations(List<SimulationByTimeSlotDto> simulationsDto) {
         Practice practice = practiceRepository.findById(simulationsDto.get(0).getPracticeId())
-                .orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + simulationsDto.get(0).getPracticeId()));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Practice not found with id: " + simulationsDto.get(0).getPracticeId()));
         Integer duration = practice.getSimulationDuration();
         Integer numberOfGroups = practice.getMaxStudentsGroup();
 
         int totalSimulationsAvailable = 0;
 
-        for (SimulationDto simulation : simulationsDto) {
-            long durationInMinutes = java.time.Duration.between(simulation.getStartDateTime(), simulation.getEndDateTime()).toMinutes();
+        for (SimulationByTimeSlotDto simulation : simulationsDto) {
+            long durationInMinutes = java.time.Duration
+                    .between(simulation.getStartDateTime(), simulation.getEndDateTime()).toMinutes();
             totalSimulationsAvailable += durationInMinutes / duration;
         }
 
         return totalSimulationsAvailable >= numberOfGroups;
     }
 
-
-    private void addSimulationsPerTimeSlot(SimulationDto simulationDto) {
+    @Transactional
+    private List<Simulation> addSimulationsPerTimeSlot(SimulationByTimeSlotDto simulationDto) {
 
         Practice practice = practiceRepository.findById(simulationDto.getPracticeId())
-                .orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + simulationDto.getPracticeId()));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Practice not found with id: " + simulationDto.getPracticeId()));
 
-        Room room = roomService.findById(simulationDto.getRoomId());
-        if (room == null) {
-            throw new EntityNotFoundException("Room not found with id: " + simulationDto.getRoomId());
-        }
+        Room room = roomRepository.findById(simulationDto.getRoomId())
+                .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + simulationDto.getRoomId()));
 
-        // TODO Change this to a custom exception
-        if (!simulationRepository.isRoomAvailable(room, simulationDto.getStartDateTime(), simulationDto.getEndDateTime())) {
-            throw new RuntimeException("Room is not available for the selected dates");
+        if (!simulationRepository.isRoomAvailable(room, simulationDto.getStartDateTime(),
+                simulationDto.getEndDateTime())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Room is not available for the selected dates");
         }
 
         if (practice.getMaxStudentsGroup() > room.getCapacity()) {
-            throw new RuntimeException("Room capacity is not enough for the selected practice");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Room capacity is not enough for the selected practice");
         }
 
         Integer duration = practice.getSimulationDuration();
         
+        GradeStatus gradeStatus = practice.getGradeable() ? GradeStatus.PENDING : GradeStatus.NOT_EVALUABLE;
+
+        List<Simulation> createdSimulations = new ArrayList<>();
+
         while (simulationDto.getStartDateTime().isBefore(simulationDto.getEndDateTime())) {
             Simulation simulation = Simulation.builder()
                     .practice(practice)
                     .room(room)
                     .startDateTime(simulationDto.getStartDateTime())
                     .endDateTime(simulationDto.getStartDateTime().plusMinutes(duration))
-                    .gradeDate(null)
-                    .gradeStatus(null)
+                    .gradeDateTime(null)
+                    .gradeStatus(gradeStatus)
                     .grade(null)
                     .build();
+            createdSimulations.add(simulation);
             simulationRepository.save(simulation);
             simulationDto.setStartDateTime(simulationDto.getStartDateTime().plusMinutes(duration));
         }
+
+        return createdSimulations;
     }
-
-    /*
-    public Simulation addSimulation(SimulationDto simulationDto) {
-        Practice practice = practiceService.findById(simulationDto.getPracticeId());
-        Room room = roomService.findById(simulationDto.getRoomId());
-
-        // TODO Change this to a custom exception
-        if (!simulationRepository.isRoomAvailable(room, simulationDto.getStartDateTime(), simulationDto.getEndDateTime())) {
-            throw new RuntimeException("Room is not available for the selected dates");
-        }
-
-        if (practice.getMaxStudentsGroup() > room.getCapacity()) {
-            throw new RuntimeException("Room capacity is not enough for the selected practice");
-        }
-
-        Simulation simulation = Simulation.builder()
-                .practice(practice)
-                .room(room)
-                .startDateTime(simulationDto.getStartDateTime())
-                .endDateTime(simulationDto.getEndDateTime())
-                .build();
-        
-        
-        return simulationRepository.save(simulation);
-    }*/
 
     public Simulation updateSimulation(Long id, SimulationDto simulationDto) {
         Simulation existingSimulation = simulationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
 
-        Practice practice = practiceRepository.findById(simulationDto.getPracticeId()).orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + simulationDto.getPracticeId()));
-        Room room = roomService.findById(simulationDto.getRoomId());
+        Practice practice = practiceRepository.findById(simulationDto.getPracticeId()).orElseThrow(
+                () -> new EntityNotFoundException("Practice not found with id: " + simulationDto.getPracticeId()));
+        Room room = roomRepository.findById(simulationDto.getRoomId())
+                .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + simulationDto.getRoomId()));
 
-        // TODO Change this to a custom exception
-        if (!simulationRepository.isRoomAvailable(room, simulationDto.getStartDateTime(), simulationDto.getEndDateTime())) {
-            throw new RuntimeException("Room is not available for the selected dates");
+        if (!simulationRepository.isRoomAvailable(room, simulationDto.getStartDateTime(),
+                simulationDto.getEndDateTime())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Room is not available for the selected dates");
         }
 
         if (practice.getMaxStudentsGroup() > room.getCapacity()) {
-            throw new RuntimeException("Room capacity is not enough for the selected practice");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Room capacity is not enough for the selected practice");
         }
 
         existingSimulation.setPractice(practice);
         existingSimulation.setRoom(room);
         existingSimulation.setStartDateTime(simulationDto.getStartDateTime());
         existingSimulation.setEndDateTime(simulationDto.getEndDateTime());
-
+        existingSimulation.setGradeDateTime(simulationDto.getGradeDateTime());
+        existingSimulation.setGradeStatus(simulationDto.getGradeStatus());
+        existingSimulation.setGrade(simulationDto.getGrade());
         return simulationRepository.save(existingSimulation);
     }
 
@@ -176,7 +171,8 @@ public class SimulationService {
         Simulation simulation = simulationRepository.findById(simulationId)
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + simulationId));
 
-        simulation.getUsers().add(userService.findById(studentId));
+        simulation.getUsers().add(userRepository.findById(studentId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + studentId)));
         simulationRepository.save(simulation);
     }
 }

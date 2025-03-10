@@ -76,6 +76,7 @@ public class SimulationService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Practice not found with id: " + simulationsDto.get(0).getPracticeId()));
         Integer duration = practice.getSimulationDuration();
+        // TODO corregir
         Integer numberOfGroups = practice.getMaxStudentsGroup();
 
         int totalSimulationsAvailable = 0;
@@ -174,5 +175,9 @@ public class SimulationService {
         simulation.getUsers().add(userRepository.findById(studentId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + studentId)));
         simulationRepository.save(simulation);
+    }
+
+    public void findRoomDisponibility(Long roomId, String startDateTime, String endDateTime) {
+        // TODO Auto-generated method stub
     }
 }

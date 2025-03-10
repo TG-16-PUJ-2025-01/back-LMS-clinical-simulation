@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-
 @Repository
 public interface ClassRepository extends JpaRepository<ClassModel, Long> {
     @Query("""
@@ -65,5 +64,19 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
             )
             """)
     Page<User> findUsersNotInClass(@Param("classId") Long classId, @Param("filter") String filter, Pageable pageable);
+
+    @Query("""
+            SELECT COUNT(s) FROM ClassModel c 
+            JOIN c.students s 
+            WHERE c.classId = :classId
+            """)
+    long countStudentsByClassId(@Param("classId") Long classId);
+
+    @Query("""
+            SELECT COUNT(p) FROM ClassModel c 
+            JOIN c.professors p 
+            WHERE c.classId = :classId
+            """)
+    long countProfessorsByClassId(@Param("classId") Long classId);
 
 }

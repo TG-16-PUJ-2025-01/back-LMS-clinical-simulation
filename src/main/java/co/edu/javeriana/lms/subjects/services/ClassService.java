@@ -128,4 +128,18 @@ public class ClassService {
         return classModel;
     }
 
+    public long countStudentsByClassId(Long classId) {
+        classRepository.findById(classId)
+                .orElseThrow(() -> new EntityNotFoundException("Class with ID " + classId + " not found"));
+
+        return classRepository.countStudentsByClassId(classId);
+    }
+    
+    public long countProfessorsByClassId(Long classId) {
+        classRepository.findById(classId)
+                .orElseThrow(() -> new EntityNotFoundException("Class with ID " + classId + " not found"));
+                
+        return classRepository.countProfessorsByClassId(classId);
+    }
+
 }

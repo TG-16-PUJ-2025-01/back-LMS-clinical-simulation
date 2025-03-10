@@ -13,6 +13,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.server.ResponseStatusException;
 
 import co.edu.javeriana.lms.shared.dtos.ErrorDto;
 import co.edu.javeriana.lms.shared.dtos.ValidationErrorDto;
@@ -96,5 +97,12 @@ public class GlobalExceptionHandler {
         log.warn("Validation failed: {}", ex.getMessage());
 
         return new ResponseEntity<>(new ErrorDto("Validation failed", ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex) {
+        log.warn("Response status exception: {}", ex.getMessage());
+
+        return new ResponseEntity<>(new ErrorDto("Response status exception", ex.getMessage()), ex.getStatusCode());
     }
 }

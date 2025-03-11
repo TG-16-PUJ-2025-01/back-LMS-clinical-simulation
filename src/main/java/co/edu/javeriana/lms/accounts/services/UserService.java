@@ -60,7 +60,7 @@ public class UserService implements UserDetailsService {
         return savedUser;
     }
 
-    public User getUserById(Long id) {
+    public User findById(Long id) {
         log.info("Getting user by id: " + id);
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));

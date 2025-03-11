@@ -3,6 +3,8 @@ package co.edu.javeriana.lms.subjects.models;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.practices.models.Practice;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.Getter;
@@ -53,5 +56,9 @@ public class ClassModel {
     @JoinTable(name = "class_students", joinColumns = @JoinColumn(name = "classId"), inverseJoinColumns = @JoinColumn(name = "id"))
     @JsonIgnore
     private List<User> students;
+
+    @OneToMany(mappedBy = "classModel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Practice> practices;
 
 }

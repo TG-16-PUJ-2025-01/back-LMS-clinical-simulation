@@ -59,12 +59,12 @@ public class RoomController {
 
         String previous = null;
         if (roomsPage.hasPrevious()) {
-            previous = String.format("%s://%s/rooms/all?page=%d&size=%d", scheme, host, page - 1, size);
+            previous = String.format("%s://%s/room/all?page=%d&size=%d", scheme, host, page - 1, size);
         }
 
         String next = null;
         if (roomsPage.hasNext()) {
-            next = String.format("%s://%s/rooms/all?page=%d&size=%d", scheme, host, page + 1, size);
+            next = String.format("%s://%s/room/all?page=%d&size=%d", scheme, host, page + 1, size);
         }
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, roomsPage.getNumberOfElements(),
@@ -154,7 +154,7 @@ public class RoomController {
     public ResponseEntity<ApiResponseDto<?>> addRoom(@Valid @RequestBody RoomDto roomDto) {
         log.info("Requesting creation of room: name={}, type={}", roomDto.getName(), roomDto.getType());
 
-        Room roomEntity = roomDto.toEntity(null);
+        Room roomEntity = roomDto.toEntity();
         Room savedRoom = roomService.save(roomEntity);
 
         return ResponseEntity.status(HttpStatus.CREATED)

@@ -169,6 +169,14 @@ public class DBInitializer implements CommandLineRunner {
 		admin.setInstitutionalId("98675");
 		admin.setRoles(Set.of(Role.ADMIN));
 
+		User admin2 = new User();
+		admin.setEmail("admin@gmail.com");
+		admin.setPassword(passwordEncoder.encode("admin"));
+		admin.setName("admin");
+		admin.setLastName("admin");
+		admin.setInstitutionalId("111222");
+		admin.setRoles(Set.of(Role.ADMIN));
+
 		User student = new User();
 		student.setEmail("sopita@javeriana.edu.co");
 		student.setPassword(passwordEncoder.encode("123"));
@@ -184,6 +192,7 @@ public class DBInitializer implements CommandLineRunner {
 		userRepository.save(both1);
 		userRepository.save(both2);
 		userRepository.save(admin);
+		userRepository.save(admin2);
 		userRepository.save(student);
 	}
 

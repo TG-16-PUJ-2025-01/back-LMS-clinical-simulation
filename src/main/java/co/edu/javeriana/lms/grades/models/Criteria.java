@@ -14,7 +14,7 @@ public class Criteria {
     
     private String name;
     private String description;
-    private int points;
+    private Integer points;
     private List<Pair<Long, Long>> scoringScale;
     private List<String> scoringScaleDescription;
     private Long score;

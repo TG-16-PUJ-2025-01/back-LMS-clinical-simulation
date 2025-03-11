@@ -54,6 +54,7 @@ public class Practice {
     @Column(nullable = false)
     private Boolean gradeable;
 
+    @NonNull
     @Column(nullable = false)
     private Integer simulationDuration;
 

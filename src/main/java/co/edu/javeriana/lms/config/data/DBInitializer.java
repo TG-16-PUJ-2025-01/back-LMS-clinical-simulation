@@ -249,27 +249,16 @@ public class DBInitializer implements CommandLineRunner {
 
 	private void insertPractices() {
 		List<Practice> practices = Arrays.asList(
-				Practice.builder().name("Practica 1").description(
-						"Descripcion de la practica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(5)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(30).build(),
-				Practice.builder().name("Practica 2").description(
-						"Descripcion de la practica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(2).maxStudentsGroup(5)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build(),
-				Practice.builder().name("Practica 3").description(
-						"Descripcion de la practica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(10).maxStudentsGroup(5)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build(),
-				Practice.builder().name("Practica 4").description(
-						"Descripcion de la practica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(60).build(),
-				Practice.builder().name("Practica 5").description(
-						"Descripcion de la practica 5. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build());
-		practiceRepository.saveAll(practices);
+			Practice.builder().name("Practica 1").description("Descripcion de la practica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.GRUPAL).gradeable(true).simulationDuration(15).numberOfGroups(3).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
+			Practice.builder().name("Practica 2").description("Descripcion de la practica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.INDIVIDUAL).gradeable(true).simulationDuration(30).classModel(classRepository.findById(1L).get()).build(),
+			Practice.builder().name("Practica 3").description("Descripcion de la practica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.INDIVIDUAL).gradeable(true).simulationDuration(45).classModel(classRepository.findById(1L).get()).build(),
+			Practice.builder().name("Practica 4").description("Descripcion de la practica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.GRUPAL).gradeable(true).simulationDuration(60).numberOfGroups(5).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
+			Practice.builder().name("Practica 5").description("Descripcion de la practica 5. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.GRUPAL).gradeable(true).simulationDuration(75).numberOfGroups(5).maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
+			Practice.builder().name("Practica 6").description("Descripcion de la practica 6. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.GRUPAL).gradeable(true).simulationDuration(15).numberOfGroups(3).maxStudentsGroup(5).classModel(classRepository.findById(2L).get()).build(),
+			Practice.builder().name("Practica 7").description("Descripcion de la practica 7. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.INDIVIDUAL).gradeable(true).simulationDuration(30).classModel(classRepository.findById(2L).get()).build(),
+			Practice.builder().name("Practica 8").description("Descripcion de la practica 8. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.").type(PracticeType.INDIVIDUAL).gradeable(true).simulationDuration(45).classModel(classRepository.findById(2L).get()).build());
+
+			practiceRepository.saveAll(practices);
 	}
 
 	private void insertSimulations() {

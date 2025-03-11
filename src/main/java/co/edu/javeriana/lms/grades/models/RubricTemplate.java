@@ -4,19 +4,14 @@ import java.sql.Date;
 import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
-import org.hibernate.query.spi.Limit;
 import org.hibernate.type.SqlTypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.practices.models.Practice;
-import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -54,6 +49,9 @@ public class RubricTemplate {
 
     @Column(nullable = false)
     private Date creationDate;
+
+    @Column(nullable = false)
+    private Boolean archived;
 
     @ManyToMany
     @JoinTable(name = "Rubric_Template_Course", joinColumns = @JoinColumn(name = "rubricTemplateId"), inverseJoinColumns = @JoinColumn(name = "courseId"))  

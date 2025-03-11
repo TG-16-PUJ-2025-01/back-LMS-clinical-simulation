@@ -92,6 +92,7 @@ public class CourseController {
                 "Course deleted successfully.", course, null));
     }
 
+    @Valid
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updatCourse(@RequestBody CourseDto courseModel, @PathVariable Long id) {
         log.info("Updating course with ID: " + id);
@@ -102,6 +103,7 @@ public class CourseController {
                 "Course updated successfully.", course, null));
     }
 
+    @Valid
     @PostMapping("/add")
     public ResponseEntity<?> addCourse(@Valid @RequestBody CourseDto courseModel) {
         log.info("Adding a course");

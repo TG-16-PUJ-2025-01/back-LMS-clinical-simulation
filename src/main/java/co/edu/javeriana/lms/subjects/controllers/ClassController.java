@@ -189,6 +189,7 @@ public class ClassController {
         
     }
 
+    @Valid
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateClass(@RequestBody ClassDto classModel, @PathVariable Long id) {
         log.info("Updating course with ID: " + id+ " "+classModel.toString());
@@ -198,6 +199,7 @@ public class ClassController {
         
     }
 
+    @Valid
     @PutMapping("/update/{id}/members")
     public ResponseEntity<?> updateClassMembers(@RequestBody List<User> members, @PathVariable Long id) {
         log.info("Updating class members with ID: " + id);
@@ -207,6 +209,7 @@ public class ClassController {
         
     }
 
+    @Valid
     @PostMapping("/add")
     public ResponseEntity<?> addClass(@Valid @RequestBody ClassDto classModel) {
        

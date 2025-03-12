@@ -1,8 +1,6 @@
 package co.edu.javeriana.lms.grades.repositories;
 
 import co.edu.javeriana.lms.grades.models.RubricTemplate;
-import co.edu.javeriana.lms.subjects.models.Course;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +14,37 @@ public interface RubricTemplateRepository extends JpaRepository<RubricTemplate, 
     @Query("""
         SELECT c FROM RubricTemplate c 
         WHERE 
-            LOWER(TRANSLATE(c.title, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
-            OR CAST(c.creationDate AS string) LIKE CONCAT('%', :filter, '%')
-        """)
-    Page<RubricTemplate> findByTitleOrCreationDateContaining(@Param("filter") String filter, Pageable pageable);
+            (LOWER(TRANSLATE(c.title, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
+            OR CAST(c.creationDate AS string) LIKE CONCAT('%', :filter, '%'))
+            AND c.archived = :archived
+            AND c.creator.id = :creatorId
+    """)
+    Page<RubricTemplate> findArchivedMineByTitleOrCreationDateContaining(
+        @Param("filter") String filter, 
+        @Param("archived") Boolean archived, 
+        @Param("creatorId") Long creatorId, 
+        Pageable pageable
+    );
+
     
+    @Query("""
+        SELECT c FROM RubricTemplate c 
+        WHERE 
+            (LOWER(TRANSLATE(c.title, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
+            OR CAST(c.creationDate AS string) LIKE CONCAT('%', :filter, '%'))
+            AND c.creator.id = :creatorId
+    """)
+    Page<RubricTemplate> findMineByTitleOrCreationDateContaining(@Param("filter") String filter,  @Param("creatorId") Long creatorId, Pageable pageable);
+    
+    
+    @Query("""
+        SELECT c FROM RubricTemplate c 
+        WHERE 
+            (LOWER(TRANSLATE(c.title, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
+            OR CAST(c.creationDate AS string) LIKE CONCAT('%', :filter, '%'))
+            AND c.archived != :archived
+            AND c.creator.id != :creatorId
+    """)
+    Page<RubricTemplate> findNotMineByTitleOrCreationDateContaining(@Param("filter") String filter, @Param("creatorId") Long creatorId, Pageable pageable);
+
 }

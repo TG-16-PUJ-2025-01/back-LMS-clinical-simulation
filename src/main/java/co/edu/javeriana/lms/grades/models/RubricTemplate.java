@@ -2,6 +2,7 @@ package co.edu.javeriana.lms.grades.models;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -22,6 +23,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -60,9 +62,9 @@ public class RubricTemplate {
 
     //no se deberian borrar las practicas si se borra la rubrica
     //revisar que poner
-    @OneToMany(mappedBy = "rubricTemplate")
+    @OneToOne
     @JsonIgnore
-    private List<Practice> practices;
+    private Practice practice;
 
     @OneToMany(mappedBy = "rubricTemplate")
     @JsonIgnore
@@ -71,4 +73,5 @@ public class RubricTemplate {
     @ManyToOne
     @JoinColumn(nullable = false)
     private User creator;
+    
 }

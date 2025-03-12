@@ -1,5 +1,6 @@
 package co.edu.javeriana.lms.grades.controllers;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,11 +22,13 @@ import co.edu.javeriana.lms.grades.dtos.RubricTemplateDTO;
 import co.edu.javeriana.lms.grades.models.RubricTemplate;
 import co.edu.javeriana.lms.grades.services.RubricTemplateService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
+import co.edu.javeriana.lms.shared.dtos.ErrorDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.subjects.dtos.CourseDto;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.subjects.services.CourseService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -40,7 +44,7 @@ public class RubricTemplateController {
     private RubricTemplateService rubricTemplateService;
 
     //list the rubrics
-    //solo listar los archived si eres coordinador, admin o el dueño de la rubrica
+    //solo listar los archived si eres admin o el dueño de la rubrica
      @GetMapping("/all")
     public ResponseEntity<?> getAll(
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
@@ -48,13 +52,16 @@ public class RubricTemplateController {
             @RequestParam(defaultValue = "courseId") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
             @RequestParam(defaultValue = "") String filter,
-            HttpServletRequest request) {
+            @RequestParam(defaultValue = "true") Boolean mine,
+            @RequestParam(defaultValue = "true") Boolean archived,
+            HttpServletRequest request,
+            Principal principal) {
         log.info("Requesting all courses");
 
         String host = request.getHeader("Host");
         String scheme = request.getScheme();
 
-        Page<RubricTemplate> rubricsTemplatesPage = rubricTemplateService.findAll(filter, page, size, sort, asc);
+        Page<RubricTemplate> rubricsTemplatesPage = rubricTemplateService.findAll(filter, page, size, sort, asc, mine, archived, principal.getName());
 
         String previous = null;
         if (rubricsTemplatesPage.hasPrevious()) {
@@ -92,11 +99,11 @@ public class RubricTemplateController {
 
     //create the rubric template
     @Valid
-    @PostMapping("/add")
-    public ResponseEntity<?> addCourse(@Valid @RequestBody RubricTemplateDTO rubricTemplate) {
+    @PostMapping("")
+    public ResponseEntity<?> addRubricTemplate( @Valid @RequestBody RubricTemplateDTO rubricTemplate, Principal principal) {
         log.info("Adding a rubric template");
 
-        RubricTemplate newRubricTemplate = rubricTemplateService.save(rubricTemplate);
+        RubricTemplate newRubricTemplate = rubricTemplateService.save(rubricTemplate,principal.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<RubricTemplate>(HttpStatus.OK.value(),
                 "Class added successfully.", newRubricTemplate, null));
@@ -104,13 +111,18 @@ public class RubricTemplateController {
     
 
     //update the rubric template
-    //this depends on several factors, like if the rubric template is being used by a rubric, if it is being used by a course, etc.
-    //if the rubric template is being used by a rubric, then the rubric template cannot be updated, we will need to create a new rubric template
-    //if it is no been used by a rubric, then we can update the rubric template 
-    //if we are updating the rubric of the practice, then we need to update the rubric of the practice (vearing in mind that the ruric may be used by other people)
+    @Valid
+    @PutMapping("{id}/practice/{practiceId}")
+    public ResponseEntity<?> updatRubricTemplate(@RequestBody RubricTemplateDTO rubricTemplate, @PathVariable Long id, @PathVariable Long practiceId) {
+        log.info("Updating rubric template with ID: " + id);
 
+        RubricTemplate rubricTemplateUpdated = rubricTemplateService.update(rubricTemplate, id, practiceId);
 
-    
+        return ResponseEntity.ok(new ApiResponseDto<RubricTemplate>(HttpStatus.OK.value(),
+                "Course updated successfully.", rubricTemplateUpdated, null));
+    }
+
+    //change the status of the rubric template to archived
     @PutMapping("/archive/{id}")
     public ResponseEntity<?> archivelassById(@PathVariable Long id) {
         log.info("Archiving rubric template with ID: " + id);
@@ -123,5 +135,31 @@ public class RubricTemplateController {
     }
 
     //delete the rubric template
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteRubricTemplateById(@PathVariable Long id) {
+        
+        log.info("Deleting rubric template with ID: " + id);
+
+        try {
+            RubricTemplate rubricTemplate = rubricTemplateService.findById(id);
+            rubricTemplateService.deleteById(id);
+
+            return ResponseEntity.ok(new ApiResponseDto<>(
+                    HttpStatus.OK.value(),
+                    "Rubric Template deleted successfully.",
+                    rubricTemplate,
+                    null));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ApiResponseDto<ErrorDto>(HttpStatus.BAD_REQUEST.value(), "Unable to delete rubric template as other courses o practices are using it", null , null));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ApiResponseDto<ErrorDto>(HttpStatus.NOT_FOUND.value(), "rubric template with id "+ id+" not found", null, null));
+        }
+    }
+
+    //add new courses to the rubric template if the rubric is only used and not edited
+
+    //return the suggested rubrics if the practice is part of a chosen course
 
 }

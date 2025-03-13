@@ -15,10 +15,13 @@ import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.grades.dtos.RubricTemplateDTO;
 import co.edu.javeriana.lms.grades.models.Criteria;
+import co.edu.javeriana.lms.grades.models.EvaluatedCriteria;
 import co.edu.javeriana.lms.grades.models.Rubric;
 import co.edu.javeriana.lms.grades.models.RubricTemplate;
 import co.edu.javeriana.lms.grades.repositories.RubricRepository;
 import co.edu.javeriana.lms.grades.repositories.RubricTemplateRepository;
+import co.edu.javeriana.lms.practices.models.Practice;
+import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
 import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.subjects.repositories.CourseRepository;
@@ -94,18 +97,36 @@ public class RubricTemplateService {
         rubricTemplateModel.setCreationDate(rubricTemplate.getCreationDate());
         
         if(rubricTemplate.getPracticeId()!=null)
-            rubricTemplateModel.setPractice(practiceRepository.findById(rubricTemplate.getPracticeId()).get());
-        
+        {
+            Practice practice = practiceRepository.findById(rubricTemplate.getPracticeId()).get();
+            rubricTemplateModel.setPractice(practice);
+            createRubricsFromTemplate(rubricTemplateModel, practice);
+        }
         rubricTemplateModel.setArchived(rubricTemplate.getArchived());
 
         //asignar el creador por el principal
         User creator = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         rubricTemplateModel.setCreator(creator);
-        
-        return rubricTemplateRepository.save(rubricTemplateModel);
+                
+                return rubricTemplateRepository.save(rubricTemplateModel);
     }
-             
+                     
+    private void createRubricsFromTemplate(RubricTemplate rubricTemplateModel, Practice practice ) {
+        //create the rubric based on the rubric template
+        Rubric newRubric = new Rubric();
+        newRubric.setRubricTemplate(rubricTemplateModel);
+        rubricTemplateModel.getCriteria().forEach(criteria -> {
+            newRubric.addEvaluatedCriteria(new EvaluatedCriteria(criteria.getId(), "", 0));
+        });
+
+        //get the simulations from practice
+        for (Simulation simulation : practice.getSimulations()) {
+            newRubric.setSimulation(simulation);
+            rubricRepository.save(newRubric);
+        }
+    }
+        
     private List<Criteria> addCriteriaUUID(List<Criteria> criteria) {
         for (Criteria criteria2 : criteria) {
             criteria2.setId(java.util.UUID.randomUUID());

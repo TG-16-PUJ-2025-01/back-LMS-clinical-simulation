@@ -65,4 +65,8 @@ public class Rubric {
         }
 
     }
+
+    public void addEvaluatedCriteria(EvaluatedCriteria evaluatedCriteria) {
+        this.evaluatedCriterias.add(evaluatedCriteria);
+    }
 }

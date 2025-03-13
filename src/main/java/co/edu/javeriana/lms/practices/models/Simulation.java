@@ -32,8 +32,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Simulation {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

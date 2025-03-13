@@ -243,7 +243,7 @@ public class DBInitializer implements CommandLineRunner {
 		Simulation simulation = Simulation.builder()
 				.startDateTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
 				.endDateTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
-				.grade(4.5F).gradeStatus(null).gradeDate(new Date())
+				.grade(4.5F).gradeStatus(null)
 				.video(newVideos.get(1)).room(roomRepository.findById(1L).get()).build();
 
 		simulationRepository.save(simulation);

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -98,7 +99,7 @@ public class RoomControllerTest {
         roomA.setName("Room A");
         roomA.setType(roomType1);
 
-        when(roomService.findById(1L)).thenReturn(roomA);
+        when(roomService.findById(1L)).thenReturn(Optional.of(roomA));
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.getRoomById(1L);
@@ -166,7 +167,7 @@ public class RoomControllerTest {
         roomA.setName("Room A");
         roomA.setType(roomType1);
 
-        when(roomService.findById(1L)).thenReturn(roomA);
+        when(roomService.findById(1L)).thenReturn(Optional.of(roomA));
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.deleteRoomById(1L);
@@ -212,7 +213,7 @@ public class RoomControllerTest {
         roomB.setName("Room B");
         roomB.setType(roomType1);
 
-        when(roomService.findById(1L)).thenReturn(roomA);
+        when(roomService.findById(1L)).thenReturn(Optional.of(roomA));
         when(roomService.update(roomA)).thenReturn(roomB);
 
         // Act
@@ -263,7 +264,7 @@ public class RoomControllerTest {
         roomA.setType(roomType1);
 
         // Simula que la sala exista
-        when(roomService.findById(1L)).thenReturn(roomA);
+        when(roomService.findById(1L)).thenReturn(Optional.of(roomA));
         // Simula el comportamiento del servicio para lanzar la excepción por conflicto
         // de nombre
         when(roomService.update(roomA)).thenThrow(new IllegalArgumentException("El nombre de la sala ya existe"));

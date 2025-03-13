@@ -1,5 +1,7 @@
 package co.edu.javeriana.lms.practices.services;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
 import co.edu.javeriana.lms.practices.dtos.SimulationDto;
+import co.edu.javeriana.lms.practices.dtos.TimeSlotDto;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
@@ -180,7 +183,22 @@ public class SimulationService {
         simulationRepository.save(simulation);
     }
 
-    public void findRoomDisponibility(Long roomId, String startDateTime, String endDateTime) {
-        // TODO Auto-generated method stub
+    public List<TimeSlotDto> findRoomSimulationsSchedule(Long roomId, LocalDate startOfWeekDate) {
+        roomRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + roomId));
+        LocalDateTime startOfWeek = startOfWeekDate.atStartOfDay();
+        LocalDateTime endOfWeek = startOfWeekDate.plusDays(7).atStartOfDay().minusSeconds(1);
+        List<Simulation> simulations = simulationRepository.findByRoomIdAndStartDateTimeBetween(roomId, startOfWeek,
+                endOfWeek);
+        
+        List<TimeSlotDto> timeSlots = new ArrayList<>();
+        for (Simulation simulation : simulations) {
+            timeSlots.add(TimeSlotDto.builder()
+                    .startDateTime(simulation.getStartDateTime())
+                    .endDateTime(simulation.getEndDateTime())
+                    .build());
+        }
+
+        return timeSlots;
     }
 }

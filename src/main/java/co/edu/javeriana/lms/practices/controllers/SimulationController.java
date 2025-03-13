@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,5 +120,12 @@ public class SimulationController {
 
         simulationService.deleteSimulationById(id);
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Simulation deleted successfully", null, null));
+    }
+
+    @GetMapping("/room")
+    public ResponseEntity<ApiResponseDto<?>> getSimulationsByRoomId(@RequestParam Long roomId, @RequestParam LocalDate startOfWeekDate) {
+        log.info("Requesting simulations for room with id: {} and startOfWeekDate: {}", roomId, startOfWeekDate);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findRoomSimulationsSchedule(roomId, startOfWeekDate), null));
     }
 }

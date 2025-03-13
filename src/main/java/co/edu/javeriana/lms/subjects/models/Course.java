@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.grades.models.RubricTemplate;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,6 +56,6 @@ public class Course {
 
     @ManyToMany
     @JoinTable(name = "Rubric_Template_Course", joinColumns = @JoinColumn(name = "courseId"), inverseJoinColumns = @JoinColumn(name = "rubricTemplateId"))  
-    private List<Course> courses;
+    private List<RubricTemplate> rubricTemplates;
 
 }

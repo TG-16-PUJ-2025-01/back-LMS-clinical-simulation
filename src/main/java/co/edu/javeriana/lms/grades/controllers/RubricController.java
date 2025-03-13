@@ -49,13 +49,13 @@ public class RubricController {
     public ResponseEntity<?> getRubricById(@PathVariable Long id) {
         log.info("Requesting rubric  with ID: " + id);
 
-        RubricTemplate rubric = rubricService.findById(id);
+        Rubric rubric = rubricService.findById(id);
 
         if (rubric == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No rubric found", null, null));
         }
 
-        return ResponseEntity.ok(new ApiResponseDto<RubricTemplate>(HttpStatus.OK.value(), "ok", rubric, null));
+        return ResponseEntity.ok(new ApiResponseDto<Rubric>(HttpStatus.OK.value(), "ok", rubric, null));
     } 
 }

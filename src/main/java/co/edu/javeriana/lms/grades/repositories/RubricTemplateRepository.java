@@ -52,14 +52,15 @@ public interface RubricTemplateRepository extends JpaRepository<RubricTemplate, 
 
 
     @Query("""
-        SELECT c.rubricTemplates 
+        SELECT rt 
         FROM Practice p 
         JOIN p.classModel cm 
         JOIN cm.course c 
+        JOIN c.rubricTemplates rt
         WHERE p.id = :id
     """)
     List<RubricTemplate> findRecommendedRubricTemplatesByCoursesById(@Param("id") Long id);
-
+    
     @Query("""
         SELECT c FROM RubricTemplate c 
         WHERE 

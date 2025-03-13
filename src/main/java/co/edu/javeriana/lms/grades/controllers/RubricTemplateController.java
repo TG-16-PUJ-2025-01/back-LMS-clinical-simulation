@@ -131,6 +131,17 @@ public class RubricTemplateController {
         
     }
 
+    @PutMapping("/unarchive/{id}")
+    public ResponseEntity<?> unarchivelassById(@PathVariable Long id) {
+        log.info("Archiving rubric template with ID: " + id);
+        
+        RubricTemplate rubricTemplate=rubricTemplateService.unarchiveById(id);
+
+        return ResponseEntity.ok(new ApiResponseDto<RubricTemplate>(HttpStatus.OK.value(),
+                "Clase deleted successfully.", rubricTemplate, null));
+        
+    }
+
     //delete the rubric template
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRubricTemplateById(@PathVariable Long id) {

@@ -1,6 +1,7 @@
 package co.edu.javeriana.lms.grades.services;
 
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +84,12 @@ public class RubricTemplateService {
         return rubricTemplateRepository.save(rubricTemplate);
     }
 
+    public RubricTemplate unarchiveById(Long id) {
+        RubricTemplate rubricTemplate=rubricTemplateRepository.findById(id).get();;
+        rubricTemplate.setArchived(false);
+        return rubricTemplateRepository.save(rubricTemplate);
+    }
+
     public RubricTemplate save(RubricTemplateDTO rubricTemplate, String userEmail) {
 
         RubricTemplate rubricTemplateModel = new RubricTemplate();
@@ -91,16 +98,18 @@ public class RubricTemplateService {
         //SE LE ANADEN LOS IDS A LOS CRITERIOS IMPORTANTE
         rubricTemplateModel.setCriteria(addCriteriaUUID(rubricTemplate.getCriteria()));
         
-        if(rubricTemplate.getCourses()!=null)
+        if(rubricTemplate.getCourses()!=null || rubricTemplate.getCourses().size()>0)
             rubricTemplateModel.setCourses(courseRepository.findAllById(rubricTemplate.getCourses()));
         
         rubricTemplateModel.setCreationDate(rubricTemplate.getCreationDate());
         
+        Boolean isForPractice=false;
+        Practice practice = new Practice();
         if(rubricTemplate.getPracticeId()!=null)
         {
-            Practice practice = practiceRepository.findById(rubricTemplate.getPracticeId()).get();
+            practice = practiceRepository.findById(rubricTemplate.getPracticeId()).get();
             rubricTemplateModel.setPractice(practice);
-            createRubricsFromTemplate(rubricTemplateModel, practice);
+            isForPractice=true;
         }
         rubricTemplateModel.setArchived(rubricTemplate.getArchived());
 
@@ -108,14 +117,22 @@ public class RubricTemplateService {
         User creator = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         rubricTemplateModel.setCreator(creator);
+
+        RubricTemplate savedRubricTemplate = rubricTemplateRepository.save(rubricTemplateModel);
+
+        if(isForPractice)
+        {
+            createRubricsFromTemplate(rubricTemplateModel, practice);
+        }
                 
-                return rubricTemplateRepository.save(rubricTemplateModel);
+        return savedRubricTemplate;
     }
                      
     private void createRubricsFromTemplate(RubricTemplate rubricTemplateModel, Practice practice ) {
         //create the rubric based on the rubric template
         Rubric newRubric = new Rubric();
         newRubric.setRubricTemplate(rubricTemplateModel);
+        newRubric.setEvaluatedCriterias(new ArrayList<EvaluatedCriteria>());
         rubricTemplateModel.getCriteria().forEach(criteria -> {
             newRubric.addEvaluatedCriteria(new EvaluatedCriteria(criteria.getId(), "", 0));
         });

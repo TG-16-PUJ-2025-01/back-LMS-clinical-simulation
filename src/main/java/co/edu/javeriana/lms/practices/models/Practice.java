@@ -78,10 +78,11 @@ public class Practice {
     private List<TimeSlot> timeSlot;*/ 
 
     @OneToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = true)
     private RubricTemplate rubricTemplate;
     
-
+    
+    @OneToMany(mappedBy = "practice")
     @JsonIgnore
     private List<Simulation> simulations;
 

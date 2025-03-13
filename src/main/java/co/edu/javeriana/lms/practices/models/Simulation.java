@@ -71,7 +71,7 @@ public class Simulation {
     private List<GroupPerSimulation> groups;*/
 
     @OneToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = true)
     private Rubric rubric;
 
     private List<User> users;

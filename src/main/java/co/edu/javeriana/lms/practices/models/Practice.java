@@ -2,7 +2,6 @@ package co.edu.javeriana.lms.practices.models;
 
 import java.util.List;
 
-import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.grades.models.RubricTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.grades.models.EvaluatedCriteria;
 import co.edu.javeriana.lms.grades.models.Rubric;
-import co.edu.javeriana.lms.grades.models.RubricTemplate;
 import co.edu.javeriana.lms.grades.repositories.RubricRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;

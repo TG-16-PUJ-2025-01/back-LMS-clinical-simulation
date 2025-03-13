@@ -29,7 +29,6 @@ import co.edu.javeriana.lms.videos.controllers.VideoController;
 import co.edu.javeriana.lms.videos.dtos.EditVideoDto;
 import co.edu.javeriana.lms.videos.models.Video;
 import co.edu.javeriana.lms.videos.services.VideoService;
-import jakarta.servlet.http.HttpServletRequest;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -39,9 +38,6 @@ public class VideoControllerTest {
 
     @Mock
     private VideoService videoService;
-
-    @Mock
-    private HttpServletRequest request;
 
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -74,10 +70,8 @@ public class VideoControllerTest {
     @Test
     public void testSearchVideos() {
         when(videoService.searchVideos("", 0, 10, "name", true)).thenReturn(mockVideosPage);
-        when(request.getHeader("Host")).thenReturn("localhost:8080");
-        when(request.getScheme()).thenReturn("http");
 
-        ResponseEntity<ApiResponseDto<List<Video>>> videosPage = videoController.searchVideos(0, 10, "name", true, "", request);
+        ResponseEntity<ApiResponseDto<List<Video>>> videosPage = videoController.searchVideos(0, 10, "name", true, "");
 
         PaginationMetadataDto metadata = (PaginationMetadataDto) videosPage.getBody().getMetadata();
         
@@ -86,8 +80,6 @@ public class VideoControllerTest {
         assert (metadata.getSize() == mockVideosPage.getNumberOfElements());
         assert (metadata.getTotalPages() == mockVideosPage.getTotalPages());
         assert (metadata.getPage() == mockVideosPage.getNumber());
-        assert (metadata.getPrevious() == null);
-        assert (metadata.getNext() == null);
     }
 
     @Test
@@ -95,10 +87,8 @@ public class VideoControllerTest {
         Page<Video> filteredVideosPage = new PageImpl<>(mockVideosPage.getContent(), PageRequest.of(0, 1, Sort.by("name").ascending()), mockVideosPage.getTotalElements());
 
         when(videoService.searchVideos("", 0, 1, "name", true)).thenReturn(filteredVideosPage);
-        when(request.getHeader("Host")).thenReturn("localhost:8080");
-        when(request.getScheme()).thenReturn("http");
 
-        ResponseEntity<ApiResponseDto<List<Video>>> videosPage = videoController.searchVideos(0, 1, "name", true, "", request);
+        ResponseEntity<ApiResponseDto<List<Video>>> videosPage = videoController.searchVideos(0, 1, "name", true, "");
 
         PaginationMetadataDto metadata = (PaginationMetadataDto) videosPage.getBody().getMetadata();
         
@@ -107,8 +97,6 @@ public class VideoControllerTest {
         assert (metadata.getSize() == filteredVideosPage.getNumberOfElements());
         assert (metadata.getTotalPages() == filteredVideosPage.getTotalPages());
         assert (metadata.getPage() == filteredVideosPage.getNumber());
-        assert (metadata.getPrevious() == null);
-        assert (metadata.getNext().equals("http://localhost:8080/video/all?page=1&size=1&sort=name&asc=true&filter="));
     }
 
     @Test

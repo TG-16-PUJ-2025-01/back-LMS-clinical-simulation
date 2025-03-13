@@ -29,6 +29,8 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "simulation")
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

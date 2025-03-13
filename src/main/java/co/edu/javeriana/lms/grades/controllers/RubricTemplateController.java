@@ -112,11 +112,11 @@ public class RubricTemplateController {
 
     //update the rubric template
     @Valid
-    @PutMapping("{id}/practice/{practiceId}")
-    public ResponseEntity<?> updatRubricTemplate(@RequestBody RubricTemplateDTO rubricTemplate, @PathVariable Long id, @PathVariable Long practiceId) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatRubricTemplate(@RequestBody RubricTemplateDTO rubricTemplate, @PathVariable Long id) {
         log.info("Updating rubric template with ID: " + id);
 
-        RubricTemplate rubricTemplateUpdated = rubricTemplateService.update(rubricTemplate, id, practiceId);
+        RubricTemplate rubricTemplateUpdated = rubricTemplateService.update(rubricTemplate, id);
 
         return ResponseEntity.ok(new ApiResponseDto<RubricTemplate>(HttpStatus.OK.value(),
                 "Course updated successfully.", rubricTemplateUpdated, null));
@@ -159,7 +159,31 @@ public class RubricTemplateController {
     }
 
     //add new courses to the rubric template if the rubric is only used and not edited
+    @Valid
+    @PutMapping("/{id}/courses")
+    public ResponseEntity<?> updatRubricCourses(@RequestBody List<Course> courses, @PathVariable Long id) {
+        
+        log.info("Updating rubric template with ID: " + id);
+
+        RubricTemplate rubricTemplateUpdated = rubricTemplateService.updaterubricTemplateCourses(courses, id);
+
+        return ResponseEntity.ok(new ApiResponseDto<RubricTemplate>(HttpStatus.OK.value(),
+                "Course updated successfully.", rubricTemplateUpdated, null));
+    }
 
     //return the suggested rubrics if the practice is part of a chosen course
+    @GetMapping("/recommended/{idPractice}")
+    public ResponseEntity<?> getRecommendedRubricTemplatesByCoursesById(@PathVariable Long idPractice) {
+        log.info("Requesting suggested rubric templates with practice ID: " + idPractice);
+
+        List<RubricTemplate> rubricTemplates = rubricTemplateService.findRecommendedRubricTemplatesByCoursesById(idPractice);
+
+        if (rubricTemplates.size() == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No rubric template found", null, null));
+        }
+
+        return ResponseEntity.ok(new ApiResponseDto<List<RubricTemplate>>(HttpStatus.OK.value(), "ok", rubricTemplates, null));
+    }
 
 }

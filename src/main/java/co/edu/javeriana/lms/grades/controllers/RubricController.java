@@ -10,6 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping(value = "/rubric")
 public class RubricController {
 
+    //crear rubrica
+
+    //editar rubrica
+
+    //ver rubrica
     
     
 }

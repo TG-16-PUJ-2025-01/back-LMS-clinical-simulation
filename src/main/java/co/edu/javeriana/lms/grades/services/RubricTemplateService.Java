@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.grades.dtos.RubricTemplateDTO;
@@ -48,8 +49,13 @@ public class RubricTemplateService {
         User creator = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        //FALTA SI ES ADMIN ACA SE ENVIA TODO
-
+        
+        //SI ES ADMIN ACA SE ENVIA TODO
+        for (Role role : creator.getRoles()) {
+            if (role.equals(Role.ADMIN)) {
+                return rubricTemplateRepository.findAllByTitleOrCreationDateContaining(filter, pageable);
+            }
+        }
         //SI SOLO QUIERE VER SUS ARCHIVADOS
         if(mine && archived)
             return rubricTemplateRepository.findArchivedMineByTitleOrCreationDateContaining(filter, archived, creator.getId(), pageable);
@@ -124,7 +130,7 @@ public class RubricTemplateService {
     }
 
     //REVISAR ADD TO PRACTICE Y ADD COURSES
-    public RubricTemplate update(RubricTemplateDTO rubricTemplate, Long id, Long practiceId) {
+    public RubricTemplate update(RubricTemplateDTO rubricTemplate, Long id) {
 
         RubricTemplate rubricTemplateModel = rubricTemplateRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Rubric Template not found with ID: " + id));
@@ -158,6 +164,11 @@ public class RubricTemplateService {
         rubricTemplate.getCourses().clear();
         rubricTemplate.getCourses().addAll(coursesToAdd);
         return rubricTemplateRepository.save(rubricTemplate);
+    }
+
+
+    public List<RubricTemplate> findRecommendedRubricTemplatesByCoursesById(Long id) {
+        return rubricTemplateRepository.findRecommendedRubricTemplatesByCoursesById(id);
     }
     
 }

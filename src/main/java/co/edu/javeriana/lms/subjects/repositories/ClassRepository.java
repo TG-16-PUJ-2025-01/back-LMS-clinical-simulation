@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -78,5 +80,7 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
             WHERE c.classId = :classId
             """)
     long countProfessorsByClassId(@Param("classId") Long classId);
+
+    List<ClassModel> findByProfessors_Id(Long professorId);
 
 }

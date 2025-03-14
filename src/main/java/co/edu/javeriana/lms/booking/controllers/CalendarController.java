@@ -2,16 +2,17 @@ package co.edu.javeriana.lms.booking.controllers;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
-import co.edu.javeriana.lms.booking.dtos.EventDto; // Crea esta clase para representar un evento
-
+import co.edu.javeriana.lms.accounts.services.AuthService;
+import co.edu.javeriana.lms.booking.dtos.EventDto;
+import co.edu.javeriana.lms.booking.services.CalendarService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -19,22 +20,23 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/calendar")
 public class CalendarController {
 
+    @Autowired
+    private AuthService authService;
+
+    @Autowired
+    private CalendarService calendarService;
+
     @GetMapping("")
     public ResponseEntity<?> getEvents(@RequestHeader("Authorization") String token) {
         token = token.substring(7);
         log.info("Requesting events for user with token: {}", token);
 
-        // Simulación de eventos
-        List<EventDto> events = List.of(
-            new EventDto(1, "Reunión", "2025-03-12 09:00", "2025-03-12 16:00"),
-            new EventDto(2, "Entrega", "2025-03-15", "2025-03-15"),
-            new EventDto(3, "Reunión", "2025-03-12 10:00", "2025-03-12 14:00"),
-            new EventDto(4, "Reunión", "2025-03-12 15:00", "2025-03-12 16:00")
-        );
+        Long userId = authService.getUserIdByToken(token);
+        log.info("User ID found: " + userId);
 
+        List<EventDto> realEvents = calendarService.searchEvents(userId);
 
-        token = token.substring(7);
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Roles retrieved successfully", events, null));
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Events retrieved successfully", realEvents, null));
     }
 }
 

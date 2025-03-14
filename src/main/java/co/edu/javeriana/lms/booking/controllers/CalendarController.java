@@ -27,7 +27,9 @@ public class CalendarController {
         // Simulación de eventos
         List<EventDto> events = List.of(
             new EventDto(1, "Reunión", "2025-03-12 09:00", "2025-03-12 16:00"),
-            new EventDto(2, "Entrega", "2025-03-15", "2025-03-15")
+            new EventDto(2, "Entrega", "2025-03-15", "2025-03-15"),
+            new EventDto(3, "Reunión", "2025-03-12 10:00", "2025-03-12 14:00"),
+            new EventDto(4, "Reunión", "2025-03-12 15:00", "2025-03-12 16:00")
         );
 
 

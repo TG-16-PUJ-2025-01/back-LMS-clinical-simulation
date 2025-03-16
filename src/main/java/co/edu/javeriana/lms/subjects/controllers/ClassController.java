@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
@@ -65,7 +66,47 @@ public class ClassController {
             @PathVariable Long id) {
         log.info("Requesting all members of the class");
 
-        Page<User> classModelPage = classService.findAllMembers(filter, page, size, sort, asc, id);
+        Page<User> classModelPage = classService.findAllMembers(filter, page, size, sort, asc, id, "");
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
+                classModelPage.getTotalElements(),
+                classModelPage.getTotalPages());
+
+        return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok",
+                classModelPage.getContent(), metadata));
+    }
+
+    @GetMapping("/{id}/member/students")
+    public ResponseEntity<?> getAllClassStudentsMembers(
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            @PathVariable Long id) {
+        log.info("Requesting all students members of the class");
+
+        Page<User> classModelPage = classService.findAllMembers(filter, page, size, sort, asc, id, Role.ESTUDIANTE.name());
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
+                classModelPage.getTotalElements(),
+                classModelPage.getTotalPages());
+
+        return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok",
+                classModelPage.getContent(), metadata));
+    }
+
+    @GetMapping("/{id}/member/professors")
+    public ResponseEntity<?> getAllClassProfessorsMembers(
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            @PathVariable Long id) {
+        log.info("Requesting all professors members of the class");
+
+        Page<User> classModelPage = classService.findAllMembers(filter, page, size, sort, asc, id, Role.PROFESOR.name());
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
                 classModelPage.getTotalElements(),
@@ -85,7 +126,47 @@ public class ClassController {
             @PathVariable Long id) {
         log.info("Requesting all members out of the class");
 
-        Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id);
+        Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id, "");
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
+                classModelPage.getTotalElements(),
+                classModelPage.getTotalPages());
+
+        return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok",
+                classModelPage.getContent(), metadata));
+    }
+
+    @GetMapping("/{id}/member/students/outside")
+    public ResponseEntity<?> getAllClassStudentsMembersNotInClass(
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            @PathVariable Long id) {
+        log.info("Requesting all members out of the class");
+
+        Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id, Role.ESTUDIANTE.name());
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
+                classModelPage.getTotalElements(),
+                classModelPage.getTotalPages());
+
+        return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok",
+                classModelPage.getContent(), metadata));
+    }
+
+    @GetMapping("/{id}/member/professors/outside")
+    public ResponseEntity<?> getAllClassProfessorsMembersNotInClass(
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            @PathVariable Long id) {
+        log.info("Requesting all members out of the class");
+
+        Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id, Role.PROFESOR.name());
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
                 classModelPage.getTotalElements(),

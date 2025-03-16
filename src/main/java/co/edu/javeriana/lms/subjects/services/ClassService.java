@@ -1,6 +1,7 @@
 package co.edu.javeriana.lms.subjects.services;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,22 +40,93 @@ public class ClassService {
         return classRepository.searchClasses(filter, pageable);
     }
 
-    public Page<User>findAllMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id)
+    public Page<User>findAllMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id, String role)
     {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        return classRepository.findMembers(id, filter, pageable);
+
+        if(role.equals(Role.PROFESOR.name()))
+        {
+            return classRepository.findProfessorsMembers(id, filter, pageable).map(user -> {
+                user.getRoles().clear();
+                ArrayList<Role> roles = new ArrayList<>();
+                roles.add(Role.PROFESOR);
+                user.setRoles(new HashSet<>(roles));
+                return user;
+            });
+        }
+        else if(role.equals(Role.ESTUDIANTE.name()))
+        {
+            return classRepository.findStudentsMembers(id, filter, pageable).map(user -> {
+                user.getRoles().clear();
+                ArrayList<Role> roles = new ArrayList<>();
+                roles.add(Role.ESTUDIANTE);
+                user.setRoles(new HashSet<>(roles));
+                return user;
+            });
+        }
+        else
+        {
+            ClassModel classModel = classRepository.findById(id).get();
+            Page<User> members = classRepository.findMembers(id, filter, pageable);
+
+            //iterar sobre los miembros de la clase y manipular el rol
+            //si pertenece a profesor, se le asigna el rol de profesor
+            //si pertenece a estudiante, se le asigna el rol de estudiante
+
+            members.forEach(user -> {
+                if(classModel.getProfessors().contains(user))
+                {
+                    user.getRoles().clear();
+                    ArrayList<Role> roles = new ArrayList<>();
+                    roles.add(Role.PROFESOR);
+                    user.setRoles(new HashSet<>(roles));
+                }
+                else if(classModel.getStudents().contains(user))
+                {
+                    user.getRoles().clear();
+                    ArrayList<Role> roles = new ArrayList<>();
+                    roles.add(Role.ESTUDIANTE);
+                    user.setRoles(new HashSet<>(roles));
+                }
+            });
+
+            return members;
+        }
+
     }
 
-    public Page<User>findAllNonMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id)
+    public Page<User>findAllNonMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id,String role)
     {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        return classRepository.findUsersNotInClass(id, filter, pageable).map(user -> {
-            user.getRoles().remove(Role.COORDINADOR);
-            user.setRoles(user.getRoles());
-            return user;
-        });
+        
+        if(role.equals(Role.PROFESOR.name()))
+        {
+            return classRepository.findProfessorsNotInClass(id, filter, pageable).map(user -> {
+                user.getRoles().clear();
+                ArrayList<Role> roles = new ArrayList<>();
+                roles.add(Role.PROFESOR);
+                user.setRoles(new HashSet<>(roles));
+                return user;
+            });
+        }
+        else if(role.equals(Role.ESTUDIANTE.name()))
+        {
+            return classRepository.findStudentsNotInClass(id, filter, pageable).map(user -> {
+                user.getRoles().clear();
+                ArrayList<Role> roles = new ArrayList<>();
+                roles.add(Role.ESTUDIANTE);
+                user.setRoles(new HashSet<>(roles));
+                return user;
+            });
+        }
+        else
+            return classRepository.findUsersNotInClass(id, filter, pageable).map(user -> {
+                user.getRoles().remove(Role.COORDINADOR);
+                user.setRoles(user.getRoles());
+                return user;
+            });
     }
 
     public ClassModel findById(Long id) {

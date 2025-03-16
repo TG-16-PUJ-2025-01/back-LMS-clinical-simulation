@@ -5,6 +5,8 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import co.edu.javeriana.lms.practices.models.Simulation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,6 +42,7 @@ public class Rubric {
     
     @OneToOne
     @JoinColumn(nullable = false)
+    @JsonIgnore
     private Simulation simulation;
 
     public void changeEvaluatedCriteria(List<Criteria> previousCriterias) {

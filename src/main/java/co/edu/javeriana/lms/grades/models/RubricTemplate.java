@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.subjects.models.Course;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -66,8 +67,7 @@ public class RubricTemplate {
     @JsonIgnore
     private Practice practice;
 
-    @OneToMany(mappedBy = "rubricTemplate")
-    @JsonIgnore
+    @OneToMany(mappedBy = "rubricTemplate", cascade = CascadeType.DETACH, orphanRemoval = false)    @JsonIgnore
     private List<Rubric> rubrics;
 
     @ManyToOne

@@ -103,7 +103,7 @@ public class RubricTemplateController {
         RubricTemplate newRubricTemplate = rubricTemplateService.save(rubricTemplate,principal.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<RubricTemplate>(HttpStatus.OK.value(),
-                "Class added successfully.", newRubricTemplate, null));
+                "Rubric template added successfully.", newRubricTemplate, null));
     }
     
 
@@ -149,13 +149,13 @@ public class RubricTemplateController {
         log.info("Deleting rubric template with ID: " + id);
 
         try {
-            RubricTemplate rubricTemplate = rubricTemplateService.findById(id);
+            //RubricTemplate rubricTemplate = rubricTemplateService.findById(id);
             rubricTemplateService.deleteById(id);
 
             return ResponseEntity.ok(new ApiResponseDto<>(
                     HttpStatus.OK.value(),
                     "Rubric Template deleted successfully.",
-                    rubricTemplate,
+                    new RubricTemplate(),
                     null));
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(

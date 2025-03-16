@@ -16,14 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class RubricService {
     
-    @Autowired
-    private RubricRepository rubricRepository;
+@Autowired
+private RubricRepository rubricRepository;
 
-    public Rubric findById(Long id) {
-   
-        return rubricRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Rubric not found"));
-    }
+public Rubric findById(Long id) {
+
+    return rubricRepository.findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Rubric not found"));
+}
 
 public Rubric update(List<EvaluatedCriteria> evaluatedCriterias, Long id) {
     Rubric foundRubric= rubricRepository.findById(id)

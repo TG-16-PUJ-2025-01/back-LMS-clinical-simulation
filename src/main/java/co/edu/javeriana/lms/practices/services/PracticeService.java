@@ -74,10 +74,6 @@ public class PracticeService {
         Sort sortOrder = Sort.by("id").ascending();
         List<Practice> practices = practiceRepository.findByClassModel_ClassId(classId, sortOrder);
 
-        if(practices.isEmpty()) {
-            throw new EntityNotFoundException("No practices found for class with id: " + classId);
-        }
-
         return practices;
     }
 }

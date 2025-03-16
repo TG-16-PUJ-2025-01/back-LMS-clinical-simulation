@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,6 @@ import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.services.RoomService;
 import co.edu.javeriana.lms.booking.services.RoomTypeService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
-import jakarta.servlet.http.HttpServletRequest;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -43,9 +43,6 @@ public class RoomControllerTest {
 
     @Mock
     private RoomTypeService roomTypeService;
-
-    @Mock
-    private HttpServletRequest request;
 
     @BeforeEach
     public void setUp() {
@@ -78,11 +75,9 @@ public class RoomControllerTest {
         Page<Room> roomPage = new PageImpl<>(rooms, PageRequest.of(0, 10), rooms.size());
 
         when(roomService.searchRooms("", 0, 10, "id", true)).thenReturn(roomPage);
-        when(request.getHeader("Host")).thenReturn("localhost:8080");
-        when(request.getScheme()).thenReturn("http");
 
         // Act
-        ResponseEntity<ApiResponseDto<?>> response = roomController.getAllRooms(0, 10, "id", true, "", request);
+        ResponseEntity<ApiResponseDto<?>> response = roomController.getAllRooms(0, 10, "id", true, "");
 
         // Assert
         assertNotNull(response);
@@ -104,7 +99,7 @@ public class RoomControllerTest {
         roomA.setName("Room A");
         roomA.setType(roomType1);
 
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.of(roomA));
+        when(roomService.findById(1L)).thenReturn(Optional.of(roomA));
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.getRoomById(1L);
@@ -121,7 +116,7 @@ public class RoomControllerTest {
     @Test
     public void testGetRoomById_NotFound() {
         // Arrange
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.empty());
+        when(roomService.findById(1L)).thenReturn(null);
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.getRoomById(1L);
@@ -172,7 +167,7 @@ public class RoomControllerTest {
         roomA.setName("Room A");
         roomA.setType(roomType1);
 
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.of(roomA));
+        when(roomService.findById(1L)).thenReturn(Optional.of(roomA));
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.deleteRoomById(1L);
@@ -189,7 +184,7 @@ public class RoomControllerTest {
     @Test
     public void testDeleteRoom_NotFound() {
         // Arrange
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.empty());
+        when(roomService.findById(1L)).thenReturn(null);
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.deleteRoomById(1L);
@@ -218,7 +213,7 @@ public class RoomControllerTest {
         roomB.setName("Room B");
         roomB.setType(roomType1);
 
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.of(roomA));
+        when(roomService.findById(1L)).thenReturn(Optional.of(roomA));
         when(roomService.update(roomA)).thenReturn(roomB);
 
         // Act
@@ -244,7 +239,7 @@ public class RoomControllerTest {
         roomA.setName("Room A");
         roomA.setType(roomType1);
 
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.empty());
+        when(roomService.findById(1L)).thenReturn(null);
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.updateRoom(roomA);
@@ -269,7 +264,7 @@ public class RoomControllerTest {
         roomA.setType(roomType1);
 
         // Simula que la sala exista
-        when(roomService.findById(1L)).thenReturn(java.util.Optional.of(roomA));
+        when(roomService.findById(1L)).thenReturn(Optional.of(roomA));
         // Simula el comportamiento del servicio para lanzar la excepción por conflicto
         // de nombre
         when(roomService.update(roomA)).thenThrow(new IllegalArgumentException("El nombre de la sala ya existe"));

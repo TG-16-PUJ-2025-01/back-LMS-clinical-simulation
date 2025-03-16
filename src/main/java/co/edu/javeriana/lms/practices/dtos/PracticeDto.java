@@ -31,6 +31,9 @@ public class PracticeDto {
     private Boolean gradeable;
 
     @NonNull
+    private Integer simulationDuration;
+
+    @NonNull
     @Enumerated(EnumType.STRING)
     private PracticeType type;
 
@@ -48,6 +51,7 @@ public class PracticeDto {
                 .name(this.name)
                 .description(this.description)
                 .gradeable(this.gradeable)
+                .simulationDuration(this.simulationDuration)
                 .type(this.type)
                 .numberOfGroups(this.numberOfGroups)
                 .maxStudentsGroup(this.maxStudentsGroup)

@@ -9,7 +9,6 @@ import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.videos.dtos.EditVideoDto;
 import co.edu.javeriana.lms.videos.models.Video;
 import co.edu.javeriana.lms.videos.services.VideoService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
@@ -41,32 +40,32 @@ public class VideoController {
             @Min(1) @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "videoId") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
-            @RequestParam(defaultValue = "") String filter,
-            HttpServletRequest request) {
+            @RequestParam(defaultValue = "") String filter) {
         log.info("Requesting all simulations");
-
-        String host = request.getHeader("Host");
-        String scheme = request.getScheme();
 
         Page<Video> videosPage = videoService.searchVideos(filter, page, size, sort, asc);
 
-        String previous = null;
-        if (videosPage.hasPrevious()) {
-            previous = String.format("%s://%s/video/all?page=%d&size=%d&sort=%s&asc=%b&filter=%s", scheme, host, page - 1, size, sort, asc, filter);
-        }
-
-        String next = null;
-        if (videosPage.hasNext()) {
-            next = String.format("%s://%s/video/all?page=%d&size=%d&sort=%s&asc=%b&filter=%s", scheme, host, page + 1, size, sort, asc, filter);
-        }
-
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, videosPage.getNumberOfElements(),
-                videosPage.getTotalElements(), videosPage.getTotalPages(), next,
-                previous);
+                videosPage.getTotalElements(), videosPage.getTotalPages());
 
         return ResponseEntity.ok(
                 new ApiResponseDto<List<Video>>(HttpStatus.OK.value(), "ok", videosPage.getContent(), metadata));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponseDto<Video>> getVideo(@PathVariable Long id) {
+        log.info("Requesting video with id: {}", id);
+
+        Video video = videoService.getVideo(id);
+
+        if (video == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Video not found", null, null));
+        }
+
+        return ResponseEntity.ok(new ApiResponseDto<Video>(HttpStatus.OK.value(), "ok", video, null));
+    }
+    
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDto<Video>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDto dto) {

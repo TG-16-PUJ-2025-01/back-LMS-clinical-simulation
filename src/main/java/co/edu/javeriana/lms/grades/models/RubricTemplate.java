@@ -2,7 +2,6 @@ package co.edu.javeriana.lms.grades.models;
 
 import java.sql.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;

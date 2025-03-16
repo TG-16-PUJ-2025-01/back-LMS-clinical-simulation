@@ -25,6 +25,10 @@ public class VideoService {
         return videoRepository.findByNameContainingIgnoreCase(filter, pageable);
     }
 
+    public Video getVideo(Long id) {
+        return videoRepository.findById(id).orElse(null);
+    }
+
     public Video editVideo(Long id, EditVideoDto video) {
         Video videoToEdit = videoRepository.findById(id).orElse(null);
         if (videoToEdit == null) {

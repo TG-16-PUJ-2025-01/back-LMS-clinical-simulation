@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +25,6 @@ import co.edu.javeriana.lms.shared.dtos.ErrorDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.subjects.models.Course;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
@@ -51,29 +49,14 @@ public class RubricTemplateController {
             @RequestParam(defaultValue = "") String filter,
             @RequestParam(defaultValue = "true") Boolean mine,
             @RequestParam(defaultValue = "true") Boolean archived,
-            HttpServletRequest request,
             Principal principal) {
         log.info("Requesting all courses");
 
-        String host = request.getHeader("Host");
-        String scheme = request.getScheme();
-
         Page<RubricTemplate> rubricsTemplatesPage = rubricTemplateService.findAll(filter, page, size, sort, asc, mine, archived, principal.getName());
-
-        String previous = null;
-        if (rubricsTemplatesPage.hasPrevious()) {
-            previous = String.format("%s://%s/course/all?page=%d&size=%d", scheme, host, page - 1, size);
-        }
-
-        String next = null;
-        if (rubricsTemplatesPage.hasNext()) {
-            next = String.format("%s://%s/course/all?page=%d&size=%d", scheme, host, page + 1, size);
-        }
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, rubricsTemplatesPage.getNumberOfElements(),
                 rubricsTemplatesPage.getTotalElements(),
-                rubricsTemplatesPage.getTotalPages(), next,
-                previous);
+                rubricsTemplatesPage.getTotalPages());
 
         return ResponseEntity.ok(new ApiResponseDto<List<RubricTemplate>>(HttpStatus.OK.value(), "ok", rubricsTemplatesPage.getContent(), metadata));
     }

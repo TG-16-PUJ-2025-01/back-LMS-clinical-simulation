@@ -2,7 +2,9 @@ package co.edu.javeriana.lms.practices.services;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,19 +188,43 @@ public class SimulationService {
     public List<TimeSlotDto> findRoomSimulationsSchedule(Long roomId, LocalDate startOfWeekDate) {
         roomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + roomId));
+    
         LocalDateTime startOfWeek = startOfWeekDate.atStartOfDay();
         LocalDateTime endOfWeek = startOfWeekDate.plusDays(7).atStartOfDay().minusSeconds(1);
-        List<Simulation> simulations = simulationRepository.findByRoomIdAndStartDateTimeBetween(roomId, startOfWeek,
-                endOfWeek);
-        
+        List<Simulation> simulations = simulationRepository.findByRoomIdAndStartDateTimeBetween(roomId, startOfWeek, endOfWeek);
+    
         List<TimeSlotDto> timeSlots = new ArrayList<>();
-        for (Simulation simulation : simulations) {
-            timeSlots.add(TimeSlotDto.builder()
-                    .startDateTime(simulation.getStartDateTime())
-                    .endDateTime(simulation.getEndDateTime())
-                    .build());
+    
+        if (simulations.isEmpty()) {
+            return timeSlots;
         }
-
+    
+        simulations.sort(Comparator.comparing(Simulation::getStartDateTime));
+    
+        LocalDateTime unifiedStart = simulations.get(0).getStartDateTime();
+        LocalDateTime unifiedEnd = simulations.get(0).getEndDateTime();
+    
+        for (Simulation currentSimulation : simulations) {
+            if (!currentSimulation.getStartDateTime().isAfter(unifiedEnd)) { 
+                // Se solapan o son contiguos
+                unifiedEnd = unifiedEnd.isAfter(currentSimulation.getEndDateTime()) ? unifiedEnd : currentSimulation.getEndDateTime();
+            } else {
+                // Guardar el intervalo previo antes de actualizar
+                timeSlots.add(TimeSlotDto.builder()
+                        .startDateTime(unifiedStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                        .endDateTime(unifiedEnd.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                        .build());
+                unifiedStart = currentSimulation.getStartDateTime();
+                unifiedEnd = currentSimulation.getEndDateTime();
+            }
+        }
+    
+        // Agregar el último intervalo
+        timeSlots.add(TimeSlotDto.builder()
+                .startDateTime(unifiedStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                .endDateTime(unifiedEnd.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                .build());
+    
         return timeSlots;
     }
 }

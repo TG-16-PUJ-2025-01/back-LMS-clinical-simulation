@@ -263,7 +263,7 @@ public class DBInitializer implements CommandLineRunner {
 
 	private void insertSimulations() {
 
-		LocalDateTime startDateTime = LocalDateTime.now();
+		LocalDateTime startDateTime = LocalDateTime.now().withHour(11).withMinute(0).withSecond(0).withNano(0);
 
 		Simulation simulation1 = Simulation.builder()
 			.practice(practiceRepository.findById(1L).get())
@@ -295,8 +295,19 @@ public class DBInitializer implements CommandLineRunner {
 			.grade(5.0f)
 			.build();
 
+			Simulation simulation4 = Simulation.builder()
+			.practice(practiceRepository.findById(1L).get())
+			.room(roomRepository.findById(1L).get())
+			.startDateTime(startDateTime.plusDays(1))
+			.endDateTime(startDateTime.plusDays(1).plusMinutes(30))
+			.gradeDateTime(LocalDateTime.now().plusDays(2))
+			.gradeStatus(GradeStatus.REGISTERED)
+			.grade(5.0f)
+			.build();
+
 			simulationRepository.save(simulation1);
 			simulationRepository.save(simulation2);
 			simulationRepository.save(simulation3);
+			simulationRepository.save(simulation4);
 	}
 }

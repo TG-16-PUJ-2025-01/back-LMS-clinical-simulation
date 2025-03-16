@@ -114,5 +114,4 @@ public class PracticeController {
 
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice deleted successfully", null, null));
     }
-
 }

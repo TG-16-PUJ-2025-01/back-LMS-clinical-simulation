@@ -75,6 +75,7 @@ public class DBInitializer implements CommandLineRunner {
 		insertCoursesAndClasses();
 		insertPractices();
 		insertSimulations();
+		insertRubricTemplates();
 	}
 
 	private void insertRoomsAndTypes() {
@@ -327,5 +328,9 @@ public class DBInitializer implements CommandLineRunner {
 			simulationRepository.save(simulation1);
 			simulationRepository.save(simulation2);
 			simulationRepository.save(simulation3);
+	}
+
+	private void insertRubricTemplates() {
+
 	}
 }

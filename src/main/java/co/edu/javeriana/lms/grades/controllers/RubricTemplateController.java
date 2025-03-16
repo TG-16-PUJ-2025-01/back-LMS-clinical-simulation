@@ -44,7 +44,7 @@ public class RubricTemplateController {
     public ResponseEntity<?> getAll(
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
             @Min(1) @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(defaultValue = "courseId") String sort,
+            @RequestParam(defaultValue = "rubricTemplateId") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
             @RequestParam(defaultValue = "") String filter,
             @RequestParam(defaultValue = "true") Boolean mine,

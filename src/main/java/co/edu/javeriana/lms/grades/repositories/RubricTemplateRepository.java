@@ -45,7 +45,6 @@ public interface RubricTemplateRepository extends JpaRepository<RubricTemplate, 
         WHERE 
             (LOWER(TRANSLATE(c.title, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
             OR CAST(c.creationDate AS string) LIKE CONCAT('%', :filter, '%'))
-            AND c.archived != :archived
             AND c.creator.id != :creatorId
     """)
     Page<RubricTemplate> findNotMineByTitleOrCreationDateContaining(@Param("filter") String filter, @Param("creatorId") Long creatorId, Pageable pageable);

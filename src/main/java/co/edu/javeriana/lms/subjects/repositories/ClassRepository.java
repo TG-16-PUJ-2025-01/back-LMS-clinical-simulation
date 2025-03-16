@@ -110,7 +110,7 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
                 'COORDINADOR' MEMBER OF u.roles AND SIZE(u.roles) = 1
             )
             AND (
-                'PROFESOR' MEMBER OF u.roles AND SIZE(u.roles) = 1
+                'PROFESOR' MEMBER OF u.roles
             )
             AND (
                 :filter IS NULL OR :filter = '' OR

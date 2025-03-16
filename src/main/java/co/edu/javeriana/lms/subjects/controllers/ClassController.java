@@ -164,7 +164,7 @@ public class ClassController {
             @RequestParam(defaultValue = "true") Boolean asc,
             @RequestParam(defaultValue = "") String filter,
             @PathVariable Long id) {
-        log.info("Requesting all members out of the class");
+        log.info("Requesting all professor members out of the class");
 
         Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id, Role.PROFESOR.name());
 

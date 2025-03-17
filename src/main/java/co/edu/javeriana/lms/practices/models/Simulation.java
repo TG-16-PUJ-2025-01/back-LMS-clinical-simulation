@@ -36,7 +36,7 @@ import lombok.NoArgsConstructor;
 public class Simulation {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long simulationId;
+    private Long id;
 
     @Column(nullable = false)
     private LocalDateTime startDateTime;

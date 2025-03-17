@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.practices.models.Simulation;
+import co.edu.javeriana.lms.practices.models.Practice;
 
 @Repository
 public interface SimulationRepository extends JpaRepository<Simulation, Long> {
@@ -23,5 +24,7 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
     List<Simulation> findByRoomId(Long roomId);
 
     Page<Simulation> findByPracticeId(Long practiceId, Pageable pageable);
+
+    List<Simulation> findByPracticeIn(List<Practice> practices);
 
 }

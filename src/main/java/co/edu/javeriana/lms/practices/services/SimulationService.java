@@ -1,6 +1,5 @@
 package co.edu.javeriana.lms.practices.services;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -185,13 +184,11 @@ public class SimulationService {
         simulationRepository.save(simulation);
     }
 
-    public List<TimeSlotDto> findRoomSimulationsSchedule(Long roomId, LocalDate startOfWeekDate) {
+    public List<TimeSlotDto> findRoomSimulationsSchedule(Long roomId) {
         roomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + roomId));
     
-        LocalDateTime startOfWeek = startOfWeekDate.atStartOfDay();
-        LocalDateTime endOfWeek = startOfWeekDate.plusDays(7).atStartOfDay().minusSeconds(1);
-        List<Simulation> simulations = simulationRepository.findByRoomIdAndStartDateTimeBetween(roomId, startOfWeek, endOfWeek);
+        List<Simulation> simulations = simulationRepository.findByRoomId(roomId);
     
         List<TimeSlotDto> timeSlots = new ArrayList<>();
     

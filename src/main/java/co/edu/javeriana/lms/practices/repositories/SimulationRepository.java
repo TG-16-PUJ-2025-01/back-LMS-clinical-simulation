@@ -20,7 +20,7 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
     Boolean isRoomAvailable(@Param("room") Room room, @Param("startDateTime") LocalDateTime startDateTime,
             @Param("endDateTime") LocalDateTime endDateTime);
 
-    List<Simulation> findByRoomIdAndStartDateTimeBetween(Long roomId, LocalDateTime startOfWeekDate, LocalDateTime endOfWeekDate);
+    List<Simulation> findByRoomId(Long roomId);
 
     Page<Simulation> findByPracticeId(Long practiceId, Pageable pageable);
 

@@ -89,7 +89,7 @@ public class CalendarService {
             Practice practice = simulation.getPractice();
             ClassModel classModel = practice.getClassModel();
             return new EventDto(
-                    simulation.getSimulationId().intValue(),
+                    simulation.getId().intValue(),
                     practice.getName(),
                     "Clase: " + classModel.getCourse().getName(),
                     simulation.getRoom() != null ? simulation.getRoom().getName() : "Sin sala",

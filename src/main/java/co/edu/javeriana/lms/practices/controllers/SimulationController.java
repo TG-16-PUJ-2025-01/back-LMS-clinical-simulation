@@ -91,7 +91,10 @@ public class SimulationController {
 
         Page<Simulation> simulationsPage = simulationService.findSimulationsByPracticeId(practiceId, page, size);
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(), null));
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),
+                simulationsPage.getTotalElements(), simulationsPage.getTotalPages(), null, null);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(), metadata));
     }
 
     @PostMapping()
@@ -127,5 +130,12 @@ public class SimulationController {
         log.info("Requesting simulations for room with id: {} and startOfWeekDate: {}", roomId, startOfWeekDate);
 
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findRoomSimulationsSchedule(roomId, startOfWeekDate), null));
+    }
+
+    @GetMapping("/{id}/users")
+    public ResponseEntity<ApiResponseDto<?>> getSimulationStudents(@PathVariable Long id) {
+        log.info("Requesting simulation students with id: {}", id);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationStudents(id), null));
     }
 }

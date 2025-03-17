@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
 import co.edu.javeriana.lms.practices.dtos.SimulationDto;
@@ -200,5 +201,12 @@ public class SimulationService {
         }
 
         return timeSlots;
+    }
+
+    public List<User> findSimulationStudents(Long simulationId) {
+        Simulation simulation = simulationRepository.findById(simulationId)
+                .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + simulationId));
+
+        return simulation.getUsers();
     }
 }

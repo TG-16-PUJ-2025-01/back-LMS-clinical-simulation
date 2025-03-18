@@ -84,8 +84,7 @@ public class SimulationService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Practice not found with id: " + simulationsDto.get(0).getPracticeId()));
         Integer duration = practice.getSimulationDuration();
-        // TODO corregir
-        Integer numberOfGroups = practice.getMaxStudentsGroup();
+        Integer numberOfGroups = practice.getNumberOfGroups();
 
         int totalSimulationsAvailable = 0;
 
@@ -189,7 +188,7 @@ public class SimulationService {
         roomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + roomId));
     
-        List<Simulation> simulations = simulationRepository.findByRoomId(roomId);
+        List<Simulation> simulations = simulationRepository.findByRoomIdAndStartDateTimeAfter(roomId, LocalDateTime.now());
     
         List<TimeSlotDto> timeSlots = new ArrayList<>();
     

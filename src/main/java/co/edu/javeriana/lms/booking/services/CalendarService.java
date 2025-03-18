@@ -3,6 +3,8 @@ package co.edu.javeriana.lms.booking.services;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +38,31 @@ public class CalendarService {
     private UserRepository userRepository;
 
     public List<EventDto> searchEvents(Long idUser) {
-        // Retrieve user to ensure it exists and fetch simulations directly associated
-        // with the user
+        // Get the current date and determine the semester
+        LocalDate now = LocalDate.now();
+        LocalDateTime semesterStart;
+        LocalDateTime semesterEnd;
+
+        if (now.getMonthValue() <= 6) {
+            semesterStart = LocalDateTime.of(now.getYear(), 1, 1, 0, 0);
+            semesterEnd = LocalDateTime.of(now.getYear(), 6, 30, 23, 59);
+        } else {
+            semesterStart = LocalDateTime.of(now.getYear(), 7, 1, 0, 0);
+            semesterEnd = LocalDateTime.of(now.getYear(), 12, 31, 23, 59);
+        }
+
+        log.info("Semester start: {}", semesterStart);
+        log.info("Semester end: {}", semesterEnd);
+
+        // Check if the user exists
         User user = userRepository.findById(idUser)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + idUser));
 
-        List<Simulation> userSimulations = user.getSimulations();
+        // Search simulations directly for the user within the semester
+        List<Simulation> userSimulations = simulationRepository.findByPracticeInAndStartDateTimeBetween(
+                user.getSimulations().stream().map(Simulation::getPractice).collect(Collectors.toList()),
+                semesterStart, semesterEnd);
+
         log.info("Simulations found directly for user with id {}: {}", idUser, userSimulations.size());
 
         // Search classes where user is a professor
@@ -56,8 +77,10 @@ public class CalendarService {
 
         log.info("Classes found for user with id {}: {}", idUser, classes.size());
 
-        // Search practices associated with those classes
-        List<Practice> practices = practiceRepository.findByClassModelIn(classes);
+        // Search practices associated with those classes within the semester
+        List<Practice> practices = practiceRepository.findByClassModelInAndSimulations_StartDateTimeBetween(
+                classes, semesterStart, semesterEnd);
+
         if (practices.isEmpty()) {
             log.info("No practices found for the classes of user with id: {}. Returning only direct simulations.",
                     idUser);
@@ -69,8 +92,9 @@ public class CalendarService {
 
         log.info("Practices found for user with id {}: {}", idUser, practices.size());
 
-        // Search simulations associated with those practices
-        List<Simulation> simulations = simulationRepository.findByPracticeIn(practices);
+        // Search simulations associated with those practices within the semester
+        List<Simulation> simulations = simulationRepository.findByPracticeInAndStartDateTimeBetween(
+                practices, semesterStart, semesterEnd);
         simulations.addAll(userSimulations);
 
         if (simulations.isEmpty()) {

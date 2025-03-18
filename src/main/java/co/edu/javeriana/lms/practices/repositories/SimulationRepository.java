@@ -29,4 +29,7 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
 
     List<Simulation> findByPracticeIn(List<Practice> practices);
 
+    List<Simulation> findByPracticeInAndStartDateTimeBetween(
+            List<Practice> practices, LocalDateTime startDateTime, LocalDateTime endDateTime);
+
 }

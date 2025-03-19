@@ -15,6 +15,7 @@ import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class RoomService {
@@ -107,8 +108,9 @@ public class RoomService {
         return roomRepository.save(room);
     }
 
-    public Optional<Room> findById(Long id) {
-        return roomRepository.findById(id);
+    public Room findById(Long id) {
+        return roomRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + id));
     }
 
     public List<Room> findAll(Integer page, Integer size) {
@@ -121,17 +123,16 @@ public class RoomService {
     }
 
     public void deleteById(Long id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + id));
+
         // Check if the room type trying to be deleted is the last one
-        Room room = roomRepository.findById(id).orElse(null);
+        RoomType type = room.getType();
+        roomRepository.deleteById(id);
 
-        if (room != null) {
-            RoomType type = room.getType();
-            roomRepository.deleteById(id);
-
-            // If it is the last one, delete the room type
-            if (roomRepository.countByType(type) == 0) {
-                roomTypeRepository.delete(type);
-            }
+        // If it is the last one, delete the room type
+        if (roomRepository.countByType(type) == 0) {
+            roomTypeRepository.delete(type);
         }
     }
 

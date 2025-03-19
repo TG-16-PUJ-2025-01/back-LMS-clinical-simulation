@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.booking.dtos.RoomDto;
+import co.edu.javeriana.lms.booking.dtos.RoomTypeDto;
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.services.RoomService;
@@ -89,45 +90,19 @@ public class RoomController {
 		return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Room deleted successfully", null, null));
 	}
 
-	@PutMapping("/update")
-	public ResponseEntity<ApiResponseDto<?>> updateRoom(@Valid @RequestBody Room room) {
+	@PutMapping("/{id}")
+	public ResponseEntity<ApiResponseDto<?>> updateRoom(@PathVariable Long id, @Valid @RequestBody RoomDto roomDto) {
+		log.info("Requesting update of room with id={}", id);
 
-		log.info("Requesting update of room with id={}", room.getId());
+		Room updatedRoom = roomService.update(id, roomDto.toEntity());
 
-		log.info("Room: id={}, name={}, capacity={}, type={}", room.getId(), room.getName(), room.getCapacity(),
-				room.getType().getName());
-
-		// // Check if room exists
-		// Optional<Room> roomEntity = roomService.findById(room.getId());
-
-		// if (roomEntity.isEmpty()) {
-		// log.error("Room not found");
-		// return ResponseEntity.status(HttpStatus.NOT_FOUND)
-		// .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Room not found",
-		// null, null));
-		// }
-
-		// Update room using the save method
-		try {
-			Room updatedRoom = roomService.update(room);
-			log.info("Updated room: id={}, name={}, capacity={}, type={}", updatedRoom.getId(), updatedRoom.getName(),
-					updatedRoom.getCapacity(),
-					updatedRoom.getType().getName());
-
-			// Return updated room
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new ApiResponseDto<>(HttpStatus.OK.value(), "Room updated successfully", updatedRoom, null));
-		} catch (IllegalArgumentException e) {
-			// If there's an error (like room name conflict)
-			log.error("Error: {}", e.getMessage());
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body(new ApiResponseDto<>(HttpStatus.CONFLICT.value(), e.getMessage(), null, null));
-		}
+		return ResponseEntity
+				.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Room updated successfully", updatedRoom, null));
 	}
 
-	@PostMapping("/add")
+	@PostMapping()
 	public ResponseEntity<ApiResponseDto<?>> addRoom(@Valid @RequestBody RoomDto roomDto) {
-		log.info("Creating room: name={}, type={}", roomDto.getName(), roomDto.getType());
+		log.info("Creating room: name={}, typeId={}", roomDto.getName(), roomDto.getTypeId());
 
 		Room newRoom = roomService.save(roomDto.toEntity());
 
@@ -135,11 +110,11 @@ public class RoomController {
 				.ok(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Room created successfully", newRoom, null));
 	}
 
-	@PostMapping("/type/add")
-	public ResponseEntity<ApiResponseDto<?>> addRoomType(@Valid @RequestBody RoomType type) {
-		log.info("Requesting creation of room type: name={}", type.getName());
+	@PostMapping("/type")
+	public ResponseEntity<ApiResponseDto<?>> addRoomType(@Valid @RequestBody RoomTypeDto typeDto) {
+		log.info("Requesting creation of room type: name={}", typeDto.getName());
 
-		RoomType savedType = roomTypeService.save(type);
+		RoomType savedType = roomTypeService.save(typeDto.toEntity());
 
 		return ResponseEntity
 				.ok(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Room type created successfully", savedType,

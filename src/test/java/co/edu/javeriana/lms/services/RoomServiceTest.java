@@ -83,7 +83,7 @@ public class RoomServiceTest {
         when(roomTypeRepository.findByName(mockRoom.getType().getName())).thenReturn(mockRoomType);
         when(roomRepository.save(mockRoom)).thenReturn(mockRoom);
 
-        Room editedRoom = roomService.update(mockRoom);
+        Room editedRoom = roomService.update(id, mockRoom);
 
         assert (editedRoom.equals(mockRoom));
     }
@@ -96,7 +96,7 @@ public class RoomServiceTest {
         when(roomRepository.findById(id)).thenReturn(Optional.empty());
         when(roomTypeRepository.findByName(mockRoom.getType().getName())).thenReturn(mockRoomType);
 
-        Room editedRoom = roomService.update(roomWithNullType);
+        Room editedRoom = roomService.update(id, roomWithNullType);
 
         assert (editedRoom == null);
     }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.booking.models.RoomType;
@@ -16,6 +17,9 @@ public class RoomTypeService {
     private RoomTypeRepository roomTypeRepository;
 
     public RoomType save(RoomType type) {
+        if (roomTypeRepository.findByName(type.getName()) != null) {
+            throw new DataIntegrityViolationException("El nombre del tipo de sala ya existe: " + type.getName());
+        }
         return roomTypeRepository.save(type);
     }
 

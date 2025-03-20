@@ -66,6 +66,20 @@ public class SimulationController {
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulation, null));
     }
 
+    @GetMapping("/practice/{practiceId}")
+    public ResponseEntity<ApiResponseDto<?>> getSimulationsByPracticeId(@PathVariable Long practiceId,
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Requesting simulations for practice with id: {}", practiceId);
+
+        Page<Simulation> simulationsPage = simulationService.findSimulationsByPracticeId(practiceId, page, size);
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),
+                simulationsPage.getTotalElements(), simulationsPage.getTotalPages(), null, null);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(), metadata));
+    }
+
     @PostMapping()
     public ResponseEntity<ApiResponseDto<?>> createSimulations(@Valid @RequestBody CreateSimulationRequestDto simulationRequestDto) {
         log.info("Creating simulations {} ", simulationRequestDto.getSimulations().size());
@@ -92,5 +106,19 @@ public class SimulationController {
 
         simulationService.deleteSimulationById(id);
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Simulation deleted successfully", null, null));
+    }
+
+    @GetMapping("/room")
+    public ResponseEntity<ApiResponseDto<?>> getSimulationsByRoomId(@RequestParam Long roomId) {
+        log.info("Requesting simulations for room with id: {}", roomId);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findRoomSimulationsSchedule(roomId), null));
+    }
+
+    @GetMapping("/{id}/users")
+    public ResponseEntity<ApiResponseDto<?>> getSimulationStudents(@PathVariable Long id) {
+        log.info("Requesting simulation students with id: {}", id);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationStudents(id), null));
     }
 }

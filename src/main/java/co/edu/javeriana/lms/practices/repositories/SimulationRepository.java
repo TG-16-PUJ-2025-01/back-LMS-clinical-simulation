@@ -1,6 +1,7 @@
 package co.edu.javeriana.lms.practices.repositories;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.practices.models.Simulation;
+import co.edu.javeriana.lms.practices.models.Practice;
 
 @Repository
 public interface SimulationRepository extends JpaRepository<Simulation, Long> {
@@ -19,5 +21,15 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
     Boolean isRoomAvailable(@Param("room") Room room, @Param("startDateTime") LocalDateTime startDateTime,
             @Param("endDateTime") LocalDateTime endDateTime);
 
+    List<Simulation> findByRoomId(Long roomId);
+
     Page<Simulation> findByPracticeId(Long practiceId, Pageable pageable);
+
+    List<Simulation> findByRoomIdAndStartDateTimeAfter(Long roomId, LocalDateTime startDateTime);
+
+    List<Simulation> findByPracticeIn(List<Practice> practices);
+
+    List<Simulation> findByPracticeInAndStartDateTimeBetween(
+            List<Practice> practices, LocalDateTime startDateTime, LocalDateTime endDateTime);
+
 }

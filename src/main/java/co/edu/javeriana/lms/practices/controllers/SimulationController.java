@@ -75,7 +75,7 @@ public class SimulationController {
         Page<Simulation> simulationsPage = simulationService.findSimulationsByPracticeId(practiceId, page, size);
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),
-                simulationsPage.getTotalElements(), simulationsPage.getTotalPages(), null, null);
+                simulationsPage.getTotalElements(), simulationsPage.getTotalPages());
 
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(), metadata));
     }

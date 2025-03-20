@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.subjects.dtos.ClassDto;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.services.ClassService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
@@ -41,32 +41,16 @@ public class ClassController {
             @Min(1) @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "id") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
-            @RequestParam(defaultValue = "") String filter,
-            HttpServletRequest request) {
-
+            @RequestParam(defaultValue = "") String filter) {
         log.info("Requesting all classes");
-
-        String host = request.getHeader("Host");
-        String scheme = request.getScheme();
 
         Page<ClassModel> classModelPage = classService.findAll(filter, page, size, sort, asc);
 
         log.info("Requesting all classes");
 
-        String previous = null;
-        if (classModelPage.hasPrevious()) {
-            previous = String.format("%s://%s/class/all?page=%d&size=%d", scheme, host, page - 1, size);
-        }
-
-        String next = null;
-        if (classModelPage.hasNext()) {
-            next = String.format("%s://%s/class/all?page=%d&size=%d", scheme, host, page + 1, size);
-        }
-
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
                 classModelPage.getTotalElements(),
-                classModelPage.getTotalPages(), next,
-                previous);
+                classModelPage.getTotalPages());
 
         return ResponseEntity.ok(new ApiResponseDto<List<ClassModel>>(HttpStatus.OK.value(), "ok",
                 classModelPage.getContent(), metadata));
@@ -79,30 +63,54 @@ public class ClassController {
             @RequestParam(defaultValue = "id") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
             @RequestParam(defaultValue = "") String filter,
-            HttpServletRequest request,
             @PathVariable Long id) {
-
         log.info("Requesting all members of the class");
 
-        String host = request.getHeader("Host");
-        String scheme = request.getScheme();
-
-        Page<User> classModelPage = classService.findAllMembers(filter, page, size, sort, asc, id);
-
-        String previous = null;
-        if (classModelPage.hasPrevious()) {
-            previous = String.format("%s://%s/class/all?page=%d&size=%d", scheme, host, page - 1, size);
-        }
-
-        String next = null;
-        if (classModelPage.hasNext()) {
-            next = String.format("%s://%s/class/all?page=%d&size=%d", scheme, host, page + 1, size);
-        }
+        Page<User> classModelPage = classService.findAllMembers(filter, page, size, sort, asc, id, "");
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
                 classModelPage.getTotalElements(),
-                classModelPage.getTotalPages(), next,
-                previous);
+                classModelPage.getTotalPages());
+
+        return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok",
+                classModelPage.getContent(), metadata));
+    }
+
+    @GetMapping("/{id}/member/students")
+    public ResponseEntity<?> getAllClassStudentsMembers(
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            @PathVariable Long id) {
+        log.info("Requesting all students members of the class");
+
+        Page<User> classModelPage = classService.findAllMembers(filter, page, size, sort, asc, id, Role.ESTUDIANTE.name());
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
+                classModelPage.getTotalElements(),
+                classModelPage.getTotalPages());
+
+        return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok",
+                classModelPage.getContent(), metadata));
+    }
+
+    @GetMapping("/{id}/member/professors")
+    public ResponseEntity<?> getAllClassProfessorsMembers(
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            @PathVariable Long id) {
+        log.info("Requesting all professors members of the class");
+
+        Page<User> classModelPage = classService.findAllMembers(filter, page, size, sort, asc, id, Role.PROFESOR.name());
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
+                classModelPage.getTotalElements(),
+                classModelPage.getTotalPages());
 
         return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok",
                 classModelPage.getContent(), metadata));
@@ -135,34 +143,59 @@ public class ClassController {
             @RequestParam(defaultValue = "id") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
             @RequestParam(defaultValue = "") String filter,
-            HttpServletRequest request,
             @PathVariable Long id) {
-
         log.info("Requesting all members out of the class");
 
-        String host = request.getHeader("Host");
-        String scheme = request.getScheme();
-
-        Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id);
-
-        String previous = null;
-        if (classModelPage.hasPrevious()) {
-            previous = String.format("%s://%s/class/all?page=%d&size=%d", scheme, host, page - 1, size);
-        }
-
-        String next = null;
-        if (classModelPage.hasNext()) {
-            next = String.format("%s://%s/class/all?page=%d&size=%d", scheme, host, page + 1, size);
-        }
+        Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id, "");
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
                 classModelPage.getTotalElements(),
-                classModelPage.getTotalPages(), next,
-                previous);
+                classModelPage.getTotalPages());
 
         return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok",
                 classModelPage.getContent(), metadata));
     }
+
+    @GetMapping("/{id}/member/students/outside")
+    public ResponseEntity<?> getAllClassStudentsMembersNotInClass(
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            @PathVariable Long id) {
+        log.info("Requesting all members out of the class");
+
+        Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id, Role.ESTUDIANTE.name());
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
+                classModelPage.getTotalElements(),
+                classModelPage.getTotalPages());
+
+        return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok",
+                classModelPage.getContent(), metadata));
+    }
+
+    @GetMapping("/{id}/member/professors/outside")
+    public ResponseEntity<?> getAllClassProfessorsMembersNotInClass(
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            @PathVariable Long id) {
+        log.info("Requesting all professor members out of the class");
+
+        Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id, Role.PROFESOR.name());
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, classModelPage.getNumberOfElements(),
+                classModelPage.getTotalElements(),
+                classModelPage.getTotalPages());
+
+        return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok",
+                classModelPage.getContent(), metadata));
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getClassById(@PathVariable Long id) {
@@ -206,6 +239,7 @@ public class ClassController {
 
     }
 
+    @Valid
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateClass(@RequestBody ClassDto classModel, @PathVariable Long id) {
         log.info("Updating course with ID: " + id + " " + classModel.toString());
@@ -215,6 +249,7 @@ public class ClassController {
 
     }
 
+    @Valid
     @PutMapping("/update/{id}/members")
     public ResponseEntity<?> updateClassMembers(@RequestBody List<User> members, @PathVariable Long id) {
         log.info("Updating class members with ID: " + id);
@@ -224,6 +259,7 @@ public class ClassController {
 
     }
 
+    @Valid
     @PostMapping("/add")
     public ResponseEntity<?> addClass(@Valid @RequestBody ClassDto classModel) {
 

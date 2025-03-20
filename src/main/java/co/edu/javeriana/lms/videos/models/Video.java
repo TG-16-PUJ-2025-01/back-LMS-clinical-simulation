@@ -1,12 +1,21 @@
 package co.edu.javeriana.lms.videos.models;
 
 import java.util.Date;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import co.edu.javeriana.lms.practices.models.Simulation;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,5 +61,14 @@ public class Video {
     @NonNull
     @Column(nullable = false)
     private Double size; // in MB
+
+    @OneToOne
+    @JoinColumn(name = "simulation_id")
+    @JsonIgnore
+    private Simulation simulation;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("timestamp ASC") 
+    private List<Comment> comments;
 
 }

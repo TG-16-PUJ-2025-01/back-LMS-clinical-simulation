@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.grades.models.RubricTemplate;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +13,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -50,5 +53,9 @@ public class Course {
     @ManyToOne
     @JoinColumn(nullable = false)
     private User coordinator;
+
+    @ManyToMany
+    @JoinTable(name = "Rubric_Template_Course", joinColumns = @JoinColumn(name = "courseId"), inverseJoinColumns = @JoinColumn(name = "rubricTemplateId"))  
+    private List<RubricTemplate> rubricTemplates;
 
 }

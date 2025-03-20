@@ -2,6 +2,7 @@ package co.edu.javeriana.lms.practices.models;
 
 import java.util.List;
 
+import co.edu.javeriana.lms.grades.models.RubricTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import co.edu.javeriana.lms.subjects.models.ClassModel;
@@ -16,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -71,7 +73,17 @@ public class Practice {
     @JsonIgnore
     private ClassModel classModel;
 
+   /* @OneToMany(mappedBy = "practice")
+
+    private List<TimeSlot> timeSlot;*/ 
+
+    @OneToOne
+    @JoinColumn(nullable = true)
+    private RubricTemplate rubricTemplate;
+    
+    
     @OneToMany(mappedBy = "practice")
     @JsonIgnore
     private List<Simulation> simulations;
+
 }

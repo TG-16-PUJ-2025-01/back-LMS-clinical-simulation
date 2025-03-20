@@ -12,7 +12,6 @@ import co.edu.javeriana.lms.practices.services.SimulationService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import org.springframework.web.bind.annotation.RequestBody;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
@@ -41,12 +40,8 @@ public class SimulationController {
     @GetMapping("/all")
     public ResponseEntity<ApiResponseDto<?>> getAllSimulations(
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
-            @Min(1) @RequestParam(defaultValue = "10") Integer size,
-            HttpServletRequest request) {
+            @Min(1) @RequestParam(defaultValue = "10") Integer size) {
         log.info("Requesting all simulations");
-
-        String host = request.getHeader("Host");
-        String scheme = request.getScheme();
 
         Page<Simulation> simulationsPage = simulationService.findAllSimulations(page, size);
 
@@ -55,19 +50,8 @@ public class SimulationController {
                     .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No simulations found", null, null));
         }
 
-        String previous = null;
-        if (simulationsPage.hasPrevious()) {
-            previous = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page - 1, size);
-        }
-
-        String next = null;
-        if (simulationsPage.hasNext()) {
-            next = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page + 1, size);
-        }
-
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),
-                simulationsPage.getTotalElements(), simulationsPage.getTotalPages(), next,
-                previous);
+                simulationsPage.getTotalElements(), simulationsPage.getTotalPages());
 
         return ResponseEntity.ok(
                 new ApiResponseDto<List<Simulation>>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(),

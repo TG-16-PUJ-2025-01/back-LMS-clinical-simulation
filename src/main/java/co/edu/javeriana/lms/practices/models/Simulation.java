@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.grades.models.GradeStatus;
+import co.edu.javeriana.lms.grades.models.Rubric;
 import co.edu.javeriana.lms.videos.models.Video;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,8 +18,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -30,9 +29,9 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "simulation")
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Simulation {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -63,13 +62,21 @@ public class Simulation {
     @JsonIgnore
     private Video video;
 
-    @ManyToMany
+    /*@ManyToMany
     @JoinTable(name = "simulation_users", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
     @JsonIgnore
+
+    private List<GroupPerSimulation> groups;*/
+
+    @OneToOne
+    @JoinColumn(nullable = true)
+    private Rubric rubric;
+
     private List<User> users;
 
     @ManyToOne
     @JoinColumn(name = "room_id")
     @JsonIgnore
     private Room room;
+
 }

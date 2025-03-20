@@ -1,8 +1,7 @@
 package co.edu.javeriana.lms.grades.models;
 
 import java.util.List;
-
-import ch.qos.logback.core.joran.sanity.Pair;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,11 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Criteria {
     
+    private UUID id;
     private String name;
-    private String description;
-    private int points;
-    private List<Pair<Long, Long>> scoringScale;
+    private Integer points;
+    private List<ScoringPair> scoringScale;  // 👈 Aquí se reemplaza Pair<Long, Long>
     private List<String> scoringScaleDescription;
-    //private Long score;
-
+    private Integer score;
 }

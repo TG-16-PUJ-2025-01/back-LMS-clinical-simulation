@@ -1,7 +1,6 @@
 package co.edu.javeriana.lms.grades.services;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,11 +101,12 @@ public class RubricTemplateService {
 
         // SE LE ANADEN LOS IDS A LOS CRITERIOS IMPORTANTE
         rubricTemplateModel.setCriteria(addCriteriaUUID(rubricTemplate.getCriteria()));
+        rubricTemplateModel.setColumns(rubricTemplate.getColumns());
 
         if (rubricTemplate.getCourses() != null || rubricTemplate.getCourses().size() > 0)
             rubricTemplateModel.setCourses(courseRepository.findAllById(rubricTemplate.getCourses()));
 
-        rubricTemplateModel.setCreationDate(rubricTemplate.getCreationDate());
+        rubricTemplateModel.setCreationDate(new java.sql.Date(System.currentTimeMillis()));
 
         Boolean isForPractice = false;
         Practice practice = new Practice();
@@ -188,7 +188,6 @@ public class RubricTemplateService {
         List<Criteria> previousCriteria = rubricTemplate.getCriteria();
         rubricTemplateModel.setCriteria(rubricTemplate.getCriteria());
         rubricTemplateModel.setCourses(courseRepository.findAllById(rubricTemplate.getCourses()));
-        rubricTemplateModel.setCreationDate(rubricTemplate.getCreationDate());
         rubricTemplateModel.setArchived(rubricTemplate.getArchived());
 
         // update the rubric based on the rubric template edition
@@ -205,7 +204,7 @@ public class RubricTemplateService {
     }
 
     // all courses are added
-    public RubricTemplate updaterubricTemplateCourses(List<Course> coursesToAdd, Long id) {
+    public RubricTemplate updateRubricTemplateCourses(List<Course> coursesToAdd, Long id) {
         RubricTemplate rubricTemplate = rubricTemplateRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Rubric Template not found with ID: " + id));
 
@@ -217,5 +216,4 @@ public class RubricTemplateService {
     public List<RubricTemplate> findRecommendedRubricTemplatesByCoursesById(Long id) {
         return rubricTemplateRepository.findRecommendedRubricTemplatesByCoursesById(id);
     }
-
 }

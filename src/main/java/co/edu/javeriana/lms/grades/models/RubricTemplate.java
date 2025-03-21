@@ -49,7 +49,11 @@ public class RubricTemplate {
     @Column(columnDefinition = "jsonb") 
     private List<Criteria> criteria;
 
-    @Column(nullable = false)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb") 
+    private List<RubricColumn> columns;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date creationDate;
 
     @Column(nullable = false)

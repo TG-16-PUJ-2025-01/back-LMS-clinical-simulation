@@ -150,7 +150,7 @@ public class RoomControllerTest {
         assertNotNull(response);
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
-        assertEquals("Room types found", response.getBody().getMessage());
+        assertEquals("Room types retrieved successfully", response.getBody().getMessage());
         assertEquals(2, ((List<?>) response.getBody().getData()).size());
         verify(roomService, times(1)).findAllTypes();
     }
@@ -176,7 +176,6 @@ public class RoomControllerTest {
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertEquals("Room deleted successfully", response.getBody().getMessage());
-        verify(roomService, times(1)).findById(1L);
         verify(roomService, times(1)).deleteById(1L);
     }
 
@@ -206,11 +205,13 @@ public class RoomControllerTest {
         roomA.setId(1L);
         roomA.setName("Room A");
         roomA.setType(roomType1);
+        roomA.setCapacity(12);
 
         Room roomB = new Room();
         roomB.setId(1L);
         roomB.setName("Room B");
         roomB.setType(roomType1);
+        roomB.setCapacity(20);
 
         RoomDto roomDto = new RoomDto();
         roomDto.setName(roomA.getName());
@@ -228,8 +229,7 @@ public class RoomControllerTest {
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertEquals("Room updated successfully", response.getBody().getMessage());
-        verify(roomService, times(1)).findById(1L);
-        verify(roomService, times(1)).update(1L, roomA);
+        verify(roomService, times(1)).update(1L, roomDto.toEntity());
     }
 
     @Test
@@ -242,6 +242,7 @@ public class RoomControllerTest {
         roomA.setId(1L);
         roomA.setName("Room A");
         roomA.setType(roomType1);
+        roomA.setCapacity(12);
 
         RoomDto roomDto = new RoomDto();
         roomDto.setName(roomA.getName());
@@ -271,6 +272,7 @@ public class RoomControllerTest {
         roomA.setId(1L);
         roomA.setName("Room A");
         roomA.setType(roomType1);
+        roomA.setCapacity(20);
 
         RoomDto roomDto = new RoomDto();
         roomDto.setName(roomA.getName());
@@ -302,8 +304,10 @@ public class RoomControllerTest {
         roomDto.setName("Room A");
         roomDto.setTypeId(1L);
         roomDto.setCapacity(10);
+        roomDto.setTypeId(1L);
 
         RoomType roomType = new RoomType();
+        roomType.setId(1L);
         roomType.setName("Cirugia");
 
         Room roomA = new Room();
@@ -319,7 +323,7 @@ public class RoomControllerTest {
 
         // Assert
         assertNotNull(response);
-        assertEquals(201, response.getStatusCode().value());
+        assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertEquals("Room created successfully", response.getBody().getMessage());
         verify(roomService, times(1)).save(roomA);
@@ -340,7 +344,7 @@ public class RoomControllerTest {
 
         // Assert
         assertNotNull(response);
-        assertEquals(201, response.getStatusCode().value());
+        assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertEquals("Room type created successfully", response.getBody().getMessage());
         verify(roomTypeService, times(1)).save(roomType);

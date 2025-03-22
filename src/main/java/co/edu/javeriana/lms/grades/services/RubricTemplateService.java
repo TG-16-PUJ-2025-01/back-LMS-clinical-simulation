@@ -2,6 +2,8 @@ package co.edu.javeriana.lms.grades.services;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,7 +108,7 @@ public class RubricTemplateService {
         if (rubricTemplate.getCourses() != null || rubricTemplate.getCourses().size() > 0)
             rubricTemplateModel.setCourses(courseRepository.findAllById(rubricTemplate.getCourses()));
 
-        rubricTemplateModel.setCreationDate(new java.sql.Date(System.currentTimeMillis()));
+        rubricTemplateModel.setCreationDate(new Date());
 
         Boolean isForPractice = false;
         Practice practice = new Practice();
@@ -159,9 +161,9 @@ public class RubricTemplateService {
         RubricTemplate rubricTemplate = rubricTemplateRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Rubric Template not found with ID: " + id));
 
-        // Convertir la fecha de creación de java.sql.Date a LocalDate
-        LocalDate creationYear = rubricTemplate.getCreationDate().toLocalDate();
-        int yearsDifference = LocalDate.now().getYear() - creationYear.getYear();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(rubricTemplate.getCreationDate());
+        Integer yearsDifference = LocalDate.now().getYear() - cal.get(Calendar.YEAR);
 
         // Validar si ya tiene rúbricas calificadas
         if (rubricTemplate.getRubrics().size() > 0 && yearsDifference < 3) {

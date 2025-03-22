@@ -1,6 +1,6 @@
 package co.edu.javeriana.lms.grades.models;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -53,7 +53,7 @@ public class RubricTemplate {
     @Column(columnDefinition = "jsonb") 
     private List<RubricColumn> columns;
 
-    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false)
     private Date creationDate;
 
     @Column(nullable = false)

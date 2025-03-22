@@ -1,5 +1,6 @@
 package co.edu.javeriana.lms.subjects.controllers;
 
+import java.security.Principal;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -50,6 +51,21 @@ public class CourseController {
         return ResponseEntity
                 .ok(new ApiResponseDto<List<Course>>(HttpStatus.OK.value(), "ok", coursesPage.getContent(), metadata));
     }
+
+    @GetMapping("/all/coordinator")
+    public ResponseEntity<?> getAllByCoordinator(
+            @RequestParam(defaultValue = "courseId") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(defaultValue = "") String filter,
+            Principal principal) {
+        log.info("Requesting all coordinator courses");
+
+        List<CourseDto> courses = courseService.findAllCoordinatorCourses(filter, sort, asc , principal.getName());
+
+        return ResponseEntity
+                .ok(new ApiResponseDto<List<CourseDto>>(HttpStatus.OK.value(), "ok", courses, null));
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCourseById(@PathVariable Long id) {

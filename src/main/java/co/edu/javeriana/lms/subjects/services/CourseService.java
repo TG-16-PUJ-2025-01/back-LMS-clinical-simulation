@@ -1,5 +1,7 @@
 package co.edu.javeriana.lms.subjects.services;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +87,20 @@ public class CourseService {
 
         // log.info("Updating course with ID: " + currentCourseModel);
         return currentCourseModel;
+    }
+
+    public List<CourseDto> findAllCoordinatorCourses(String filter, String sort, Boolean asc, String email) {
+       User coordinator = userRepository.findByEmail(email).get();
+
+       //hacer un map y buscar las clases de cada curso y crear para cada course un clurse dto
+
+       List<Course> coordinatorCourses= courseRepository.findCoursesByCoordinator(coordinator);
+       List<CourseDto> courses = new ArrayList<>();
+       for (Course course : coordinatorCourses) {
+            courses.add(new CourseDto(course.getCourseId(), course.getJaverianaId(), course.getName(), course.getCoordinator().getId(), classRepository.findClassesByCourseId(course)));
+       }
+
+       return courses;
     }
 
 }

@@ -251,18 +251,24 @@ public class DBInitializer implements CommandLineRunner {
 
 	private void insertCoursesAndClasses() {
 		Course course1 = new Course("Cálculo Diferencial", 123456L, userRepository.findById(1L).get());
-		Course course2 = new Course("Cálculo Integral", 123455L, userRepository.findById(2L).get());
+		Course course2 = new Course("Cálculo Integral", 123455L, userRepository.findById(3L).get());
 		Course course3 = new Course("Cálculo Vectorial", 123454L, userRepository.findById(3L).get());
 
 		courseRepository.save(course1);
 		courseRepository.save(course2);
 		courseRepository.save(course3);
 
-		ClassModel class1 = new ClassModel("2024-1", userRepository.findAllProfessors(), course1, 12L);
-		ClassModel class2 = new ClassModel("2026-1", userRepository.findAllProfessors(), course2, 13L);
+		ClassModel class1 = new ClassModel("2024-1", userRepository.findAllProfessors(), course2, 12L);
+		ClassModel class2 = new ClassModel("2026-1", userRepository.findAllProfessors(), course3, 13L);
+		ClassModel class3 = new ClassModel("2023-1", userRepository.findAllProfessors(), course3, 14L);
+		ClassModel class4 = new ClassModel("2024-1", userRepository.findAllProfessors(), course3, 15L);
+		ClassModel class5 = new ClassModel("2025-1", userRepository.findAllProfessors(), course3, 16L);
 
 		classRepository.save(class1);
 		classRepository.save(class2);
+		classRepository.save(class3);
+		classRepository.save(class4);
+		classRepository.save(class5);
 	}
 
 	private void insertPractices() {

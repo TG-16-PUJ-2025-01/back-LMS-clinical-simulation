@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
+import co.edu.javeriana.lms.subjects.models.Course;
 
 import java.util.List;
 
@@ -163,5 +164,10 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
                 """)
         Page<User> findStudentsNotInClass(@Param("classId") Long classId, @Param("filter") String filter,
                 Pageable pageable);
+
+            
+
+            @Query("SELECT c FROM ClassModel c WHERE c.course = :course")
+            List<ClassModel> findClassesByCourseId(Course course);
 
 }

@@ -28,9 +28,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Course {
+    
 
     public Course(String name, Long javerianaId, User coordinator) {
-        // TODO Auto-generated constructor stub
         this.name = name;
         this.javerianaId = javerianaId;
         this.coordinator = coordinator;

@@ -57,10 +57,11 @@ public class CourseController {
             @RequestParam(defaultValue = "courseId") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
             @RequestParam(defaultValue = "") String filter,
+            @RequestParam(defaultValue = "") String searsearchByKey,
             Principal principal) {
         log.info("Requesting all coordinator courses");
 
-        List<CourseDto> courses = courseService.findAllCoordinatorCourses(filter, sort, asc , principal.getName());
+        List<CourseDto> courses = courseService.findAllCoordinatorCourses(filter, sort, asc , principal.getName(),searsearchByKey);
 
         return ResponseEntity
                 .ok(new ApiResponseDto<List<CourseDto>>(HttpStatus.OK.value(), "ok", courses, null));

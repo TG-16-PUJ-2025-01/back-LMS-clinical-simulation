@@ -21,5 +21,14 @@ public interface CourseRepository extends JpaRepository <Course, Long> {
 
     
     @Query("SELECT c FROM Course c WHERE c.coordinator = :coordinator")
+    //buscar con el filtro por el id del curso, el nombre del curso
+    
     List<Course> findCoursesByCoordinator(@Param("coordinator") User coordinator);
+
+    @Query("SELECT c FROM Course c WHERE c.coordinator = :coordinator")
+    List<Course> findCoursesByCoordinatorAndNameContaining(User coordinator,  @Param("filter") String filter);
+
+
+    @Query("SELECT c FROM Course c WHERE c.coordinator = :coordinator")
+    List<Course> findClassesByCourseByProfessorContaining(User coordinator, @Param("filter") String filter);
 }

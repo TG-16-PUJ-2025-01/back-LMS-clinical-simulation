@@ -17,6 +17,9 @@ public class RoomTypeService {
     private RoomTypeRepository roomTypeRepository;
 
     public RoomType save(RoomType type) {
+        if (type.getName().isEmpty()) {
+            throw new DataIntegrityViolationException("El nombre del tipo de sala no puede estar vacio");
+        }
         if (roomTypeRepository.findByName(type.getName()) != null) {
             throw new DataIntegrityViolationException("El nombre del tipo de sala ya existe: " + type.getName());
         }

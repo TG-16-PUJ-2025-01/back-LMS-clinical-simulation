@@ -107,18 +107,4 @@ public class SimulationController {
         simulationService.deleteSimulationById(id);
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Simulation deleted successfully", null, null));
     }
-
-    @GetMapping("/room")
-    public ResponseEntity<ApiResponseDto<?>> getSimulationsByRoomId(@RequestParam Long roomId) {
-        log.info("Requesting simulations for room with id: {}", roomId);
-
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findRoomSimulationsSchedule(roomId), null));
-    }
-
-    @GetMapping("/{id}/users")
-    public ResponseEntity<ApiResponseDto<?>> getSimulationStudents(@PathVariable Long id) {
-        log.info("Requesting simulation students with id: {}", id);
-
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationStudents(id), null));
-    }
 }

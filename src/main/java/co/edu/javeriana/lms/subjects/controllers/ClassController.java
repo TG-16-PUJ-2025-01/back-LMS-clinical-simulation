@@ -1,5 +1,5 @@
-package co.edu.javeriana.lms.subjects.controllers;
 
+package co.edu.javeriana.lms.subjects.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class ClassController {
     @GetMapping("/all")
     public ResponseEntity<?> getAll(
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
-            @Min(1) @RequestParam(defaultValue = "10") Integer size,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
             @RequestParam(defaultValue = "id") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
             @RequestParam(defaultValue = "") String filter) {
@@ -59,7 +59,7 @@ public class ClassController {
     @GetMapping("/{id}/member/all")
     public ResponseEntity<?> getAllClassMembers(
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
-            @Min(1) @RequestParam(defaultValue = "10") Integer size,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
             @RequestParam(defaultValue = "id") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
             @RequestParam(defaultValue = "") String filter,
@@ -116,30 +116,10 @@ public class ClassController {
                 classModelPage.getContent(), metadata));
     }
 
-    @GetMapping("/{id}/member/count/students")
-    public ResponseEntity<?> countStudentsInClass(@PathVariable Long id) {
-        log.info("Counting students in class with ID: " + id);
-
-        long studentCount = classService.countStudentsByClassId(id);
-
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Student count retrieved successfully.",
-                studentCount, null));
-    }
-
-    @GetMapping("/{id}/member/count/professors")
-    public ResponseEntity<?> countProfessorsInClass(@PathVariable Long id) {
-        log.info("Counting professors in class with ID: " + id);
-
-        long professorCount = classService.countProfessorsByClassId(id);
-
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Professor count retrieved successfully.",
-                professorCount, null));
-    }
-
     @GetMapping("/{id}/member/all/outside")
     public ResponseEntity<?> getAllClassMembersNotInClass(
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
-            @Min(1) @RequestParam(defaultValue = "10") Integer size,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size, 
             @RequestParam(defaultValue = "id") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
             @RequestParam(defaultValue = "") String filter,
@@ -216,12 +196,12 @@ public class ClassController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteClassById(@PathVariable Long id) {
         log.info("Deleting course with ID: " + id);
-
+        
         classService.deleteById(id);
 
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
                 "Clase deleted successfully.", new ClassModel(), null));
-
+        
     }
 
     @DeleteMapping("/delete/{idClass}/member/{idMember}")
@@ -231,38 +211,38 @@ public class ClassController {
         ClassModel classModel = classService.findById(idClass);
         classModel.getProfessors().removeIf(user -> user.getId().equals(idMember));
         classModel.getStudents().removeIf(user -> user.getId().equals(idMember));
-
+        
         classService.update(classModel);
 
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
                 "Member class deleted successfully.", classModel, null));
-
+        
     }
 
     @Valid
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateClass(@RequestBody ClassDto classModel, @PathVariable Long id) {
-        log.info("Updating course with ID: " + id + " " + classModel.toString());
-
+        log.info("Updating course with ID: " + id+ " "+classModel.toString());
+        
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
-                "Class updated successfully.", classService.update(classService.fromDtoToClass(classModel, id)), null));
-
+                    "Class updated successfully.", classService.update(classService.fromDtoToClass(classModel, id)), null));
+        
     }
 
     @Valid
     @PutMapping("/update/{id}/members")
     public ResponseEntity<?> updateClassMembers(@RequestBody List<User> members, @PathVariable Long id) {
         log.info("Updating class members with ID: " + id);
-
+        
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
-                "Class updated successfully.", classService.updateMembers(members, id), null));
-
+                    "Class updated successfully.", classService.updateMembers(members, id), null));
+        
     }
 
     @Valid
     @PostMapping("/add")
     public ResponseEntity<?> addClass(@Valid @RequestBody ClassDto classModel) {
-
+       
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<ClassModel>(
                 HttpStatus.CREATED.value(), "Class added successfully.", classService.save(classModel), null));
     }

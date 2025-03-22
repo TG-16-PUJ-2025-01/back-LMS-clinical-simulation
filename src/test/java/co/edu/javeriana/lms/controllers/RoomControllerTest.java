@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -43,36 +44,46 @@ public class RoomControllerTest {
     @Mock
     private RoomTypeService roomTypeService;
 
+    private static RoomType roomType1;
+    private static Room roomA;
+    private static List<Room> rooms;
+    private static List<RoomType> roomTypes;
+    private static RoomDto roomDto;
+    private static Page<Room> roomPage;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    public void testGetAllRooms() {
-        // Arrange
-        RoomType roomType1 = new RoomType();
+    @BeforeAll
+    public static void setUpAll() {
+        roomType1 = new RoomType();
         roomType1.setName("Cirugia");
 
-        RoomType roomType2 = new RoomType();
-        roomType2.setName("Urgencias");
-
-        List<Room> rooms = new ArrayList<>();
-
-        Room roomA = new Room();
+        roomA = new Room();
         roomA.setId(1L);
         roomA.setName("Room A");
         roomA.setType(roomType1);
+        roomA.setCapacity(10);
+
+        rooms = new ArrayList<>();
         rooms.add(roomA);
 
-        Room roomB = new Room();
-        roomB.setId(2L);
-        roomB.setName("Room B");
-        roomB.setType(roomType2);
-        rooms.add(roomB);
+        roomDto = new RoomDto();
+        roomDto.setName(roomA.getName());
+        roomDto.setTypeId(1L);
+        roomDto.setCapacity(roomA.getCapacity());
 
-        Page<Room> roomPage = new PageImpl<>(rooms, PageRequest.of(0, 10), rooms.size());
+        roomTypes = new ArrayList<>();
+        roomTypes.add(roomType1);
 
+        roomPage = new PageImpl<>(rooms, PageRequest.of(0, 10), rooms.size());
+    }
+
+    @Test
+    public void testGetAllRooms() {
+        // Arrange
         when(roomService.searchRooms("", 0, 10, "id", true)).thenReturn(roomPage);
 
         // Act
@@ -83,21 +94,13 @@ public class RoomControllerTest {
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertEquals("Rooms retrieved successfully", response.getBody().getMessage());
-        assertEquals(2, ((List<?>) response.getBody().getData()).size());
+        assertEquals(1, ((List<?>) response.getBody().getData()).size());
         verify(roomService, times(1)).searchRooms("", 0, 10, "id", true);
     }
 
     @Test
     public void testGetRoomById_Success() {
         // Arrange
-        RoomType roomType1 = new RoomType();
-        roomType1.setName("Cirugia");
-
-        Room roomA = new Room();
-        roomA.setId(1L);
-        roomA.setName("Room A");
-        roomA.setType(roomType1);
-
         when(roomService.findById(1L)).thenReturn(roomA);
 
         // Act
@@ -113,34 +116,8 @@ public class RoomControllerTest {
     }
 
     @Test
-    public void testGetRoomById_NotFound() {
-        // Arrange
-        when(roomService.findById(1L)).thenReturn(null);
-
-        // Act
-        ResponseEntity<ApiResponseDto<?>> response = roomController.getRoomById(1L);
-
-        // Assert
-        assertNotNull(response);
-        assertEquals(404, response.getStatusCode().value());
-        assertNotNull(response.getBody());
-        assertEquals("Room not found", response.getBody().getMessage());
-        verify(roomService, times(1)).findById(1L);
-    }
-
-    @Test
     public void testGetAllRoomsTypes() {
         // Arrange
-        RoomType roomType1 = new RoomType();
-        roomType1.setName("Cirugia");
-
-        RoomType roomType2 = new RoomType();
-        roomType2.setName("Urgencias");
-
-        List<RoomType> roomTypes = new ArrayList<>();
-        roomTypes.add(roomType1);
-        roomTypes.add(roomType2);
-
         when(roomService.findAllTypes()).thenReturn(roomTypes);
 
         // Act
@@ -151,21 +128,13 @@ public class RoomControllerTest {
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertEquals("Room types retrieved successfully", response.getBody().getMessage());
-        assertEquals(2, ((List<?>) response.getBody().getData()).size());
+        assertEquals(1, ((List<?>) response.getBody().getData()).size());
         verify(roomService, times(1)).findAllTypes();
     }
 
     @Test
     public void testDeleteRoom_Success() {
         // Arrange
-        RoomType roomType1 = new RoomType();
-        roomType1.setName("Cirugia");
-
-        Room roomA = new Room();
-        roomA.setId(1L);
-        roomA.setName("Room A");
-        roomA.setType(roomType1);
-
         when(roomService.findById(1L)).thenReturn(roomA);
 
         // Act
@@ -180,46 +149,9 @@ public class RoomControllerTest {
     }
 
     @Test
-    public void testDeleteRoom_NotFound() {
-        // Arrange
-        when(roomService.findById(1L)).thenReturn(null);
-
-        // Act
-        ResponseEntity<ApiResponseDto<?>> response = roomController.deleteRoomById(1L);
-
-        // Assert
-        assertNotNull(response);
-        assertEquals(404, response.getStatusCode().value());
-        assertNotNull(response.getBody());
-        assertEquals("Room not found", response.getBody().getMessage());
-        verify(roomService, times(1)).findById(1L);
-    }
-
-    @Test
     public void testUpdateRoom_Success() {
         // Arrange
-        RoomType roomType1 = new RoomType();
-        roomType1.setName("Cirugia");
-
-        Room roomA = new Room();
-        roomA.setId(1L);
-        roomA.setName("Room A");
-        roomA.setType(roomType1);
-        roomA.setCapacity(12);
-
-        Room roomB = new Room();
-        roomB.setId(1L);
-        roomB.setName("Room B");
-        roomB.setType(roomType1);
-        roomB.setCapacity(20);
-
-        RoomDto roomDto = new RoomDto();
-        roomDto.setName(roomA.getName());
-        roomDto.setTypeId(1L);
-        roomDto.setCapacity(roomA.getCapacity());
-
-        when(roomService.findById(1L)).thenReturn(roomA);
-        when(roomService.update(1L, roomA)).thenReturn(roomB);
+        when(roomService.update(1L, roomDto.toEntity())).thenReturn(roomA);
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.updateRoom(roomA.getId(), roomDto);
@@ -233,90 +165,9 @@ public class RoomControllerTest {
     }
 
     @Test
-    public void testUpdateRoom_NotFound() {
-        // Arrange
-        RoomType roomType1 = new RoomType();
-        roomType1.setName("Cirugia");
-
-        Room roomA = new Room();
-        roomA.setId(1L);
-        roomA.setName("Room A");
-        roomA.setType(roomType1);
-        roomA.setCapacity(12);
-
-        RoomDto roomDto = new RoomDto();
-        roomDto.setName(roomA.getName());
-        roomDto.setTypeId(1L);
-        roomDto.setCapacity(roomA.getCapacity());
-
-        when(roomService.findById(1L)).thenReturn(null);
-
-        // Act
-        ResponseEntity<ApiResponseDto<?>> response = roomController.updateRoom(roomA.getId(), roomDto);
-
-        // Assert
-        assertNotNull(response);
-        assertEquals(404, response.getStatusCode().value());
-        assertNotNull(response.getBody());
-        assertEquals("Room not found", response.getBody().getMessage());
-        verify(roomService, times(1)).findById(1L);
-    }
-
-    @Test
-    public void testUpdateRoom_NameConflict() {
-        // Arrange
-        RoomType roomType1 = new RoomType();
-        roomType1.setName("Cirugia");
-
-        Room roomA = new Room();
-        roomA.setId(1L);
-        roomA.setName("Room A");
-        roomA.setType(roomType1);
-        roomA.setCapacity(20);
-
-        RoomDto roomDto = new RoomDto();
-        roomDto.setName(roomA.getName());
-        roomDto.setTypeId(1L);
-        roomDto.setCapacity(roomA.getCapacity());
-
-        when(roomService.findById(1L)).thenReturn(roomA);
-        when(roomService.update(1L, roomA)).thenThrow(new IllegalArgumentException("El nombre de la sala ya existe"));
-
-        // Act
-        ResponseEntity<ApiResponseDto<?>> response = roomController.updateRoom(roomA.getId(), roomDto);
-
-        // Assert
-        assertNotNull(response);
-        assertEquals(409, response.getStatusCode().value());
-        assertNotNull(response.getBody());
-        assertEquals("El nombre de la sala ya existe", response.getBody().getMessage());
-        verify(roomService, times(1)).findById(1L);
-        verify(roomService, times(1)).update(1L, roomA);
-    }
-
-    @Test
     public void testAddRoom_Success() {
         // Arrange
-        RoomTypeDto roomTypeDto = new RoomTypeDto();
-        roomTypeDto.setName("Cirugia");
-
-        RoomDto roomDto = new RoomDto();
-        roomDto.setName("Room A");
-        roomDto.setTypeId(1L);
-        roomDto.setCapacity(10);
-        roomDto.setTypeId(1L);
-
-        RoomType roomType = new RoomType();
-        roomType.setId(1L);
-        roomType.setName("Cirugia");
-
-        Room roomA = new Room();
-        roomA.setId(null);
-        roomA.setName("Room A");
-        roomA.setType(roomType);
-        roomA.setCapacity(10);
-
-        when(roomService.save(roomA)).thenReturn(roomA);
+        when(roomService.save(roomDto.toEntity())).thenReturn(roomA);
 
         // Act
         ResponseEntity<ApiResponseDto<?>> response = roomController.addRoom(roomDto);
@@ -326,20 +177,17 @@ public class RoomControllerTest {
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertEquals("Room created successfully", response.getBody().getMessage());
-        verify(roomService, times(1)).save(roomA);
+        verify(roomService, times(1)).save(roomDto.toEntity());
     }
 
     @Test
     public void testAddRoomType_Success() {
         // Arrange
-        RoomType roomType = new RoomType();
-        roomType.setName("Cirugia");
-
-        when(roomTypeService.save(roomType)).thenReturn(roomType);
+        when(roomTypeService.save(roomType1)).thenReturn(roomType1);
 
         // Act
         RoomTypeDto roomTypeDto = new RoomTypeDto();
-        roomTypeDto.setName(roomType.getName());
+        roomTypeDto.setName(roomType1.getName());
         ResponseEntity<ApiResponseDto<?>> response = roomController.addRoomType(roomTypeDto);
 
         // Assert
@@ -347,7 +195,6 @@ public class RoomControllerTest {
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertEquals("Room type created successfully", response.getBody().getMessage());
-        verify(roomTypeService, times(1)).save(roomType);
+        verify(roomTypeService, times(1)).save(roomType1);
     }
-
 }

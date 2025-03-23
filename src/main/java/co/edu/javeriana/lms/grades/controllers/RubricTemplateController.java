@@ -65,7 +65,7 @@ public class RubricTemplateController {
     // get the rubric template by id
     @GetMapping("/{id}")
     public ResponseEntity<?> getRubricTemplateById(@PathVariable Long id) {
-        log.info("Requesting rubric tamplate with ID: " + id);
+        log.info("Requesting rubric template with ID: " + id);
 
         RubricTemplate rubricTemplate = rubricTemplateService.findById(id);
 
@@ -93,7 +93,7 @@ public class RubricTemplateController {
     // update the rubric template
     @Valid
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatRubricTemplate(@RequestBody RubricTemplateDTO rubricTemplate, @PathVariable Long id) {
+    public ResponseEntity<?> updateRubricTemplate(@RequestBody RubricTemplateDTO rubricTemplate, @PathVariable Long id) {
         log.info("Updating rubric template with ID: " + id);
 
         RubricTemplate rubricTemplateUpdated = rubricTemplateService.update(rubricTemplate, id);
@@ -104,7 +104,7 @@ public class RubricTemplateController {
 
     // change the status of the rubric template to archived
     @PutMapping("/archive/{id}")
-    public ResponseEntity<?> archivelassById(@PathVariable Long id) {
+    public ResponseEntity<?> archiveById(@PathVariable Long id) {
         log.info("Archiving rubric template with ID: " + id);
 
         RubricTemplate rubricTemplate = rubricTemplateService.archiveById(id);
@@ -115,7 +115,7 @@ public class RubricTemplateController {
     }
 
     @PutMapping("/unarchive/{id}")
-    public ResponseEntity<?> unarchivelassById(@PathVariable Long id) {
+    public ResponseEntity<?> unarchiveById(@PathVariable Long id) {
         log.info("Archiving rubric template with ID: " + id);
 
         RubricTemplate rubricTemplate = rubricTemplateService.unarchiveById(id);
@@ -155,7 +155,7 @@ public class RubricTemplateController {
     // edited
     @Valid
     @PutMapping("/{id}/courses")
-    public ResponseEntity<?> updatRubricCourses(@RequestBody List<Course> courses, @PathVariable Long id) {
+    public ResponseEntity<?> updateRubricCourses(@RequestBody List<Course> courses, @PathVariable Long id) {
 
         log.info("Updating rubric template with ID: " + id);
 

@@ -111,8 +111,8 @@ public class CourseService {
         for (Course course : coordinatorCourses) {
 
             List<ClassModel> sortedClasses = new ArrayList<>();
-            // Buscar las clases del curso y ordenarlas por periodo de mayor a menor
-            if (searsearchByKey.isEmpty()) {
+            // Buscar las clases del curs o y ordenarlas por periodo de mayor a menor
+            if (searsearchByKey.isEmpty() || searsearchByKey.equals("Asignaturas")) {
                 sortedClasses = classRepository.findClassesByCourseId(course); // Convertir el stream en lista
 
             } else if (searsearchByKey.equals("Clases")) {

@@ -25,10 +25,6 @@ public interface CourseRepository extends JpaRepository <Course, Long> {
     
     List<Course> findCoursesByCoordinator(@Param("coordinator") User coordinator);
 
-    @Query("SELECT c FROM Course c WHERE c.coordinator = :coordinator")
+    @Query("SELECT c FROM Course c WHERE c.coordinator = :coordinator AND (CAST(c.javerianaId AS string) LIKE %:filter% OR LOWER(TRANSLATE(c.name, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%')))") 
     List<Course> findCoursesByCoordinatorAndNameContaining(User coordinator,  @Param("filter") String filter);
-
-
-    @Query("SELECT c FROM Course c WHERE c.coordinator = :coordinator")
-    List<Course> findClassesByCourseByProfessorContaining(User coordinator, @Param("filter") String filter);
 }

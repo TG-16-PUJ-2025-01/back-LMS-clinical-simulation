@@ -90,53 +90,58 @@ public class CourseService {
         return currentCourseModel;
     }
 
-    public List<CourseDto> findAllCoordinatorCourses(String filter, String sort, Boolean asc, String email, String searsearchByKey) {
+    public List<CourseDto> findAllCoordinatorCourses(String filter, String sort, Boolean asc, String email,
+            String searsearchByKey) {
         User coordinator = userRepository.findByEmail(email).get();
-    
+
         // Obtener los cursos del coordinador
 
         List<Course> coordinatorCourses = new ArrayList<>();
 
-        if(searsearchByKey.isEmpty() || searsearchByKey.equals("Clases")){
+        log.info("Searching by key: " + searsearchByKey);
+
+        if (searsearchByKey.isEmpty() || searsearchByKey.equals("Clases")) {
             coordinatorCourses = courseRepository.findCoursesByCoordinator(coordinator);
-        }else{
+        } else {
             coordinatorCourses = courseRepository.findCoursesByCoordinatorAndNameContaining(coordinator, filter);
         }
-        
-        
-        
+
         List<CourseDto> courses = new ArrayList<>();
-    
+
         for (Course course : coordinatorCourses) {
 
             List<ClassModel> sortedClasses = new ArrayList<>();
             // Buscar las clases del curso y ordenarlas por periodo de mayor a menor
-            if(searsearchByKey.isEmpty()){
+            if (searsearchByKey.isEmpty()) {
                 sortedClasses = classRepository.findClassesByCourseId(course); // Convertir el stream en lista
-               
-            }else if(searsearchByKey.equals("Clases")){              
-                sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter); // Convertir el stream en lista
-            }
-            else
-            {
-                sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter); // Convertir el stream en lista
+
+            } else if (searsearchByKey.equals("Clases")) {
+                sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter); // Convertir el
+                                                                                                        // stream en
+                                                                                                        // lista
+            } else {
+                sortedClasses = classRepository.findClassesByCourseByProfessorContaining(course, filter); // Convertir
+                                                                                                          // el stream
+                                                                                                          // en lista
             }
 
             // Crear un CourseDto con las clases ordenadas
-            courses.add(new CourseDto(course.getCourseId(), course.getJaverianaId(), course.getName(), 
-                                        course.getCoordinator().getId(), sortedClasses.stream()
-                                        .sorted((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod())) // Ordenar por periodo (mayor a menor)
-                                        .toList()));
-            
-            // Crear un CourseDto con las clases ordenadas
-            courses.add(new CourseDto(course.getCourseId(), course.getJaverianaId(), course.getName(), 
-                                      course.getCoordinator().getId(), sortedClasses));
+            courses.add(new CourseDto(course.getCourseId(), course.getJaverianaId(), course.getName(),
+                    course.getCoordinator().getId(), sortedClasses.stream()
+                            .sorted((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod())) // Ordenar por periodo (mayor
+                                                                                          // a menor)
+                            .toList()));
+
         }
-    
-        //enviar el resultado de mayor a menos numero de clases encontradas
+
+        // log.info("Courses found: " + courses.toString());
+
+        // enviar el resultado de mayor a menos numero de clases encontradas
         return courses.stream()
-        .sorted((c1, c2) -> Integer.compare(c2.getClasses().size(), c1.getClasses().size())) // Ordenar por periodo (mayor a menor)
-        .toList();
+                .sorted((c1, c2) -> Integer.compare(c2.getClasses().size(), c1.getClasses().size())) // Ordenar por
+                                                                                                     // periodo (mayor a
+                                                                                                     // menor)
+                .toList();
     }
-    
+
 }

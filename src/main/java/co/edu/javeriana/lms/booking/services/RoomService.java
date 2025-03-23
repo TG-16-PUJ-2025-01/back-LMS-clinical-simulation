@@ -1,7 +1,6 @@
 package co.edu.javeriana.lms.booking.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,6 +14,7 @@ import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class RoomService {
@@ -39,76 +39,44 @@ public class RoomService {
     }
 
     public Room save(Room room) {
-        // Format the room name
         String formattedName = formatRoomName(room.getName());
 
-        // Search for the room name in the database
-        // If it does not exist, create it, if it does, return error
         if (roomRepository.findByName(formattedName) != null) {
             throw new DataIntegrityViolationException("El nombre de la sala ya existe");
         }
 
-        // Search for the room type in the database
-        // If it does not exist, create it
-        RoomType type = roomTypeRepository.findByName(room.getType().getName());
+        RoomType type = roomTypeRepository.findById(room.getType().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Room type not found with id: " + room.getType().getId()));
 
-        if (type == null) {
-            type = roomTypeRepository.save(room.getType());
-        }
-
+        room.setName(formattedName);
         room.setType(type);
-        room.setName(formattedName); // Save the formatted room name
 
         return roomRepository.save(room);
     }
 
-    public Room update(Room room) {
-        // Format the room name
+    public Room update(Long id, Room room) {
         String formattedName = formatRoomName(room.getName());
 
-        // Search if the room already exists by ID
-        Optional<Room> existingRoom = roomRepository.findById(room.getId());
+        Room existingRoom = roomRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + id));
 
-        // If the room exists, proceed with the update logic
-        if (existingRoom.isPresent()) {
-            Room roomToUpdate = existingRoom.get();
-
-            // Check if the name changed and if the new name already exists
-            if (!roomToUpdate.getName().equals(formattedName) && roomRepository.findByName(formattedName) != null) {
-                throw new DataIntegrityViolationException("El nombre de la sala ya existe");
-            }
-
-            // Check if the room type changed
-            RoomType newType = roomTypeRepository.findByName(room.getType().getName());
-            if (newType == null) {
-                newType = roomTypeRepository.save(room.getType()); // create the new type
-            }
-
-            // Update the values
-            roomToUpdate.setName(formattedName);
-            roomToUpdate.setType(newType);
-            roomToUpdate.setCapacity(room.getCapacity());
-
-            return roomRepository.save(roomToUpdate);
-        }
-
-        // If the room does not exist, proceed with the creation logic
-        if (roomRepository.findByName(formattedName) != null) {
+        if (!existingRoom.getName().equals(formattedName) && roomRepository.findByName(formattedName) != null) {
             throw new DataIntegrityViolationException("El nombre de la sala ya existe");
         }
 
-        RoomType type = roomTypeRepository.findByName(room.getType().getName());
-        if (type == null) {
-            type = roomTypeRepository.save(room.getType());
-        }
+        RoomType type = roomTypeRepository.findById(room.getType().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Room type not found with id: " + room.getType().getId()));
 
-        room.setType(type);
-        room.setName(formattedName); // Save the formatted room name
-        return roomRepository.save(room);
+        existingRoom.setName(formattedName);
+        existingRoom.setCapacity(room.getCapacity());
+        existingRoom.setType(type);
+
+        return roomRepository.save(existingRoom);
     }
 
-    public Optional<Room> findById(Long id) {
-        return roomRepository.findById(id);
+    public Room findById(Long id) {
+        return roomRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + id));
     }
 
     public List<Room> findAll(Integer page, Integer size) {
@@ -121,17 +89,16 @@ public class RoomService {
     }
 
     public void deleteById(Long id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + id));
+
         // Check if the room type trying to be deleted is the last one
-        Room room = roomRepository.findById(id).orElse(null);
+        RoomType type = room.getType();
+        roomRepository.deleteById(id);
 
-        if (room != null) {
-            RoomType type = room.getType();
-            roomRepository.deleteById(id);
-
-            // If it is the last one, delete the room type
-            if (roomRepository.countByType(type) == 0) {
-                roomTypeRepository.delete(type);
-            }
+        // If it is the last one, delete the room type
+        if (roomRepository.countByType(type) == 0) {
+            roomTypeRepository.delete(type);
         }
     }
 

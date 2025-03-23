@@ -143,7 +143,7 @@ public class RubricTemplateController {
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ApiResponseDto<ErrorDto>(HttpStatus.BAD_REQUEST.value(),
-                            "Unable to delete rubric template as other courses o practices are using it", null, null));
+                            "Unable to delete rubric template as other courses or practices are using it", null, null));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ApiResponseDto<ErrorDto>(HttpStatus.NOT_FOUND.value(),

@@ -75,6 +75,7 @@ public class DBInitializer implements CommandLineRunner {
 		insertCoursesAndClasses();
 		insertPractices();
 		insertSimulations();
+		insertRubricTemplates();
 	}
 
 	private void insertRoomsAndTypes() {
@@ -181,8 +182,8 @@ public class DBInitializer implements CommandLineRunner {
 		admin.setPassword(passwordEncoder.encode("Peter2010?"));
 		admin.setName("Andres");
 		admin.setLastName("Garcia");
-		admin.setInstitutionalId("11111111111");
-		admin.setRoles(Set.of(Role.ADMIN, Role.PROFESOR, Role.COORDINADOR, Role.ESTUDIANTE));
+		admin.setInstitutionalId("98675");
+		admin.setRoles(Set.of(Role.ADMIN));
 
 		User admin2 = new User();
 		admin.setEmail("admin@gmail.com");
@@ -241,8 +242,8 @@ public class DBInitializer implements CommandLineRunner {
 		List<Video> newVideos = videoRepository.saveAll(videos);
 
 		Simulation simulation = Simulation.builder()
-				.startDateTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
-				.endDateTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+				.startDateTime(new Date())
+				.endDateTime(new Date())
 				.grade(4.5F).gradeStatus(null)
 				.video(newVideos.get(1)).room(roomRepository.findById(1L).get()).build();
 
@@ -269,87 +270,67 @@ public class DBInitializer implements CommandLineRunner {
 		List<Practice> practices = Arrays.asList(
 				Practice.builder().name("Practica 1").description(
 						"Descripcion de la practica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).simulationDuration(15).numberOfGroups(3)
-						.maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(5)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(30).build(),
 				Practice.builder().name("Practica 2").description(
 						"Descripcion de la practica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.INDIVIDUAL).gradeable(true).simulationDuration(30)
-						.classModel(classRepository.findById(1L).get()).build(),
+						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(2).maxStudentsGroup(5)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build(),
 				Practice.builder().name("Practica 3").description(
 						"Descripcion de la practica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.INDIVIDUAL).gradeable(true).simulationDuration(45)
-						.classModel(classRepository.findById(1L).get()).build(),
+						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(10).maxStudentsGroup(5)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build(),
 				Practice.builder().name("Practica 4").description(
 						"Descripcion de la practica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).simulationDuration(60).numberOfGroups(5)
-						.maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(60).build(),
 				Practice.builder().name("Practica 5").description(
 						"Descripcion de la practica 5. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).simulationDuration(75).numberOfGroups(5)
-						.maxStudentsGroup(5).classModel(classRepository.findById(1L).get()).build(),
-				Practice.builder().name("Practica 6").description(
-						"Descripcion de la practica 6. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).simulationDuration(15).numberOfGroups(3)
-						.maxStudentsGroup(5).classModel(classRepository.findById(2L).get()).build(),
-				Practice.builder().name("Practica 7").description(
-						"Descripcion de la practica 7. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.INDIVIDUAL).gradeable(true).simulationDuration(30)
-						.classModel(classRepository.findById(2L).get()).build(),
-				Practice.builder().name("Practica 8").description(
-						"Descripcion de la practica 8. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.INDIVIDUAL).gradeable(true).simulationDuration(45)
-						.classModel(classRepository.findById(2L).get()).build());
-
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build());
 		practiceRepository.saveAll(practices);
 	}
 
 	private void insertSimulations() {
 
-		LocalDateTime startDateTime = LocalDateTime.now().withHour(11).withMinute(0).withSecond(0).withNano(0);
+		LocalDateTime startDateTime = LocalDateTime.now();
 
 		Simulation simulation1 = Simulation.builder()
-				.practice(practiceRepository.findById(1L).get())
-				.room(roomRepository.findById(1L).get())
-				.startDateTime(startDateTime)
-				.endDateTime(startDateTime.plusMinutes(30))
-				.gradeDateTime(LocalDateTime.now().plusDays(1))
-				.gradeStatus(GradeStatus.REGISTERED)
-				.grade(5.0f)
-				.build();
+			.practice(practiceRepository.findById(1L).get())
+			.room(roomRepository.findById(1L).get())
+			.startDateTime(Date.from(startDateTime.atZone(ZoneId.systemDefault()).toInstant()))
+			.endDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+			.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
+			.gradeStatus(GradeStatus.REGISTERED)
+			.grade(5.0f)
+			.build();
 
-		Simulation simulation2 = Simulation.builder()
-				.practice(practiceRepository.findById(1L).get())
-				.room(roomRepository.findById(1L).get())
-				.startDateTime(startDateTime.plusMinutes(30))
-				.endDateTime(startDateTime.plusMinutes(60))
-				.gradeDateTime(LocalDateTime.now().plusDays(1))
-				.gradeStatus(GradeStatus.REGISTERED)
-				.grade(5.0f)
-				.build();
+			Simulation simulation2 = Simulation.builder()
+			.practice(practiceRepository.findById(1L).get())
+			.room(roomRepository.findById(1L).get())
+			.startDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+			.endDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
+			.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
+			.gradeStatus(GradeStatus.REGISTERED)
+			.grade(5.0f)
+			.build();
 
-		Simulation simulation3 = Simulation.builder()
-				.practice(practiceRepository.findById(1L).get())
-				.room(roomRepository.findById(1L).get())
-				.startDateTime(startDateTime.plusMinutes(60))
-				.endDateTime(startDateTime.plusMinutes(90))
-				.gradeDateTime(LocalDateTime.now().plusDays(1))
-				.gradeStatus(GradeStatus.REGISTERED)
-				.grade(5.0f)
-				.build();
+			Simulation simulation3 = Simulation.builder()
+			.practice(practiceRepository.findById(1L).get())
+			.room(roomRepository.findById(1L).get())
+			.startDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
+			.endDateTime(Date.from(startDateTime.plusMinutes(90).atZone(ZoneId.systemDefault()).toInstant()))
+			.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
+			.gradeStatus(GradeStatus.REGISTERED)
+			.grade(5.0f)
+			.build();
 
-		Simulation simulation4 = Simulation.builder()
-				.practice(practiceRepository.findById(1L).get())
-				.room(roomRepository.findById(1L).get())
-				.startDateTime(startDateTime.plusDays(1))
-				.endDateTime(startDateTime.plusDays(1).plusMinutes(30))
-				.gradeDateTime(LocalDateTime.now().plusDays(2))
-				.gradeStatus(GradeStatus.REGISTERED)
-				.grade(5.0f)
-				.build();
+			simulationRepository.save(simulation1);
+			simulationRepository.save(simulation2);
+			simulationRepository.save(simulation3);
+	}
 
-		simulationRepository.save(simulation1);
-		simulationRepository.save(simulation2);
-		simulationRepository.save(simulation3);
-		simulationRepository.save(simulation4);
+	private void insertRubricTemplates() {
+
 	}
 }

@@ -182,4 +182,19 @@ public class RubricTemplateController {
                 .ok(new ApiResponseDto<List<RubricTemplate>>(HttpStatus.OK.value(), "ok", rubricTemplates, null));
     }
 
+    @GetMapping("/{id}/courses")
+    public ResponseEntity<?> getRubricCourses(@PathVariable Long id) {
+        log.info("Requesting rubric courses with rubric ID: " + id);
+
+        RubricTemplate rubricTemplate = rubricTemplateService.findById(id);
+
+        if (rubricTemplate == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No rubric template found", null, null));
+        }
+
+        return ResponseEntity.ok(new ApiResponseDto<List<Course>>(HttpStatus.OK.value(), "ok", rubricTemplate.getCourses(),
+                null));
+    }
+
 }

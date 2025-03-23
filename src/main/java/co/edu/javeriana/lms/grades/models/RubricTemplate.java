@@ -60,7 +60,7 @@ public class RubricTemplate {
     private Boolean archived;
 
     @ManyToMany
-    @JoinTable(name = "Rubric_Template_Course", joinColumns = @JoinColumn(name = "rubricTemplateId"), inverseJoinColumns = @JoinColumn(name = "courseId"))  
+    @JoinTable(name = "Rubric_Template_Course", joinColumns = @JoinColumn(name = "rubricTemplateId"), inverseJoinColumns = @JoinColumn(name = "courseId"))
     @JsonIgnore
     private List<Course> courses;
 

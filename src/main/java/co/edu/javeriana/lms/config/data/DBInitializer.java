@@ -242,8 +242,8 @@ public class DBInitializer implements CommandLineRunner {
 		List<Video> newVideos = videoRepository.saveAll(videos);
 
 		Simulation simulation = Simulation.builder()
-				.startDateTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
-				.endDateTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+				.startDateTime(new Date())
+				.endDateTime(new Date())
 				.grade(4.5F).gradeStatus(null)
 				.video(newVideos.get(1)).room(roomRepository.findById(1L).get()).build();
 
@@ -298,9 +298,9 @@ public class DBInitializer implements CommandLineRunner {
 		Simulation simulation1 = Simulation.builder()
 			.practice(practiceRepository.findById(1L).get())
 			.room(roomRepository.findById(1L).get())
-			.startDateTime(startDateTime)
-			.endDateTime(startDateTime.plusMinutes(30))
-			.gradeDateTime(LocalDateTime.now().plusDays(1))
+			.startDateTime(Date.from(startDateTime.atZone(ZoneId.systemDefault()).toInstant()))
+			.endDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+			.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
 			.gradeStatus(GradeStatus.REGISTERED)
 			.grade(5.0f)
 			.build();
@@ -308,9 +308,9 @@ public class DBInitializer implements CommandLineRunner {
 			Simulation simulation2 = Simulation.builder()
 			.practice(practiceRepository.findById(1L).get())
 			.room(roomRepository.findById(1L).get())
-			.startDateTime(startDateTime.plusMinutes(30))
-			.endDateTime(startDateTime.plusMinutes(60))
-			.gradeDateTime(LocalDateTime.now().plusDays(1))
+			.startDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+			.endDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
+			.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
 			.gradeStatus(GradeStatus.REGISTERED)
 			.grade(5.0f)
 			.build();
@@ -318,9 +318,9 @@ public class DBInitializer implements CommandLineRunner {
 			Simulation simulation3 = Simulation.builder()
 			.practice(practiceRepository.findById(1L).get())
 			.room(roomRepository.findById(1L).get())
-			.startDateTime(startDateTime.plusMinutes(60))
-			.endDateTime(startDateTime.plusMinutes(90))
-			.gradeDateTime(LocalDateTime.now().plusDays(1))
+			.startDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
+			.endDateTime(Date.from(startDateTime.plusMinutes(90).atZone(ZoneId.systemDefault()).toInstant()))
+			.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
 			.gradeStatus(GradeStatus.REGISTERED)
 			.grade(5.0f)
 			.build();

@@ -1,6 +1,8 @@
 package co.edu.javeriana.lms.practices.services;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +84,7 @@ public class SimulationService {
 
         for (SimulationByTimeSlotDto simulation : simulationsDto) {
             long durationInMinutes = java.time.Duration
-                    .between(simulation.getStartDateTime(), simulation.getEndDateTime()).toMinutes();
+                    .between(simulation.getStartDateTime().toInstant(), simulation.getEndDateTime().toInstant()).toMinutes();
             totalSimulationsAvailable += durationInMinutes / duration;
         }
 
@@ -114,19 +116,22 @@ public class SimulationService {
 
         List<Simulation> createdSimulations = new ArrayList<>();
 
-        while (simulationDto.getStartDateTime().isBefore(simulationDto.getEndDateTime())) {
+        while (simulationDto.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                .isBefore(simulationDto.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())) {
             Simulation simulation = Simulation.builder()
                     .practice(practice)
                     .room(room)
                     .startDateTime(simulationDto.getStartDateTime())
-                    .endDateTime(simulationDto.getStartDateTime().plusMinutes(duration))
+                    .endDateTime(Date.from(simulationDto.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(duration).atZone(ZoneId.systemDefault()).toInstant()))
                     .gradeDateTime(null)
                     .gradeStatus(gradeStatus)
                     .grade(null)
                     .build();
             createdSimulations.add(simulation);
             simulationRepository.save(simulation);
-            simulationDto.setStartDateTime(simulationDto.getStartDateTime().plusMinutes(duration));
+            simulationDto.setStartDateTime(Date.from(simulationDto.getStartDateTime().toInstant()
+                    .atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(duration)
+                    .atZone(ZoneId.systemDefault()).toInstant()));
         }
 
         return createdSimulations;

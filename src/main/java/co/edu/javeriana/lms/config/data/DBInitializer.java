@@ -186,12 +186,20 @@ public class DBInitializer implements CommandLineRunner {
 		admin.setRoles(Set.of(Role.ADMIN));
 
 		User admin2 = new User();
-		admin.setEmail("admin@gmail.com");
-		admin.setPassword(passwordEncoder.encode("admin"));
-		admin.setName("admin");
-		admin.setLastName("admin");
-		admin.setInstitutionalId("111222");
-		admin.setRoles(Set.of(Role.ADMIN));
+		admin2.setEmail("admin@gmail.com");
+		admin2.setPassword(passwordEncoder.encode("admin"));
+		admin2.setName("admin");
+		admin2.setLastName("admin");
+		admin2.setInstitutionalId("111222");
+		admin2.setRoles(Set.of(Role.ADMIN));
+
+		User superAdmin = new User();
+		superAdmin.setEmail("superadmin@gmail.com");
+		superAdmin.setPassword(passwordEncoder.encode("superadmin"));
+		superAdmin.setName("super");
+		superAdmin.setLastName("admin");
+		superAdmin.setInstitutionalId("111223");
+		superAdmin.setRoles(Set.of(Role.ADMIN, Role.COORDINADOR, Role.PROFESOR));
 
 		User student = new User();
 		student.setEmail("sopita@javeriana.edu.co");
@@ -201,6 +209,30 @@ public class DBInitializer implements CommandLineRunner {
 		student.setInstitutionalId("19281");
 		student.setRoles(Set.of(Role.ESTUDIANTE));
 
+		User student2 = new User();
+		student2.setEmail("student@gmail.com");
+		student2.setPassword(passwordEncoder.encode("student"));
+		student2.setName("student");
+		student2.setLastName("student");
+		student2.setInstitutionalId("111224");
+		student2.setRoles(Set.of(Role.ESTUDIANTE));
+
+		User profesor3 = new User();
+		profesor3.setEmail("profesor@gmail.com");
+		profesor3.setPassword(passwordEncoder.encode("profesor"));
+		profesor3.setName("profesor");
+		profesor3.setLastName("profesor");
+		profesor3.setInstitutionalId("111225");
+		profesor3.setRoles(Set.of(Role.PROFESOR));
+
+		User coordinator = new User();
+		coordinator.setEmail("coordinator@gmail.com");
+		coordinator.setPassword(passwordEncoder.encode("coordinator"));
+		coordinator.setName("coordinator");
+		coordinator.setLastName("coordinator");
+		coordinator.setInstitutionalId("111226");
+		coordinator.setRoles(Set.of(Role.COORDINADOR));
+
 		userRepository.save(professor1);
 		userRepository.save(professor2);
 		userRepository.save(coord1);
@@ -209,7 +241,11 @@ public class DBInitializer implements CommandLineRunner {
 		userRepository.save(both2);
 		userRepository.save(admin);
 		userRepository.save(admin2);
+		userRepository.save(superAdmin);
 		userRepository.save(student);
+		userRepository.save(student2);
+		userRepository.save(profesor3);
+		userRepository.save(coordinator);
 	}
 
 	private void insertSimulationsVideosAndComments() throws ParseException {

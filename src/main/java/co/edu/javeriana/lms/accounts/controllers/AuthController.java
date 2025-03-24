@@ -39,6 +39,12 @@ public class AuthController {
         return ResponseEntity.ok(newToken);
     }
 
+    @GetMapping("/validate-token")
+    public ResponseEntity<?> isAuthenticated(@RequestHeader("Authorization") String token) {
+        token = token.substring(7);
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "User authenticated", null, null));
+    }
+
     @GetMapping("/roles")
     public ResponseEntity<?> getRolesByToken(@RequestHeader("Authorization") String token) {
         token = token.substring(7);

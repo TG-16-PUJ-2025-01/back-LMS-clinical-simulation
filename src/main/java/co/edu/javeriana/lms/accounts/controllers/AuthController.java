@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import co.edu.javeriana.lms.accounts.dtos.ChangePasswordDto;
 import co.edu.javeriana.lms.accounts.dtos.LoginDto;
+import co.edu.javeriana.lms.accounts.dtos.LoginResponseDto;
 import co.edu.javeriana.lms.accounts.services.AuthService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import jakarta.validation.Valid;
@@ -21,12 +22,13 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDTO) {
+    public ResponseEntity<ApiResponseDto<?>> login(@Valid @RequestBody LoginDto loginDTO) {
         String email = loginDTO.getEmail();
         String password = loginDTO.getPassword();
         
-        String token = authService.login(email, password);
-        return ResponseEntity.ok(token);
+        LoginResponseDto res = authService.login(email, password);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "User authenticated successfully", res, null));
     }
 
     @PostMapping("/change-password")
@@ -40,25 +42,25 @@ public class AuthController {
     }
 
     @GetMapping("/validate-token")
-    public ResponseEntity<?> isAuthenticated(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<ApiResponseDto<?>> isAuthenticated(@RequestHeader("Authorization") String token) {
         token = token.substring(7);
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "User authenticated", null, null));
     }
 
     @GetMapping("/roles")
-    public ResponseEntity<?> getRolesByToken(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<ApiResponseDto<?>> getRolesByToken(@RequestHeader("Authorization") String token) {
         token = token.substring(7);
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Roles retrieved successfully", authService.getRolesByToken(token), null));
     }
 
     @GetMapping("/email")
-    public ResponseEntity<?> getEmailByToken(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<ApiResponseDto<?>> getEmailByToken(@RequestHeader("Authorization") String token) {
         token = token.substring(7);
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Email retrieved successfully", authService.getEmailByToken(token), null));
     }
 
     @GetMapping("/name")
-    public ResponseEntity<?> getNameByToken(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<ApiResponseDto<?>> getNameByToken(@RequestHeader("Authorization") String token) {
         token = token.substring(7);
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Name retrieved successfully", authService.getNameByToken(token), null));
     }

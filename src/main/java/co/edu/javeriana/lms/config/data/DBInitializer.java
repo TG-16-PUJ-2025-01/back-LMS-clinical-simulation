@@ -210,10 +210,10 @@ public class DBInitializer implements CommandLineRunner {
 		student.setRoles(Set.of(Role.ESTUDIANTE));
 
 		User student2 = new User();
-		student2.setEmail("student@gmail.com");
-		student2.setPassword(passwordEncoder.encode("student"));
-		student2.setName("student");
-		student2.setLastName("student");
+		student2.setEmail("estudiante@gmail.com");
+		student2.setPassword(passwordEncoder.encode("estudiante"));
+		student2.setName("estudiante");
+		student2.setLastName("estudiante");
 		student2.setInstitutionalId("111224");
 		student2.setRoles(Set.of(Role.ESTUDIANTE));
 
@@ -226,10 +226,10 @@ public class DBInitializer implements CommandLineRunner {
 		profesor3.setRoles(Set.of(Role.PROFESOR));
 
 		User coordinator = new User();
-		coordinator.setEmail("coordinator@gmail.com");
-		coordinator.setPassword(passwordEncoder.encode("coordinator"));
-		coordinator.setName("coordinator");
-		coordinator.setLastName("coordinator");
+		coordinator.setEmail("coordinador@gmail.com");
+		coordinator.setPassword(passwordEncoder.encode("coordinador"));
+		coordinator.setName("coordinador");
+		coordinator.setLastName("coordinador");
 		coordinator.setInstitutionalId("111226");
 		coordinator.setRoles(Set.of(Role.COORDINADOR));
 

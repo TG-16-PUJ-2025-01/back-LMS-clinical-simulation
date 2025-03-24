@@ -84,6 +84,7 @@ public class CalendarService {
     }
 
     private List<EventDto> mapSimulationsToEventDtos(List<Simulation> simulations) {
+        // TODO se debe implementar la lógica para reservas con multiples salas
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return simulations.stream().map(simulation -> {
             Practice practice = simulation.getPractice();
@@ -92,7 +93,7 @@ public class CalendarService {
                     simulation.getId().intValue(),
                     practice.getName(),
                     "Clase: " + classModel.getCourse().getName(),
-                    simulation.getRoom() != null ? simulation.getRoom().getName() : "Sin sala",
+                    simulation.getRooms() != null ? simulation.getRooms().get(0).getName() : "Sin sala",
                     simulation.getStartDateTime().format(formatter),
                     simulation.getEndDateTime().format(formatter),
                     "Reserva");

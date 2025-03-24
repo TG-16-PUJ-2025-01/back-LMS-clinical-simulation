@@ -267,7 +267,7 @@ public class DBInitializer implements CommandLineRunner {
 
 		Simulation simulation1 = Simulation.builder()
 			.practice(practiceRepository.findById(1L).get())
-			.room(roomRepository.findById(1L).get())
+			.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
 			.startDateTime(startDateTime)
 			.endDateTime(startDateTime.plusMinutes(30))
 			.gradeDateTime(LocalDateTime.now().plusDays(1))
@@ -277,7 +277,7 @@ public class DBInitializer implements CommandLineRunner {
 
 			Simulation simulation2 = Simulation.builder()
 			.practice(practiceRepository.findById(1L).get())
-			.room(roomRepository.findById(1L).get())
+			.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
 			.startDateTime(startDateTime.plusMinutes(30))
 			.endDateTime(startDateTime.plusMinutes(60))
 			.gradeDateTime(LocalDateTime.now().plusDays(1))
@@ -287,7 +287,7 @@ public class DBInitializer implements CommandLineRunner {
 
 			Simulation simulation3 = Simulation.builder()
 			.practice(practiceRepository.findById(1L).get())
-			.room(roomRepository.findById(1L).get())
+			.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
 			.startDateTime(startDateTime.plusMinutes(60))
 			.endDateTime(startDateTime.plusMinutes(90))
 			.gradeDateTime(LocalDateTime.now().plusDays(1))
@@ -297,7 +297,7 @@ public class DBInitializer implements CommandLineRunner {
 
 			Simulation simulation4 = Simulation.builder()
 			.practice(practiceRepository.findById(1L).get())
-			.room(roomRepository.findById(1L).get())
+			.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
 			.startDateTime(startDateTime.plusDays(1))
 			.endDateTime(startDateTime.plusDays(1).plusMinutes(30))
 			.gradeDateTime(LocalDateTime.now().plusDays(2))

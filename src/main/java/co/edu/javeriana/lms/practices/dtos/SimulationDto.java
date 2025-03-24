@@ -1,6 +1,7 @@
 package co.edu.javeriana.lms.practices.dtos;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import co.edu.javeriana.lms.grades.models.GradeStatus;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +21,7 @@ public class SimulationDto {
     private Long practiceId; 
     
     @NotNull(message = "Room ID is required")
-    private Long roomId;
+    private List<Long> roomIds;
     
     @NotNull(message = "Start date and time is required")
     private LocalDateTime startDateTime;

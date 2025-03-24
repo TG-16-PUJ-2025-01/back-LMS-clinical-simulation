@@ -68,8 +68,8 @@ public class Simulation {
     @JsonIgnore
     private List<User> users;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
+    @ManyToMany
+    @JoinTable(name = "simulation_rooms", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
     @JsonIgnore
-    private Room room;
+    private List<Room> rooms;
 }

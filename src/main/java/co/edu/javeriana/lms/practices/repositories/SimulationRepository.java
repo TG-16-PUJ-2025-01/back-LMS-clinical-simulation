@@ -17,15 +17,19 @@ import co.edu.javeriana.lms.practices.models.Practice;
 @Repository
 public interface SimulationRepository extends JpaRepository<Simulation, Long> {
 
-    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN false ELSE true END FROM Simulation s WHERE s.room = :room AND s.startDateTime < :endDateTime AND s.endDateTime > :startDateTime")
-    Boolean isRoomAvailable(@Param("room") Room room, @Param("startDateTime") LocalDateTime startDateTime,
+    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN false ELSE true END " +
+            "FROM Simulation s " +
+            "JOIN s.rooms r " +
+            "WHERE r = :room " +
+            "AND s.startDateTime < :endDateTime " +
+            "AND s.endDateTime > :startDateTime")
+    Boolean isRoomAvailable(@Param("room") Room room,
+            @Param("startDateTime") LocalDateTime startDateTime,
             @Param("endDateTime") LocalDateTime endDateTime);
-
-    List<Simulation> findByRoomId(Long roomId);
 
     Page<Simulation> findByPracticeId(Long practiceId, Pageable pageable);
 
-    List<Simulation> findByRoomIdAndStartDateTimeAfter(Long roomId, LocalDateTime startDateTime);
+    List<Simulation> findByStartDateTimeAfter(LocalDateTime startDateTime);
 
     List<Simulation> findByPracticeIn(List<Practice> practices);
 

@@ -11,4 +11,5 @@ import lombok.Data;
 public class LoginResponseDto {
     private String token;
     private Set<Role> roles;
+    private Role preferredRole;
 }

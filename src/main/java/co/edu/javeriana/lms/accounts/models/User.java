@@ -58,6 +58,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+    @Enumerated(EnumType.STRING)
+    private Role preferredRole;
+
     @ManyToMany
     @JoinTable(name = "professor_classes", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "classId"))  
     @JsonIgnore

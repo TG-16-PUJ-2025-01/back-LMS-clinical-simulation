@@ -58,7 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/course/delete/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
                         .requestMatchers("/course/add/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
                         .requestMatchers("/course/update/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
-                        .requestMatchers("/course/all").hasAuthority(Role.ADMIN.name()) // Coordinador-only
+                        .requestMatchers("/course/all").hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name()) // Coordinador-only
                         .requestMatchers("/course/{id}").hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name()) // Coordinador-only
 
                         .requestMatchers("/class/all").hasAnyAuthority(Role.ADMIN.name())

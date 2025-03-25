@@ -1,5 +1,6 @@
 package co.edu.javeriana.lms.accounts.controllers;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.javeriana.lms.accounts.dtos.PreferredRoleDto;
 import co.edu.javeriana.lms.accounts.dtos.RegisterUserDto;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.services.UserService;
@@ -101,5 +103,12 @@ public class UserController {
         }
 
         return ResponseEntity.ok(new ApiResponseDto<List<User>>(HttpStatus.OK.value(), "ok", professors, null));
+    }
+
+    @PutMapping("/preferred-role")
+    public ResponseEntity<?> setPreferredRole(@Valid @RequestBody PreferredRoleDto preferredRoleDto, Principal principal) {
+        log.info("Setting preferred role to user with email: " + principal.getName());
+        User user = userService.setPreferredRoleToUser(principal.getName(), preferredRoleDto.getRole());
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Preferred role set successfully", user, null));
     }
 }

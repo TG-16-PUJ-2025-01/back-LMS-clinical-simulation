@@ -38,7 +38,7 @@ public class AuthService {
 
         String token = jwtService.generateToken(user);
 
-        return new LoginResponseDto(token, user.getRoles());
+        return new LoginResponseDto(token, user.getRoles(), user.getPreferredRole());
     }
 
     public String changePassword(String token, String password, String newPassword) {

@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
 import co.edu.javeriana.lms.booking.services.RoomService;
+import jakarta.persistence.EntityNotFoundException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -65,10 +67,13 @@ public class RoomServiceTest {
 
     @Test
     public void testSearchRooms() {
+        // Arrange
         when(roomRepository.findByNameContaining("", mockRoomsPage.getPageable())).thenReturn(mockRoomsPage);
 
+        // Act
         Page<Room> roomsPage = roomService.searchRooms("", 0, 10, "name", true);
 
+        // Assert
         assert (roomsPage.getTotalElements() == mockRoomsPage.getTotalElements());
         assert (roomsPage.getContent().size() == mockRoomsPage.getContent().size());
         assert (roomsPage.getContent().equals(mockRoomsPage.getContent()));
@@ -77,51 +82,137 @@ public class RoomServiceTest {
     }
 
     @Test
-    public void testEditRoomSuccess() {
-        Long id = 1L;
-        when(roomRepository.findById(id)).thenReturn(Optional.of(mockRoom));
-        when(roomTypeRepository.findByName(mockRoom.getType().getName())).thenReturn(mockRoomType);
+    public void testSaveRoom_Success() {
+        // Arrange
+        when(roomRepository.findByName(mockRoom.getName())).thenReturn(null);
+        when(roomTypeRepository.findById(mockRoomType.getId())).thenReturn(Optional.of(mockRoomType));
         when(roomRepository.save(mockRoom)).thenReturn(mockRoom);
 
-        Room editedRoom = roomService.update(mockRoom);
+        // Act
+        Room savedRoom = roomService.save(mockRoom);
 
-        assert (editedRoom.equals(mockRoom));
+        // Assert
+        assert (savedRoom.equals(mockRoom));
+        verify(roomRepository, times(1)).save(mockRoom);
     }
 
     @Test
-    public void testEditRoomFailure() {
-        Long id = 1L;
-        Room roomWithNullType = Room.builder().id(id).name("Updated Room")
-                .type(mockRoomType).capacity(20).build();
-        when(roomRepository.findById(id)).thenReturn(Optional.empty());
-        when(roomTypeRepository.findByName(mockRoom.getType().getName())).thenReturn(mockRoomType);
+    public void testSaveRoom_NameConflict() {
+        // Arrange
+        when(roomRepository.findByName(mockRoom.getName())).thenReturn(mockRoom);
 
-        Room editedRoom = roomService.update(roomWithNullType);
-
-        assert (editedRoom == null);
+        // Act & Assert
+        try {
+            roomService.save(mockRoom);
+        } catch (DataIntegrityViolationException e) {
+            assert (e.getMessage().equals("El nombre de la sala ya existe"));
+        }
+        verify(roomRepository, times(0)).save(mockRoom);
     }
 
     @Test
-    public void testDeleteRoomSuccess() {
-        Long id = 1L;
-        when(roomRepository.findById(id)).thenReturn(Optional.of(mockRoom));
+    public void testSaveRoom_TypeNotFound() {
+        // Arrange
+        when(roomRepository.findByName(mockRoom.getName())).thenReturn(null);
+        when(roomTypeRepository.findById(mockRoomType.getId())).thenReturn(Optional.empty());
 
-        roomService.deleteById(id);
-
-        verify(roomRepository, times(1)).deleteById(id);
-        assert (roomRepository.findById(id).isPresent());
+        // Act & Assert
+        try {
+            roomService.save(mockRoom);
+        } catch (EntityNotFoundException e) {
+            assert (e.getMessage().equals("Room type not found with id: " + mockRoomType.getId()));
+        }
+        verify(roomRepository, times(0)).save(mockRoom);
     }
 
     @Test
-    public void testDeleteRoomFailure() {
-        Long id = 1L;
-        when(roomRepository.findById(id)).thenReturn(Optional.empty());
+    public void testUpdateRoom_Success() {
+        // Arrange
+        when(roomRepository.findById(mockRoom.getId())).thenReturn(Optional.of(mockRoom));
+        when(roomTypeRepository.findById(mockRoomType.getId())).thenReturn(Optional.of(mockRoomType));
+        when(roomRepository.save(mockRoom)).thenReturn(mockRoom);
 
-        roomService.deleteById(id);
+        // Act
+        Room updatedRoom = roomService.update(mockRoom.getId(), mockRoom);
 
-        verify(roomRepository, times(0)).deleteById(id);
-        assert (roomRepository.findById(id).isEmpty());
-
+        // Assert
+        assert (updatedRoom.equals(mockRoom));
+        verify(roomRepository, times(1)).save(mockRoom);
     }
 
+    @Test
+    public void testUpdateRoom_NotFound() {
+        // Arrange
+        when(roomRepository.findById(mockRoom.getId())).thenReturn(Optional.empty());
+
+        // Act & Assert
+        try {
+            roomService.update(mockRoom.getId(), mockRoom);
+        } catch (EntityNotFoundException e) {
+            assert (e.getMessage().equals("Room not found with id: " + mockRoom.getId()));
+        }
+        verify(roomRepository, times(0)).save(mockRoom);
+    }
+
+    @Test
+    public void testUpdateRoom_NameConflict() {
+        // Arrange
+        Room room1 = mockRoomsPage.getContent().get(0);
+        Room room2 = mockRoomsPage.getContent().get(1);
+
+        when(roomRepository.findById(room1.getId())).thenReturn(Optional.of(room1));
+        when(roomRepository.findByName(room2.getName())).thenReturn(room2);
+        when(roomTypeRepository.findById(mockRoomType.getId())).thenReturn(Optional.of(mockRoomType));
+
+        // Act & Assert
+        try {
+            roomService.update(room1.getId(), room2); // Attempt to update room1 with room2's name
+        } catch (DataIntegrityViolationException e) {
+            assert (e.getMessage().equals("El nombre de la sala ya existe"));
+        }
+
+        // Verify that save is never called
+        verify(roomRepository, times(0)).save(room2);
+    }
+
+    @Test
+    public void testDeleteRoom_Success() {
+        // Arrange
+        when(roomRepository.findById(mockRoom.getId())).thenReturn(Optional.of(mockRoom));
+        when(roomRepository.countByType(mockRoomType)).thenReturn(0L);
+
+        // Act
+        roomService.deleteById(mockRoom.getId());
+
+        // Assert
+        verify(roomRepository, times(1)).deleteById(mockRoom.getId());
+        verify(roomTypeRepository, times(1)).delete(mockRoomType);
+    }
+
+    @Test
+    public void testDeleteRoom_NotFound() {
+        // Arrange
+        when(roomRepository.findById(mockRoom.getId())).thenReturn(Optional.empty());
+
+        // Act & Assert
+        try {
+            roomService.deleteById(mockRoom.getId());
+        } catch (EntityNotFoundException e) {
+            assert (e.getMessage().equals("Room not found with id: " + mockRoom.getId()));
+        }
+        verify(roomRepository, times(0)).deleteById(mockRoom.getId());
+    }
+
+    @Test
+    public void testFindAllTypes() {
+        // Arrange
+        when(roomTypeRepository.findAll()).thenReturn(Arrays.asList(mockRoomType));
+
+        // Act
+        List<RoomType> roomTypes = roomService.findAllTypes();
+
+        // Assert
+        assert (roomTypes.size() == 1);
+        assert (roomTypes.get(0).equals(mockRoomType));
+    }
 }

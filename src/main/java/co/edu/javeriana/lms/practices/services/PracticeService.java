@@ -71,9 +71,9 @@ public class PracticeService {
         classRepository.findById(classId)
                 .orElseThrow(() -> new EntityNotFoundException("Class not found with id: " + classId));
 
-        List<Practice> practices = practiceRepository.findByClassModel_ClassId(classId);
+        List<Practice> practices = practiceRepository.findByClassModel_ClassId(classId, Sort.by(Sort.Direction.ASC, "id"));
 
-        if(practices.isEmpty()) {
+        if (practices.isEmpty()) {
             throw new EntityNotFoundException("No practices found for class with id: " + classId);
         }
 

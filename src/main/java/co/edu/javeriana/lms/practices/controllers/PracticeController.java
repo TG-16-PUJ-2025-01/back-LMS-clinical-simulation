@@ -62,7 +62,7 @@ public class PracticeController {
     }
 
     @GetMapping("/class/{classId}")
-    public ResponseEntity<ApiResponseDto<?>> getPracticesByClass(@PathVariable Long classId) {
+    public ResponseEntity<ApiResponseDto<?>> getPracticesByClassId(@PathVariable Long classId) {
         log.info("Requesting practices by class with id: {}", classId);
 
         List<Practice> practices = practiceService.findByClassId(classId);

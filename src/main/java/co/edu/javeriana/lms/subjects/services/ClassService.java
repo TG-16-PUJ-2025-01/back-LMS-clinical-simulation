@@ -200,4 +200,8 @@ public class ClassService {
         return classModel;
     }
 
+    public List<ClassModel> findByProfessorId(Long userId) {
+        return classRepository.findByProfessors_Id(userId);
+    }
+
 }

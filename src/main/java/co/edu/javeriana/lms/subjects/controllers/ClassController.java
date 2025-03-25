@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.accounts.services.AuthService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import co.edu.javeriana.lms.subjects.dtos.ClassDto;
@@ -34,6 +36,9 @@ public class ClassController {
 
     @Autowired
     private ClassService classService;
+
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/all")
     public ResponseEntity<?> getAll(
@@ -245,5 +250,17 @@ public class ClassController {
        
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<ClassModel>(
                 HttpStatus.CREATED.value(), "Class added successfully.", classService.save(classModel), null));
+    }
+
+    @GetMapping("/all/professor")
+    public ResponseEntity<?> getClassesByProfesor(@RequestHeader("Authorization") String token) {
+        token = token.substring(7);
+        log.info("Requesting main menu information for professor role");
+
+        Long userId = authService.getUserIdByToken(token);
+
+        List<ClassModel> classes = classService.findByProfessorId(userId);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Classes retrieved succesfully", classes, null));
     }
 }

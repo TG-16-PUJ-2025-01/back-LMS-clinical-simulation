@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -145,5 +147,7 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
                 """)
         Page<User> findStudentsNotInClass(@Param("classId") Long classId, @Param("filter") String filter,
                 Pageable pageable);
+
+    List<ClassModel> findByProfessors_Id(Long userId);
 
 }

@@ -1,9 +1,9 @@
 package co.edu.javeriana.lms.practices.services;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +57,6 @@ public class SimulationService {
     }
 
     public Page<Simulation> findSimulationsByPracticeId(Long practiceId, Integer page, Integer size) {
-        practiceRepository.findById(practiceId)
-                .orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + practiceId));
-
         // TODO filtros
         Pageable pageable = PageRequest.of(page, size);
         return simulationRepository.findByPracticeId(practiceId, pageable);
@@ -84,13 +81,13 @@ public class SimulationService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Practice not found with id: " + simulationsDto.get(0).getPracticeId()));
         Integer duration = practice.getSimulationDuration();
-        Integer numberOfGroups = practice.getNumberOfGroups();
+        Integer numberOfGroups = practice.getMaxStudentsGroup();
 
         int totalSimulationsAvailable = 0;
 
         for (SimulationByTimeSlotDto simulation : simulationsDto) {
             long durationInMinutes = java.time.Duration
-                    .between(simulation.getStartDateTime(), simulation.getEndDateTime()).toMinutes();
+                    .between(simulation.getStartDateTime().toInstant(), simulation.getEndDateTime().toInstant()).toMinutes();
             totalSimulationsAvailable += durationInMinutes / duration;
         }
 
@@ -128,19 +125,22 @@ public class SimulationService {
 
         List<Simulation> createdSimulations = new ArrayList<>();
 
-        while (simulationDto.getStartDateTime().isBefore(simulationDto.getEndDateTime())) {
+        while (simulationDto.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                .isBefore(simulationDto.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())) {
             Simulation simulation = Simulation.builder()
                     .practice(practice)
                     .rooms(rooms)
                     .startDateTime(simulationDto.getStartDateTime())
-                    .endDateTime(simulationDto.getStartDateTime().plusMinutes(duration))
+                    .endDateTime(Date.from(simulationDto.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(duration).atZone(ZoneId.systemDefault()).toInstant()))
                     .gradeDateTime(null)
                     .gradeStatus(gradeStatus)
                     .grade(null)
                     .build();
             createdSimulations.add(simulation);
             simulationRepository.save(simulation);
-            simulationDto.setStartDateTime(simulationDto.getStartDateTime().plusMinutes(duration));
+            simulationDto.setStartDateTime(Date.from(simulationDto.getStartDateTime().toInstant()
+                    .atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(duration)
+                    .atZone(ZoneId.systemDefault()).toInstant()));
         }
 
         return createdSimulations;
@@ -208,7 +208,7 @@ public class SimulationService {
         roomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + roomId));
     
-        List<Simulation> simulations = simulationRepository.findByStartDateTimeAfter(LocalDateTime.now());
+        List<Simulation> simulations = simulationRepository.findByStartDateTimeAfter(new Date());
     
         List<TimeSlotDto> timeSlots = new ArrayList<>();
     
@@ -218,18 +218,18 @@ public class SimulationService {
     
         simulations.sort(Comparator.comparing(Simulation::getStartDateTime));
     
-        LocalDateTime unifiedStart = simulations.get(0).getStartDateTime();
-        LocalDateTime unifiedEnd = simulations.get(0).getEndDateTime();
+        Date unifiedStart = simulations.get(0).getStartDateTime();
+        Date unifiedEnd = simulations.get(0).getEndDateTime();
     
         for (Simulation currentSimulation : simulations) {
-            if (!currentSimulation.getStartDateTime().isAfter(unifiedEnd)) { 
+            if (!currentSimulation.getStartDateTime().after(unifiedEnd)) { 
                 // Se solapan o son contiguos
-                unifiedEnd = unifiedEnd.isAfter(currentSimulation.getEndDateTime()) ? unifiedEnd : currentSimulation.getEndDateTime();
+                unifiedEnd = unifiedEnd.after(currentSimulation.getEndDateTime()) ? unifiedEnd : currentSimulation.getEndDateTime();
             } else {
                 // Guardar el intervalo previo antes de actualizar
                 timeSlots.add(TimeSlotDto.builder()
-                        .startDateTime(unifiedStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-                        .endDateTime(unifiedEnd.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                        .startDateTime(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(unifiedStart))
+                        .endDateTime(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(unifiedEnd))
                         .build());
                 unifiedStart = currentSimulation.getStartDateTime();
                 unifiedEnd = currentSimulation.getEndDateTime();
@@ -238,9 +238,9 @@ public class SimulationService {
     
         // Agregar el último intervalo
         timeSlots.add(TimeSlotDto.builder()
-                .startDateTime(unifiedStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-                .endDateTime(unifiedEnd.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-                .build());
+            .startDateTime(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(unifiedStart))
+            .endDateTime(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(unifiedEnd))
+            .build());
     
         return timeSlots;
     }

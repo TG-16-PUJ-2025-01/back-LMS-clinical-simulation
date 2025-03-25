@@ -14,7 +14,6 @@ import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.services.PracticeService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
@@ -41,30 +40,13 @@ public class PracticeController {
             @Min(1) @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "id") String sort,
             @RequestParam(defaultValue = "true") Boolean asc,
-            @RequestParam(defaultValue = "") String filter,
-            HttpServletRequest request) {
-
+            @RequestParam(defaultValue = "") String filter) {
         log.info("Requesting all practices");
-
-        String host = request.getHeader("Host");
-        String scheme = request.getScheme();
 
         Page<Practice> practicesPage = practiceService.findAll(filter, page, size, sort, asc);
 
-        String previous = null;
-        if (practicesPage.hasPrevious()) {
-            previous = String.format("%s://%s/practice/all?page=%d&size=%d", scheme, host,
-                    page - 1, practicesPage.getSize(), sort, asc, filter);
-        }
-
-        String next = null;
-        if (practicesPage.hasNext()) {
-            next = String.format("%s://%s/practice/all?page=%d&size=%d", scheme, host,
-                    page + 1, practicesPage.getSize(), sort, asc, filter);
-        }
-
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, practicesPage.getSize(),
-                practicesPage.getTotalElements(), practicesPage.getTotalPages(), previous, next);
+                practicesPage.getTotalElements(), practicesPage.getTotalPages());
 
         return ResponseEntity
                 .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", practicesPage.getContent(), metadata));
@@ -114,4 +96,5 @@ public class PracticeController {
 
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice deleted successfully", null, null));
     }
+
 }

@@ -1,6 +1,6 @@
 package co.edu.javeriana.lms.practices.dtos;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import co.edu.javeriana.lms.grades.models.GradeStatus;
@@ -18,20 +18,20 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SimulationDto {
     @NotNull(message = "Practice ID is required")
-    private Long practiceId; 
-    
+    private Long practiceId;
+
     @NotNull(message = "Room ID is required")
     private List<Long> roomIds;
     
     @NotNull(message = "Start date and time is required")
-    private LocalDateTime startDateTime;
-    
+    private Date startDateTime;
+
     @NotNull(message = "End date and time is required")
-    private LocalDateTime endDateTime;
+    private Date endDateTime;
 
     private Float grade;
 
     private GradeStatus gradeStatus;
 
-    private LocalDateTime gradeDateTime;
+    private Date gradeDateTime;
 }

@@ -1,6 +1,6 @@
 package co.edu.javeriana.lms.practices.dtos;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import jakarta.validation.constraints.Future;
@@ -25,9 +25,9 @@ public class SimulationByTimeSlotDto {
     
     @NotNull(message = "Start date and time is required")
     @Future(message = "Start date and time must be in the future")
-    private LocalDateTime startDateTime;
+    private Date startDateTime;
     
     @Future(message = "Start date and time must be in the future")
     @NotNull(message = "End date and time is required")
-    private LocalDateTime endDateTime;
+    private Date endDateTime;
 }

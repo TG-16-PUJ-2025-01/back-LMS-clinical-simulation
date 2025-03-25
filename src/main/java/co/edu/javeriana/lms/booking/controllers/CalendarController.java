@@ -39,4 +39,3 @@ public class CalendarController {
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Events retrieved successfully", realEvents, null));
     }
 }
-

@@ -1,7 +1,10 @@
 package co.edu.javeriana.lms.booking.services;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
@@ -34,7 +37,7 @@ public class CalendarService {
 
     @Autowired
     private UserRepository userRepository;
-
+    
     public List<EventDto> searchEvents(Long idUser) {
         // Retrieve user to ensure it exists and fetch simulations directly associated
         // with the user
@@ -86,17 +89,24 @@ public class CalendarService {
     private List<EventDto> mapSimulationsToEventDtos(List<Simulation> simulations) {
         // TODO se debe implementar la lógica para reservas con multiples salas
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return simulations.stream().map(simulation -> {
+        List<EventDto> eventsDtos = new ArrayList<>();
+        
+        for (Simulation simulation : simulations) {
             Practice practice = simulation.getPractice();
             ClassModel classModel = practice.getClassModel();
-            return new EventDto(
-                    simulation.getId().intValue(),
-                    practice.getName(),
-                    "Clase: " + classModel.getCourse().getName(),
-                    simulation.getRooms() != null ? simulation.getRooms().get(0).getName() : "Sin sala",
-                    simulation.getStartDateTime().format(formatter),
-                    simulation.getEndDateTime().format(formatter),
-                    "Reserva");
-        }).collect(Collectors.toList());
+            EventDto eventDto = EventDto.builder()
+                    .id(simulation.getSimulationId())
+                    .title(practice.getName())
+                    .description("Clase: " + classModel.getCourse().getName())
+                    .location(simulation.getRooms() != null ? simulation.getRooms().get(0).getName() : "Sin sala")
+                    .start(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(
+                            simulation.getStartDateTime()))
+                    .end(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(
+                            simulation.getEndDateTime()))
+                    .build();
+            eventsDtos.add(eventDto);
+        }
+
+        return eventsDtos;
     }
 }

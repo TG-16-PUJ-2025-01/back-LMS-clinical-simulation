@@ -10,6 +10,4 @@ public class PaginationMetadataDto {
     private Integer size;
     private Long total;
     private Integer totalPages;
-    private String next;
-    private String previous;
 }

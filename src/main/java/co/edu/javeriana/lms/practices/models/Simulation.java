@@ -1,6 +1,6 @@
 package co.edu.javeriana.lms.practices.models;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.grades.models.GradeStatus;
+import co.edu.javeriana.lms.grades.models.Rubric;
 import co.edu.javeriana.lms.videos.models.Video;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,19 +31,19 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "simulation")
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Simulation {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    private Long simulationId;
 
     @Column(nullable = false)
-    private LocalDateTime startDateTime;
+    private Date startDateTime;
 
     @Column(nullable = false)
-    private LocalDateTime endDateTime;
+    private Date endDateTime;
 
     @Column(nullable = true)
     private Float grade;
@@ -52,7 +53,7 @@ public class Simulation {
     private GradeStatus gradeStatus;
 
     @Column(nullable = true)
-    private LocalDateTime gradeDateTime;
+    private Date gradeDateTime;
 
     @ManyToOne
     @JsonIgnore
@@ -60,12 +61,18 @@ public class Simulation {
 
     @OneToOne
     @JoinColumn(name = "video_id")
-    @JsonIgnore
     private Video video;
 
-    @ManyToMany
+    /*@ManyToMany
     @JoinTable(name = "simulation_users", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
     @JsonIgnore
+
+    private List<GroupPerSimulation> groups;*/
+
+    @OneToOne
+    @JoinColumn(nullable = true)
+    private Rubric rubric;
+
     private List<User> users;
 
     @ManyToMany

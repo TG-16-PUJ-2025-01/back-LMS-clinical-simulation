@@ -45,8 +45,6 @@ public class SimulationController {
             HttpServletRequest request) {
         log.info("Requesting all simulations");
 
-        String host = request.getHeader("Host");
-        String scheme = request.getScheme();
 
         Page<Simulation> simulationsPage = simulationService.findAllSimulations(page, size);
 
@@ -55,19 +53,8 @@ public class SimulationController {
                     .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "No simulations found", null, null));
         }
 
-        String previous = null;
-        if (simulationsPage.hasPrevious()) {
-            previous = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page - 1, size);
-        }
-
-        String next = null;
-        if (simulationsPage.hasNext()) {
-            next = String.format("%s://%s/simulation/all?page=%d&size=%d", scheme, host, page + 1, size);
-        }
-
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),
-                simulationsPage.getTotalElements(), simulationsPage.getTotalPages(), next,
-                previous);
+                simulationsPage.getTotalElements(), simulationsPage.getTotalPages());
 
         return ResponseEntity.ok(
                 new ApiResponseDto<List<Simulation>>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(),
@@ -91,7 +78,7 @@ public class SimulationController {
         Page<Simulation> simulationsPage = simulationService.findSimulationsByPracticeId(practiceId, page, size);
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),
-                simulationsPage.getTotalElements(), simulationsPage.getTotalPages(), null, null);
+                simulationsPage.getTotalElements(), simulationsPage.getTotalPages());
 
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(), metadata));
     }

@@ -81,7 +81,7 @@ public class SimulationService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Practice not found with id: " + simulationsDto.get(0).getPracticeId()));
         Integer duration = practice.getSimulationDuration();
-        Integer numberOfGroups = practice.getMaxStudentsGroup();
+        Integer numberOfGroups = practice.getNumberOfGroups();
 
         int totalSimulationsAvailable = 0;
 

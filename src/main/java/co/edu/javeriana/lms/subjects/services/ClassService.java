@@ -204,4 +204,25 @@ public class ClassService {
         return classRepository.findByProfessors_Id(userId);
     }
 
+    public List<ClassModel> findByProfessorIdAndFilters(Long userId, Integer year, Integer period) {
+        List<ClassModel> classes = classRepository.findByProfessors_Id(userId);
+
+        if (year != null) {
+            classes = classes.stream()
+                    .filter(c -> c.getPeriod().startsWith(year.toString()))
+                    .toList();
+        }
+
+        if (period != null) {
+            classes = classes.stream()
+                    .filter(c -> c.getPeriod().endsWith(period.toString()))
+                    .toList();
+        }
+
+        List<ClassModel> mutableClasses = new ArrayList<>(classes);
+        mutableClasses.sort((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod()));
+
+        return mutableClasses;
+    }
+
 }

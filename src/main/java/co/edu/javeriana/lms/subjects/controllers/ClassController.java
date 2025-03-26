@@ -1,4 +1,3 @@
-
 package co.edu.javeriana.lms.subjects.controllers;
 import java.util.List;
 
@@ -253,14 +252,19 @@ public class ClassController {
     }
 
     @GetMapping("/all/professor")
-    public ResponseEntity<?> getClassesByProfesor(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getClassesByProfesor(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer period) {
         token = token.substring(7);
         log.info("Requesting main menu information for professor role");
+        log.info("Year requested: " + year);
+        log.info("Period requested: " + period);
 
         Long userId = authService.getUserIdByToken(token);
 
-        List<ClassModel> classes = classService.findByProfessorId(userId);
+        List<ClassModel> classes = classService.findByProfessorIdAndFilters(userId, year, period);
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Classes retrieved succesfully", classes, null));
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Classes retrieved successfully", classes, null));
     }
 }

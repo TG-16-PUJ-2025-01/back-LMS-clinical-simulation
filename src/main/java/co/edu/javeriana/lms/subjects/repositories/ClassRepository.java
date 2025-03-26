@@ -173,11 +173,11 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
             List<ClassModel> findClassesByCourseId(Course course);
 
 
-            @Query("SELECT c FROM ClassModel c WHERE c.course = :course AND (LOWER(c.period) LIKE LOWER(CONCAT('%', :filter, '%')) OR CAST(c.javerianaId AS string) LIKE %:filter% )")
-            List<ClassModel> findClassesByCourseIdAndNameContaining(Course course, @Param("filter") String filter);
+            @Query("SELECT c FROM ClassModel c WHERE c.course = :course AND (LOWER(c.period) LIKE LOWER(CONCAT('%', :period, '%')) OR CAST(c.javerianaId AS string) LIKE %:filter% OR LOWER(c.period) LIKE LOWER(CONCAT('%', :filter, '%')))")
+            List<ClassModel> findClassesByCourseIdAndNameContaining(Course course, @Param("filter") String filter,  @Param("period") String period);
 
-            @Query("SELECT c FROM ClassModel c LEFT JOIN c.professors p WHERE c.course = :course AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :filter, '%')) OR LOWER(p.lastName) LIKE LOWER(CONCAT('%', :filter, '%')) OR p.institutionalId LIKE CONCAT('%', :filter, '%')  )")
-            List<ClassModel> findClassesByCourseByProfessorContaining(Course course, @Param("filter") String filter);
+            @Query("SELECT c FROM ClassModel c LEFT JOIN c.professors p WHERE c.course = :course AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :filter, '%')) OR LOWER(p.lastName) LIKE LOWER(CONCAT('%', :filter, '%')) OR p.institutionalId LIKE CONCAT('%', :filter, '%')  OR LOWER(c.period) LIKE LOWER(CONCAT('%', :filter, '%')))")
+            List<ClassModel> findClassesByCourseByProfessorContaining(Course course, @Param("filter") String filter, @Param("period") String period);
         
 
 }

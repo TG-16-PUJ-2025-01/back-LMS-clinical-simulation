@@ -91,16 +91,16 @@ public class CourseService {
     }
 
     public List<CourseDto> findAllCoordinatorCourses(String filter, String sort, Boolean asc, String email,
-            String searsearchByKey) {
+            String searsearchByKey, String period) {
         User coordinator = userRepository.findByEmail(email).get();
 
         // Obtener los cursos del coordinador
 
         List<Course> coordinatorCourses = new ArrayList<>();
 
-        log.info("Searching by key: " + searsearchByKey);
+        log.info("Searching by key: " + searsearchByKey + " and filter: " + filter+ " and period: " + period);
 
-        if (searsearchByKey.isEmpty() || searsearchByKey.equals("Clases")) {
+        if (searsearchByKey.isEmpty() || searsearchByKey.equals("Clases") || searsearchByKey.equals("Profesores")) {
             coordinatorCourses = courseRepository.findCoursesByCoordinator(coordinator);
         } else {
             coordinatorCourses = courseRepository.findCoursesByCoordinatorAndNameContaining(coordinator, filter);
@@ -116,13 +116,10 @@ public class CourseService {
                 sortedClasses = classRepository.findClassesByCourseId(course); // Convertir el stream en lista
 
             } else if (searsearchByKey.equals("Clases")) {
-                sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter); // Convertir el
-                                                                                                        // stream en
-                                                                                                        // lista
+                sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter, period); // Convertir el                                                                                          // lista
             } else {
-                sortedClasses = classRepository.findClassesByCourseByProfessorContaining(course, filter); // Convertir
-                                                                                                          // el stream
-                                                                                                          // en lista
+                sortedClasses = classRepository.findClassesByCourseByProfessorContaining(course, filter,period); // Convertir
+                                                                                                          // el stream                                                                                             // en lista
             }
 
             // Crear un CourseDto con las clases ordenadas

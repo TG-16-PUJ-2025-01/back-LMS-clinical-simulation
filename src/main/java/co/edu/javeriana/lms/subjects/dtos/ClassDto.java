@@ -26,4 +26,6 @@ public class ClassDto {
 
     @NotNull(message = "Period is required")
     private String period;
+
+    private Integer numberOfParticipants;
 }

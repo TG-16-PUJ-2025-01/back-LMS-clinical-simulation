@@ -144,7 +144,7 @@ public class ClassService {
         
         ClassModel classModel = new ClassModel(entity.getPeriod(),
                 professors,
-                courseRepository.findById(entity.getCourseId()).get(), entity.getJaverianaId());
+                courseRepository.findById(entity.getCourseId()).get(), entity.getJaverianaId(), entity.getNumberOfParticipants());
        
        // log.info("unicornio aa2 "+ classModel.getJaverianaId(), classModel.getName(), classModel.getBeginningDate(), classModel.getProfessor().getName(), classModel.getCourse().getCourseId());
 
@@ -174,7 +174,7 @@ public class ClassService {
         // Update fields
         currentClassModel.setPeriod(classModeldto.getPeriod());
         currentClassModel.setCourse(courseRepository.findById(classModeldto.getCourseId()).get());
-
+        currentClassModel.setNumberOfParticipants(classModeldto.getNumberOfParticipants());
         return currentClassModel;
     }
 

@@ -290,7 +290,7 @@ public class DBInitializer implements CommandLineRunner {
 
 	private void insertSimulations() {
 
-		LocalDateTime startDateTime = LocalDateTime.now();
+		LocalDateTime startDateTime = LocalDateTime.now().plusDays(1).withHour(11).withMinute(0).withSecond(0).withNano(0);
 
 		Simulation simulation1 = Simulation.builder()
 			.practice(practiceRepository.findById(1L).get())

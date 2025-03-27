@@ -169,8 +169,8 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
 
             
 
-            @Query("SELECT c FROM ClassModel c WHERE c.course = :course")
-            List<ClassModel> findClassesByCourseId(Course course);
+            @Query("SELECT c FROM ClassModel c WHERE c.course = :course AND (LOWER(c.period) LIKE LOWER(CONCAT('%', :period, '%')))")
+            List<ClassModel> findClassesByCourseId(Course course, @Param("period") String period);
 
 
             @Query("SELECT c FROM ClassModel c WHERE c.course = :course AND (LOWER(c.period) LIKE LOWER(CONCAT('%', :period, '%')) OR CAST(c.javerianaId AS string) LIKE %:filter% OR LOWER(c.period) LIKE LOWER(CONCAT('%', :filter, '%')))")

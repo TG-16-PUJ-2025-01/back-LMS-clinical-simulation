@@ -113,7 +113,7 @@ public class CourseService {
             List<ClassModel> sortedClasses = new ArrayList<>();
             // Buscar las clases del curs o y ordenarlas por periodo de mayor a menor
             if (searsearchByKey.isEmpty() || searsearchByKey.equals("Asignaturas")) {
-                sortedClasses = classRepository.findClassesByCourseId(course); // Convertir el stream en lista
+                sortedClasses = classRepository.findClassesByCourseId(course, period); // Convertir el stream en lista
 
             } else if (searsearchByKey.equals("Clases")) {
                 sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter, period); // Convertir el                                                                                          // lista

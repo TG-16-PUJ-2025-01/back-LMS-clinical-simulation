@@ -73,10 +73,6 @@ public class PracticeService {
 
         List<Practice> practices = practiceRepository.findByClassModel_ClassId(classId, Sort.by(Sort.Direction.ASC, "id"));
 
-        if (practices.isEmpty()) {
-            throw new EntityNotFoundException("No practices found for class with id: " + classId);
-        }
-
         return practices;
     }
 }

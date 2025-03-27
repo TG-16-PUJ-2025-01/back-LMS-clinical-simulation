@@ -16,6 +16,5 @@ public class EventDto {
     private String location;
     private String start;
     private String end;
-    private String type;
     private String calendarId;
 }

@@ -1,11 +1,8 @@
 package co.edu.javeriana.lms.booking.services;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +17,7 @@ import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 
 import co.edu.javeriana.lms.booking.dtos.EventDto;
+import co.edu.javeriana.lms.booking.models.Room;
 import jakarta.persistence.EntityNotFoundException;
 
 @Slf4j
@@ -52,7 +50,8 @@ public class CalendarService {
         if (classes.isEmpty()) {
             log.info("No classes found for user with id: {}. Returning only direct simulations.", idUser);
             if (userSimulations.isEmpty()) {
-                throw new EntityNotFoundException("No simulations found for user with id: " + idUser);
+                log.info("No simulations found for user with id: {}. Returning an empty list.", idUser);
+                return new ArrayList<>();
             }
             return mapSimulationsToEventDtos(userSimulations);
         }
@@ -65,7 +64,8 @@ public class CalendarService {
             log.info("No practices found for the classes of user with id: {}. Returning only direct simulations.",
                     idUser);
             if (userSimulations.isEmpty()) {
-                throw new EntityNotFoundException("No simulations found for user with id: " + idUser);
+                log.info("No simulations found for user with id: {}. Returning an empty list.", idUser);
+                return new ArrayList<>();
             }
             return mapSimulationsToEventDtos(userSimulations);
         }
@@ -74,10 +74,12 @@ public class CalendarService {
 
         // Search simulations associated with those practices
         List<Simulation> simulations = simulationRepository.findByPracticeIn(practices);
+
         simulations.addAll(userSimulations);
 
         if (simulations.isEmpty()) {
-            throw new EntityNotFoundException("No simulations found for user with id: " + idUser);
+            log.info("No simulations found for user with id: {}. Returning an empty list.", idUser);
+            return new ArrayList<>();
         }
 
         // Remove duplicates
@@ -86,23 +88,29 @@ public class CalendarService {
         return mapSimulationsToEventDtos(distinctSimulations);
     }
 
+    private String getRoomNames(List<Room> rooms) {
+        return rooms != null && !rooms.isEmpty()
+            ? rooms.stream().map(Room::getName).collect(Collectors.joining(", "))
+            : "Sin sala";
+    }
+
     private List<EventDto> mapSimulationsToEventDtos(List<Simulation> simulations) {
-        // TODO se debe implementar la lógica para reservas con multiples salas
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         List<EventDto> eventsDtos = new ArrayList<>();
         
         for (Simulation simulation : simulations) {
             Practice practice = simulation.getPractice();
             ClassModel classModel = practice.getClassModel();
+            String calendarId = simulation.getPractice() == null ? "Supervisor" : "Reserva";
             EventDto eventDto = EventDto.builder()
                     .id(simulation.getSimulationId())
-                    .title(practice.getName())
-                    .description("Clase: " + classModel.getCourse().getName())
-                    .location(simulation.getRooms() != null ? simulation.getRooms().get(0).getName() : "Sin sala")
+                    .title(practice.getName() + " - " + classModel.getCourse().getName() + " - " + practice.getType().name())
+                    .description("Clase: " + classModel.getCourse().getName() + " - " + classModel.getJaverianaId())
+                    .location(getRoomNames(simulation.getRooms()))
                     .start(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(
                             simulation.getStartDateTime()))
                     .end(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(
                             simulation.getEndDateTime()))
+                    .calendarId(calendarId)
                     .build();
             eventsDtos.add(eventDto);
         }

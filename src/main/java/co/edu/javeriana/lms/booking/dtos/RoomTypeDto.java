@@ -15,6 +15,7 @@ public class RoomTypeDto {
 
     public RoomType toEntity(){
         RoomType roomType = new RoomType();
+        roomType.setId(null);
         roomType.setName(this.name);
 
         return roomType;

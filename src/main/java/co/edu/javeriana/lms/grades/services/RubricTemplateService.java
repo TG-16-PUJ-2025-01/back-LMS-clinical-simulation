@@ -1,8 +1,9 @@
 package co.edu.javeriana.lms.grades.services;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,30 +51,27 @@ public class RubricTemplateService {
     private UserRepository userRepository;
 
     public Page<RubricTemplate> findAll(String filter, Integer page, Integer size, String sort, Boolean asc,
-            Boolean mine, Boolean archived, String userEmail) {
+            Boolean archived, String userEmail) {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         User creator = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Pageable pageable = PageRequest.of(page, size, sortOrder);
 
         // SI ES ADMIN ACA SE ENVIA TODO
-        for (Role role : creator.getRoles()) {
-            if (role.equals(Role.ADMIN)) {
-                return rubricTemplateRepository.findAllByTitleOrCreationDateContaining(filter, pageable);
-            }
-        }
-        // SI SOLO QUIERE VER SUS ARCHIVADOS
-        if (mine && archived)
-            return rubricTemplateRepository.findArchivedMineByTitleOrCreationDateContaining(filter, archived,
-                    creator.getId(), pageable);
-        // SI QUIERE VER TODOS LOS SUYOS
-        else if (mine && !archived)
-            return rubricTemplateRepository.findMineByTitleOrCreationDateContaining(filter, creator.getId(), pageable);
-        // SI QUIERE VER LOS DE OTROS Menos los archivados
-        else
-            return rubricTemplateRepository.findNotMineByTitleOrCreationDateContaining(filter, creator.getId(),
-                    pageable);
 
+        if (archived) {
+
+            if (creator.getRoles().contains(Role.ADMIN)) {
+                return rubricTemplateRepository.findArchivedByTitleOrCreationDateContaining(filter,
+                        pageable);
+            } else {
+                return rubricTemplateRepository.findArchivedMineByTitleOrCreationDateContaining(filter,
+                        creator.getId(), pageable);
+            }
+        } else {
+            return rubricTemplateRepository.findNotArchivedByTitleOrCreationDateContaining(filter,
+                    pageable);
+        }
     }
 
     public RubricTemplate findById(Long id) {
@@ -102,11 +100,12 @@ public class RubricTemplateService {
 
         // SE LE ANADEN LOS IDS A LOS CRITERIOS IMPORTANTE
         rubricTemplateModel.setCriteria(addCriteriaUUID(rubricTemplate.getCriteria()));
+        rubricTemplateModel.setColumns(rubricTemplate.getColumns());
 
         if (rubricTemplate.getCourses() != null || rubricTemplate.getCourses().size() > 0)
             rubricTemplateModel.setCourses(courseRepository.findAllById(rubricTemplate.getCourses()));
 
-        rubricTemplateModel.setCreationDate(rubricTemplate.getCreationDate());
+        rubricTemplateModel.setCreationDate(new Date());
 
         Boolean isForPractice = false;
         Practice practice = new Practice();
@@ -159,9 +158,9 @@ public class RubricTemplateService {
         RubricTemplate rubricTemplate = rubricTemplateRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Rubric Template not found with ID: " + id));
 
-        // Convertir la fecha de creación de java.sql.Date a LocalDate
-        LocalDate creationYear = rubricTemplate.getCreationDate().toLocalDate();
-        int yearsDifference = LocalDate.now().getYear() - creationYear.getYear();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(rubricTemplate.getCreationDate());
+        Integer yearsDifference = LocalDate.now().getYear() - cal.get(Calendar.YEAR);
 
         // Validar si ya tiene rúbricas calificadas
         if (rubricTemplate.getRubrics().size() > 0 && yearsDifference < 3) {
@@ -171,7 +170,7 @@ public class RubricTemplateService {
 
         rubricTemplate.getRubrics().forEach(rubric -> rubric.setRubricTemplate(null));
 
-        rubricTemplateRepository.save(rubricTemplate);  // Guardar los cambios en las rúbricas
+        rubricTemplateRepository.save(rubricTemplate); // Guardar los cambios en las rúbricas
 
         // Si cumple las condiciones, se elimina
         rubricTemplateRepository.deleteById(id);
@@ -188,7 +187,6 @@ public class RubricTemplateService {
         List<Criteria> previousCriteria = rubricTemplate.getCriteria();
         rubricTemplateModel.setCriteria(rubricTemplate.getCriteria());
         rubricTemplateModel.setCourses(courseRepository.findAllById(rubricTemplate.getCourses()));
-        rubricTemplateModel.setCreationDate(rubricTemplate.getCreationDate());
         rubricTemplateModel.setArchived(rubricTemplate.getArchived());
 
         // update the rubric based on the rubric template edition
@@ -205,7 +203,7 @@ public class RubricTemplateService {
     }
 
     // all courses are added
-    public RubricTemplate updaterubricTemplateCourses(List<Course> coursesToAdd, Long id) {
+    public RubricTemplate updateRubricTemplateCourses(List<Course> coursesToAdd, Long id) {
         RubricTemplate rubricTemplate = rubricTemplateRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Rubric Template not found with ID: " + id));
 
@@ -217,5 +215,4 @@ public class RubricTemplateService {
     public List<RubricTemplate> findRecommendedRubricTemplatesByCoursesById(Long id) {
         return rubricTemplateRepository.findRecommendedRubricTemplatesByCoursesById(id);
     }
-
 }

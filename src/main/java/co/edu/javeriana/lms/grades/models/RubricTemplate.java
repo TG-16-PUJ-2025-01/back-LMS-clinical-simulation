@@ -1,6 +1,6 @@
 package co.edu.javeriana.lms.grades.models;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -49,6 +49,10 @@ public class RubricTemplate {
     @Column(columnDefinition = "jsonb") 
     private List<Criteria> criteria;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb") 
+    private List<RubricColumn> columns;
+
     @Column(nullable = false)
     private Date creationDate;
 
@@ -56,7 +60,7 @@ public class RubricTemplate {
     private Boolean archived;
 
     @ManyToMany
-    @JoinTable(name = "Rubric_Template_Course", joinColumns = @JoinColumn(name = "rubricTemplateId"), inverseJoinColumns = @JoinColumn(name = "courseId"))  
+    @JoinTable(name = "Rubric_Template_Course", joinColumns = @JoinColumn(name = "rubricTemplateId"), inverseJoinColumns = @JoinColumn(name = "courseId"))
     @JsonIgnore
     private List<Course> courses;
 

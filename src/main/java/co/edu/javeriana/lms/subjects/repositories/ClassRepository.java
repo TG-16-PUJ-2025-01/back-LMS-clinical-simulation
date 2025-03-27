@@ -6,8 +6,6 @@ import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Order;
@@ -102,22 +100,6 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
             )
             """)
     Page<User> findUsersNotInClass(@Param("classId") Long classId, @Param("filter") String filter, Pageable pageable);
-
-    @Query("""
-            SELECT COUNT(s) FROM ClassModel c 
-            JOIN c.students s 
-            WHERE c.classId = :classId
-            """)
-    long countStudentsByClassId(@Param("classId") Long classId);
-
-    @Query("""
-            SELECT COUNT(p) FROM ClassModel c 
-            JOIN c.professors p 
-            WHERE c.classId = :classId
-            """)
-    long countProfessorsByClassId(@Param("classId") Long classId);
-
-    List<ClassModel> findByProfessors_Id(Long professorId);
 
     @Query("""
             SELECT u FROM User u

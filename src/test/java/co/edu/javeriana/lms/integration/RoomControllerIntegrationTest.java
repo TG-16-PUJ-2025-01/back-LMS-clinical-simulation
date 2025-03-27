@@ -55,7 +55,7 @@ public class RoomControllerIntegrationTest {
         roomRepository.save(mockRoom);
 
         // Authenticate and get JWT token
-        String loginJson = "{\"email\":\"andresgarciam@javeriana.edu.co\", \"password\":\"Peter2010?\"}";
+        String loginJson = "{\"email\":\"admin@gmail.com\", \"password\":\"admin\"}";
         MvcResult result = mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(loginJson))
@@ -75,27 +75,40 @@ public class RoomControllerIntegrationTest {
         mockMvc.perform(get("/room/all?page=0&size=10")
                 .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("ok"));
+                .andExpect(jsonPath("$.message").value("Rooms retrieved successfully"));
+    }
+
+    @Test
+    public void testUpdateRoom_Integration_Success() throws Exception {
+        String updatedRoomJson = "{\"name\":\"UpdatedRoom\", \"capacity\":\"15\", \"typeId\": \"1\"}";
+        mockMvc.perform(put("/room/1")
+                .header("Authorization", "Bearer " + jwtToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatedRoomJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Room updated successfully"))
+                .andExpect(jsonPath("$.data.name").value("Updatedroom"))
+                .andExpect(jsonPath("$.data.capacity").value(15));
     }
 
     @Test
     public void testAddRoom_Integration_Success() throws Exception {
         // Send a JSON with valid data to create a new room
-        String validRoomJson = "{\"name\":\"Room2X\", \"capacity\":\"10\", \"type\": {\"name\":\"UCI2\"}}";
-        mockMvc.perform(post("/room/add")
+        String validRoomJson = "{\"name\":\"Room2X\", \"capacity\":\"10\", \"typeId\": \"1\"}";
+        mockMvc.perform(post("/room")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validRoomJson))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Room created successfully"));
     }
 
     @Test
     public void testAddRoom_InvalidData() throws Exception {
         // Send a JSON with an empty name, which is invalid
-        String invalidRoomJson = "{\"name\":\"\", \"capacity\":\"10\", \"type\": {\"name\":\"Cirugia\"}}";
+        String invalidRoomJson = "{\"name\":\"\", \"capacity\":\"10\", \"typeId\": \"1\"}";
 
-        mockMvc.perform(post("/room/add")
+        mockMvc.perform(post("/room")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRoomJson))
@@ -106,15 +119,15 @@ public class RoomControllerIntegrationTest {
     @Test
     public void testAddRoom_Integration_NameConflict() throws Exception {
         // First, create a room with a specific name
-        String validRoomJson = "{\"name\":\"RoomX\", \"capacity\":\"10\", \"type\": {\"name\":\"Urgencias\"}}";
-        mockMvc.perform(post("/room/add")
+        String validRoomJson = "{\"name\":\"RoomX\", \"capacity\":\"10\", \"typeId\": \"1\"}";
+        mockMvc.perform(post("/room")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validRoomJson))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
 
         // Then, try to create another room with the same name, it should fail
-        mockMvc.perform(post("/room/add")
+        mockMvc.perform(post("/room")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validRoomJson))
@@ -123,14 +136,78 @@ public class RoomControllerIntegrationTest {
     }
 
     @Test
-    public void testAddRoom_InvalidData_Integration() throws Exception {
-        // Send a JSON with invalid data (empty name)
-        String invalidRoomJson = "{\"name\":\"\", \"type\": {\"name\":\"Cirugia\"}}";
-        mockMvc.perform(post("/room/add")
+    public void testGetRoomById_Integration_Success() throws Exception {
+        mockMvc.perform(get("/room/" + mockRoom.getId())
+                .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Room retrieved successfully"))
+                .andExpect(jsonPath("$.data.name").value(mockRoom.getName()));
+    }
+
+    @Test
+    public void testGetRoomById_Integration_NotFound() throws Exception {
+        mockMvc.perform(get("/room/9999") // ID inexistente
+                .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Entity not found"));
+    }
+
+    @Test
+    public void testGetRoomTypes_Integration() throws Exception {
+        mockMvc.perform(get("/room/types")
+                .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Room types retrieved successfully"))
+                .andExpect(jsonPath("$.data[0].name").value("Cuidado crítico intensivo")); 
+    }
+
+    @Test
+    public void testDeleteRoomById_Integration_Success() throws Exception {
+        mockMvc.perform(delete("/room/" + mockRoom.getId())
+                .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Room deleted successfully"));
+    }
+
+    @Test
+    public void testDeleteRoomById_Integration_NotFound() throws Exception {
+        mockMvc.perform(delete("/room/9999") // ID inexistente
+                .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Entity not found"));
+    }
+
+    @Test
+    public void testUpdateRoom_Integration_NotFound() throws Exception {
+        String updatedRoomJson = "{\"name\":\"UpdatedRoom\", \"capacity\":\"15\", \"typeId\": \"1\"}";
+        mockMvc.perform(put("/room/9999")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidRoomJson))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Validation failed"));
+                .content(updatedRoomJson))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Entity not found"));
+    }
+
+    @Test
+    public void testAddRoomType_Integration_Success() throws Exception {
+        String newRoomTypeJson = "{\"name\":\"NewRoomType\"}";
+        mockMvc.perform(post("/room/type")
+                .header("Authorization", "Bearer " + jwtToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newRoomTypeJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Room type created successfully"))
+                .andExpect(jsonPath("$.data.name").value("NewRoomType"));
+    }
+
+    @Test
+    public void testAddRoomType_Integration_InvalidData() throws Exception {
+        String invalidRoomTypeJson = "{\"name\":\"\"}";
+        mockMvc.perform(post("/room/type")
+                .header("Authorization", "Bearer " + jwtToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidRoomTypeJson))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Invalid data or duplicate entry"));
     }
 }

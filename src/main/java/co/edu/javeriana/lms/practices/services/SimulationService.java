@@ -1,9 +1,8 @@
 package co.edu.javeriana.lms.practices.services;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
 import co.edu.javeriana.lms.practices.dtos.SimulationDto;
-import co.edu.javeriana.lms.practices.dtos.TimeSlotDto;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
@@ -57,9 +54,6 @@ public class SimulationService {
     }
 
     public Page<Simulation> findSimulationsByPracticeId(Long practiceId, Integer page, Integer size) {
-        practiceRepository.findById(practiceId)
-                .orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + practiceId));
-
         // TODO filtros
         Pageable pageable = PageRequest.of(page, size);
         return simulationRepository.findByPracticeId(practiceId, pageable);
@@ -84,13 +78,13 @@ public class SimulationService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Practice not found with id: " + simulationsDto.get(0).getPracticeId()));
         Integer duration = practice.getSimulationDuration();
-        Integer numberOfGroups = practice.getNumberOfGroups();
+        Integer numberOfGroups = practice.getMaxStudentsGroup();
 
         int totalSimulationsAvailable = 0;
 
         for (SimulationByTimeSlotDto simulation : simulationsDto) {
             long durationInMinutes = java.time.Duration
-                    .between(simulation.getStartDateTime(), simulation.getEndDateTime()).toMinutes();
+                    .between(simulation.getStartDateTime().toInstant(), simulation.getEndDateTime().toInstant()).toMinutes();
             totalSimulationsAvailable += durationInMinutes / duration;
         }
 
@@ -122,19 +116,22 @@ public class SimulationService {
 
         List<Simulation> createdSimulations = new ArrayList<>();
 
-        while (simulationDto.getStartDateTime().isBefore(simulationDto.getEndDateTime())) {
+        while (simulationDto.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                .isBefore(simulationDto.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())) {
             Simulation simulation = Simulation.builder()
                     .practice(practice)
                     .room(room)
                     .startDateTime(simulationDto.getStartDateTime())
-                    .endDateTime(simulationDto.getStartDateTime().plusMinutes(duration))
+                    .endDateTime(Date.from(simulationDto.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(duration).atZone(ZoneId.systemDefault()).toInstant()))
                     .gradeDateTime(null)
                     .gradeStatus(gradeStatus)
                     .grade(null)
                     .build();
             createdSimulations.add(simulation);
             simulationRepository.save(simulation);
-            simulationDto.setStartDateTime(simulationDto.getStartDateTime().plusMinutes(duration));
+            simulationDto.setStartDateTime(Date.from(simulationDto.getStartDateTime().toInstant()
+                    .atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(duration)
+                    .atZone(ZoneId.systemDefault()).toInstant()));
         }
 
         return createdSimulations;
@@ -182,53 +179,5 @@ public class SimulationService {
         simulation.getUsers().add(userRepository.findById(studentId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + studentId)));
         simulationRepository.save(simulation);
-    }
-
-    public List<TimeSlotDto> findRoomSimulationsSchedule(Long roomId) {
-        roomRepository.findById(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + roomId));
-    
-        List<Simulation> simulations = simulationRepository.findByRoomIdAndStartDateTimeAfter(roomId, LocalDateTime.now());
-    
-        List<TimeSlotDto> timeSlots = new ArrayList<>();
-    
-        if (simulations.isEmpty()) {
-            return timeSlots;
-        }
-    
-        simulations.sort(Comparator.comparing(Simulation::getStartDateTime));
-    
-        LocalDateTime unifiedStart = simulations.get(0).getStartDateTime();
-        LocalDateTime unifiedEnd = simulations.get(0).getEndDateTime();
-    
-        for (Simulation currentSimulation : simulations) {
-            if (!currentSimulation.getStartDateTime().isAfter(unifiedEnd)) { 
-                // Se solapan o son contiguos
-                unifiedEnd = unifiedEnd.isAfter(currentSimulation.getEndDateTime()) ? unifiedEnd : currentSimulation.getEndDateTime();
-            } else {
-                // Guardar el intervalo previo antes de actualizar
-                timeSlots.add(TimeSlotDto.builder()
-                        .startDateTime(unifiedStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-                        .endDateTime(unifiedEnd.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-                        .build());
-                unifiedStart = currentSimulation.getStartDateTime();
-                unifiedEnd = currentSimulation.getEndDateTime();
-            }
-        }
-    
-        // Agregar el último intervalo
-        timeSlots.add(TimeSlotDto.builder()
-                .startDateTime(unifiedStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-                .endDateTime(unifiedEnd.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-                .build());
-    
-        return timeSlots;
-    }
-
-    public List<User> findSimulationStudents(Long simulationId) {
-        Simulation simulation = simulationRepository.findById(simulationId)
-                .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + simulationId));
-
-        return simulation.getUsers();
     }
 }

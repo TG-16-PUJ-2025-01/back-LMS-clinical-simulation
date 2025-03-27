@@ -1,10 +1,13 @@
 package co.edu.javeriana.lms.practices.services;
 
+import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -65,8 +68,9 @@ public class SimulationService {
     @Transactional
     public List<Simulation> addSimulations(List<SimulationByTimeSlotDto> simulationsDto) {
 
-        if (!enoughSimulations(simulationsDto)) {
-            throw new IllegalArgumentException("Not enough simulations for all the students");
+        if (!canAccommodateAllGroups(simulationsDto)) {
+            throw new IllegalArgumentException(
+                    "The number of groups does not match the number of available time slots");
         }
         List<Simulation> createdSimulations = new ArrayList<>();
         for (SimulationByTimeSlotDto simulation : simulationsDto) {
@@ -76,7 +80,7 @@ public class SimulationService {
         return createdSimulations;
     }
 
-    private boolean enoughSimulations(List<SimulationByTimeSlotDto> simulationsDto) {
+    private boolean canAccommodateAllGroups(List<SimulationByTimeSlotDto> simulationsDto) {
         Practice practice = practiceRepository.findById(simulationsDto.get(0).getPracticeId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Practice not found with id: " + simulationsDto.get(0).getPracticeId()));
@@ -87,11 +91,12 @@ public class SimulationService {
 
         for (SimulationByTimeSlotDto simulation : simulationsDto) {
             long durationInMinutes = java.time.Duration
-                    .between(simulation.getStartDateTime().toInstant(), simulation.getEndDateTime().toInstant()).toMinutes();
+                    .between(simulation.getStartDateTime().toInstant(), simulation.getEndDateTime().toInstant())
+                    .toMinutes();
             totalSimulationsAvailable += durationInMinutes / duration;
         }
 
-        return totalSimulationsAvailable >= numberOfGroups;
+        return totalSimulationsAvailable == numberOfGroups;
     }
 
     @Transactional
@@ -120,18 +125,20 @@ public class SimulationService {
         }
 
         Integer duration = practice.getSimulationDuration();
-        
+
         GradeStatus gradeStatus = practice.getGradeable() ? GradeStatus.PENDING : GradeStatus.NOT_EVALUABLE;
 
         List<Simulation> createdSimulations = new ArrayList<>();
 
         while (simulationDto.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
-                .isBefore(simulationDto.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())) {
+                .isBefore(
+                        simulationDto.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())) {
             Simulation simulation = Simulation.builder()
                     .practice(practice)
                     .rooms(rooms)
                     .startDateTime(simulationDto.getStartDateTime())
-                    .endDateTime(Date.from(simulationDto.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(duration).atZone(ZoneId.systemDefault()).toInstant()))
+                    .endDateTime(Date.from(simulationDto.getStartDateTime().toInstant().atZone(ZoneId.systemDefault())
+                            .toLocalDateTime().plusMinutes(duration).atZone(ZoneId.systemDefault()).toInstant()))
                     .gradeDateTime(null)
                     .gradeStatus(gradeStatus)
                     .grade(null)
@@ -152,7 +159,6 @@ public class SimulationService {
 
         Practice practice = practiceRepository.findById(simulationDto.getPracticeId()).orElseThrow(
                 () -> new EntityNotFoundException("Practice not found with id: " + simulationDto.getPracticeId()));
-
 
         List<Room> rooms = new ArrayList<>();
 
@@ -204,44 +210,69 @@ public class SimulationService {
         simulationRepository.save(simulation);
     }
 
-    public List<TimeSlotDto> findRoomSimulationsSchedule(Long roomId) {
-        roomRepository.findById(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + roomId));
-    
+    public List<TimeSlotDto> findSimulationsSchedule() {
         List<Simulation> simulations = simulationRepository.findByStartDateTimeAfter(new Date());
-    
+
         List<TimeSlotDto> timeSlots = new ArrayList<>();
-    
+
         if (simulations.isEmpty()) {
             return timeSlots;
         }
-    
-        simulations.sort(Comparator.comparing(Simulation::getStartDateTime));
-    
-        Date unifiedStart = simulations.get(0).getStartDateTime();
-        Date unifiedEnd = simulations.get(0).getEndDateTime();
-    
-        for (Simulation currentSimulation : simulations) {
-            if (!currentSimulation.getStartDateTime().after(unifiedEnd)) { 
-                // Se solapan o son contiguos
-                unifiedEnd = unifiedEnd.after(currentSimulation.getEndDateTime()) ? unifiedEnd : currentSimulation.getEndDateTime();
-            } else {
-                // Guardar el intervalo previo antes de actualizar
-                timeSlots.add(TimeSlotDto.builder()
-                        .startDateTime(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(unifiedStart))
-                        .endDateTime(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(unifiedEnd))
-                        .build());
-                unifiedStart = currentSimulation.getStartDateTime();
-                unifiedEnd = currentSimulation.getEndDateTime();
+
+        // Mapa para agrupar simulaciones por cada roomId
+        Map<Long, List<Simulation>> simulationsByRoom = new HashMap<>();
+
+        for (Simulation simulation : simulations) {
+            for (Room room : simulation.getRooms()) { // Iteramos sobre todas las salas de la simulación
+                simulationsByRoom
+                        .computeIfAbsent(room.getId(), k -> new ArrayList<>())
+                        .add(simulation);
             }
         }
-    
-        // Agregar el último intervalo
-        timeSlots.add(TimeSlotDto.builder()
-            .startDateTime(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(unifiedStart))
-            .endDateTime(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(unifiedEnd))
-            .build());
-    
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+        // Procesar cada grupo de simulaciones por roomId
+        for (Map.Entry<Long, List<Simulation>> entry : simulationsByRoom.entrySet()) {
+            List<Simulation> roomSimulations = entry.getValue();
+            roomSimulations.sort(Comparator.comparing(Simulation::getStartDateTime));
+
+            Date unifiedStart = roomSimulations.get(0).getStartDateTime();
+            Date unifiedEnd = roomSimulations.get(0).getEndDateTime();
+            String roomName = roomSimulations.get(0).getRooms().stream()
+                    .filter(r -> r.getId().equals(entry.getKey()))
+                    .findFirst()
+                    .map(Room::getName)
+                    .orElse("Unknown Room");
+
+            for (int i = 1; i < roomSimulations.size(); i++) {
+                Simulation currentSimulation = roomSimulations.get(i);
+
+                if (!currentSimulation.getStartDateTime().after(unifiedEnd)) {
+                    // Se solapan o son contiguos dentro del mismo roomId
+                    unifiedEnd = unifiedEnd.after(currentSimulation.getEndDateTime()) ? unifiedEnd
+                            : currentSimulation.getEndDateTime();
+                } else {
+                    // Guardar el intervalo previo antes de actualizar
+                    timeSlots.add(TimeSlotDto.builder()
+                            .room(roomName)
+                            .startDateTime(dateFormat.format(unifiedStart))
+                            .endDateTime(dateFormat.format(unifiedEnd))
+                            .build());
+
+                    unifiedStart = currentSimulation.getStartDateTime();
+                    unifiedEnd = currentSimulation.getEndDateTime();
+                }
+            }
+
+            // Agregar el último intervalo del roomId actual
+            timeSlots.add(TimeSlotDto.builder()
+                    .room(roomName)
+                    .startDateTime(dateFormat.format(unifiedStart))
+                    .endDateTime(dateFormat.format(unifiedEnd))
+                    .build());
+        }
+
         return timeSlots;
     }
 

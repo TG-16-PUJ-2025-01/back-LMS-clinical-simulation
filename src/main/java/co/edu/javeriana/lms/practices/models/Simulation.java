@@ -63,12 +63,6 @@ public class Simulation {
     @JoinColumn(name = "video_id")
     private Video video;
 
-    /*@ManyToMany
-    @JoinTable(name = "simulation_users", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
-    @JsonIgnore
-
-    private List<GroupPerSimulation> groups;*/
-
     @OneToOne
     @JoinColumn(nullable = true)
     private Rubric rubric;

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class TimeSlotDto {
+    private String room;
     private String startDateTime;
     private String endDateTime;
 }

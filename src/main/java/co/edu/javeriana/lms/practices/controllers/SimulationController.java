@@ -111,11 +111,11 @@ public class SimulationController {
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Simulation deleted successfully", null, null));
     }
 
-    @GetMapping("/room")
-    public ResponseEntity<ApiResponseDto<?>> getSimulationsByRoomId(@RequestParam Long roomId) {
-        log.info("Requesting simulations for room with id: {}", roomId);
+    @GetMapping("/schedule")
+    public ResponseEntity<ApiResponseDto<?>> getSchedule() {
+        log.info("Requesting simulations to show schedule");
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findRoomSimulationsSchedule(roomId), null));
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationsSchedule(), null));
     }
 
     @GetMapping("/{id}/users")

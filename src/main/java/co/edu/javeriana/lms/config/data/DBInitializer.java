@@ -256,6 +256,8 @@ public class DBInitializer implements CommandLineRunner {
 						.expirationDate(new Date()).duration(62L).size(8.3).build(),
 				Video.builder().name("10350-224234500_small.mp4").recordingDate(dateFormat.parse("2023-01-31"))
 						.expirationDate(new Date()).duration(600L).size(31.2).build(),
+				Video.builder().name("CCrit1-1__2025_03_03_18_25_12_Movie.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+						.expirationDate(new Date()).duration(600L).size(31.2).build(),
 				Video.builder().name("unavailable1.mp4").recordingDate(dateFormat.parse("2023-01-31"))
 						.expirationDate(new Date()).duration(210L).size(300.0).available(false).build(),
 				Video.builder().name("unavailable2.mp4").recordingDate(dateFormat.parse("2023-01-31"))
@@ -277,13 +279,19 @@ public class DBInitializer implements CommandLineRunner {
 
 		List<Video> newVideos = videoRepository.saveAll(videos);
 
-		Simulation simulation = Simulation.builder()
+		Simulation simulation1 = Simulation.builder()
 				.startDateTime(new Date())
 				.endDateTime(new Date())
 				.grade(4.5F).gradeStatus(null)
 				.video(newVideos.get(1)).room(roomRepository.findById(1L).get()).build();
+		Simulation simulation2 = Simulation.builder()
+				.startDateTime(new Date())
+				.endDateTime(new Date())
+				.grade(4.5F).gradeStatus(null)
+				.video(newVideos.get(2)).room(roomRepository.findById(2L).get()).build();
 
-		simulationRepository.save(simulation);
+		simulationRepository.save(simulation1);
+		simulationRepository.save(simulation2);
 	}
 
 	private void insertCoursesAndClasses() {

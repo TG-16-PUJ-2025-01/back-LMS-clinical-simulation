@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Example videos (NOT INCLUDED IN REPO)
+**/CCrit*.mp4

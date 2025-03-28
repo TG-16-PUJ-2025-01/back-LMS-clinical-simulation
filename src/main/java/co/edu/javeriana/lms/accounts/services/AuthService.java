@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import co.edu.javeriana.lms.accounts.dtos.LoginResponseDto;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.shared.services.JwtService;
@@ -26,7 +27,7 @@ public class AuthService {
     @Autowired
     private JwtService jwtService;
 
-    public String login(String email, String password) {
+    public LoginResponseDto login(String email, String password) {
         log.info("Logging in user: " + email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found")); 
@@ -36,7 +37,8 @@ public class AuthService {
         }
 
         String token = jwtService.generateToken(user);
-        return token;
+
+        return new LoginResponseDto(token, user.getRoles(), user.getPreferredRole());
     }
 
     public String changePassword(String token, String password, String newPassword) {

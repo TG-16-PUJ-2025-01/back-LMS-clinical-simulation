@@ -51,30 +51,27 @@ public class RubricTemplateService {
     private UserRepository userRepository;
 
     public Page<RubricTemplate> findAll(String filter, Integer page, Integer size, String sort, Boolean asc,
-            Boolean mine, Boolean archived, String userEmail) {
+            Boolean archived, String userEmail) {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         User creator = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Pageable pageable = PageRequest.of(page, size, sortOrder);
 
         // SI ES ADMIN ACA SE ENVIA TODO
-        for (Role role : creator.getRoles()) {
-            if (role.equals(Role.ADMIN)) {
-                return rubricTemplateRepository.findAllByTitleOrCreationDateContaining(filter, pageable);
-            }
-        }
-        // SI SOLO QUIERE VER SUS ARCHIVADOS
-        if (mine && archived)
-            return rubricTemplateRepository.findArchivedMineByTitleOrCreationDateContaining(filter, archived,
-                    creator.getId(), pageable);
-        // SI QUIERE VER TODOS LOS SUYOS
-        else if (mine && !archived)
-            return rubricTemplateRepository.findMineByTitleOrCreationDateContaining(filter, creator.getId(), pageable);
-        // SI QUIERE VER LOS DE OTROS Menos los archivados
-        else
-            return rubricTemplateRepository.findNotMineByTitleOrCreationDateContaining(filter, creator.getId(),
-                    pageable);
 
+        if (archived) {
+
+            if (creator.getRoles().contains(Role.ADMIN)) {
+                return rubricTemplateRepository.findArchivedByTitleOrCreationDateContaining(filter,
+                        pageable);
+            } else {
+                return rubricTemplateRepository.findArchivedMineByTitleOrCreationDateContaining(filter,
+                        creator.getId(), pageable);
+            }
+        } else {
+            return rubricTemplateRepository.findNotArchivedByTitleOrCreationDateContaining(filter,
+                    pageable);
+        }
     }
 
     public RubricTemplate findById(Long id) {
@@ -173,7 +170,7 @@ public class RubricTemplateService {
 
         rubricTemplate.getRubrics().forEach(rubric -> rubric.setRubricTemplate(null));
 
-        rubricTemplateRepository.save(rubricTemplate);  // Guardar los cambios en las rúbricas
+        rubricTemplateRepository.save(rubricTemplate); // Guardar los cambios en las rúbricas
 
         // Si cumple las condiciones, se elimina
         rubricTemplateRepository.deleteById(id);

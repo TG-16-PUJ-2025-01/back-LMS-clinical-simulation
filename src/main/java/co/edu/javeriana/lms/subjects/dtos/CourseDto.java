@@ -1,5 +1,8 @@
 package co.edu.javeriana.lms.subjects.dtos;
 
+import java.util.List;
+
+import co.edu.javeriana.lms.subjects.models.ClassModel;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -11,6 +14,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CourseDto {
+
+    private Long courseId;
+
     @NotNull(message = "Id Javeriana is required")
     @Positive(message = "Id Javeriana must be a positive number")
     private Long javerianaId;
@@ -21,4 +27,8 @@ public class CourseDto {
     @NotNull(message = "Coordinator ID is required")
     @Positive(message = "Coordinator ID must be a positive number")
     private Long coordinatorId;
+
+    private List<ClassModel> classes;
+
+
 }

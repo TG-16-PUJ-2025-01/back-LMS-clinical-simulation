@@ -200,4 +200,33 @@ public class ClassService {
         return classModel;
     }
 
+    public ClassModel updateMember(Long id, Long idMember, Role profesor) {
+        ClassModel classModel = classRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
+
+        User member = userRepository.findByInstitutionalId(idMember).get();
+
+        if(profesor.equals(Role.PROFESOR))
+        {
+            //si ya esta en la lista no se hace nada
+            if(classModel.getProfessors().contains(member))
+                return classModel;
+
+            classModel.getProfessors().add(member);
+            classModel.getStudents().remove(member);
+        }
+        else if(profesor.equals(Role.ESTUDIANTE))
+        {
+            //si ya esta en la lista no se hace nada
+            if(classModel.getStudents().contains(member))
+                return classModel;
+            classModel.getStudents().add(member);
+            classModel.getProfessors().remove(member);
+        }
+
+        classRepository.save(classModel);
+
+        return classModel;
+    }
+
 }

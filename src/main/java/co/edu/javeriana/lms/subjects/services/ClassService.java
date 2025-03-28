@@ -204,32 +204,19 @@ public class ClassService {
         return classRepository.findByProfessors_Id(userId);
     }
 
-    public List<ClassModel> findByProfessorIdAndFilters(Long userId, Integer year, Integer period, String keyword) {
-        List<ClassModel> classes = classRepository.findByProfessors_Id(userId);
-
-        if (year != null) {
-            classes = classes.stream()
-                    .filter(c -> c.getPeriod().startsWith(year.toString()))
-                    .toList();
+    public List<ClassModel> findByProfessorIdAndFilters(Long userId, Integer year, Integer period, String filter) {
+        String periodFilter = "";
+        if (year != null && period != null) {
+            periodFilter = year + "-" + period;
+        } else if (year != null) {
+            periodFilter = year.toString();
+        } else if (period != null) {
+            periodFilter = "-" + period;
         }
 
-        if (period != null) {
-            classes = classes.stream()
-                    .filter(c -> c.getPeriod().endsWith(period.toString()))
-                    .toList();
-        }
-
-        if (keyword != null && !keyword.isEmpty()) {
-            String lowerKeyword = keyword.toLowerCase();
-            classes = classes.stream()
-                    .filter(c -> c.getCourse().getName().toLowerCase().contains(lowerKeyword))
-                    .toList();
-        }
-
-        List<ClassModel> mutableClasses = new ArrayList<>(classes);
-        mutableClasses.sort((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod()));
-
-        return mutableClasses;
+        return classRepository.findByProfessors_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
+            userId, filter, periodFilter
+        );
     }
 
 }

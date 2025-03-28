@@ -264,10 +264,9 @@ public class ClassController {
 
         token = token.substring(7);
         log.info("Requesting main menu information for professor role");
-        log.info("Year requested: " + year);
-        log.info("Period requested: " + period);
 
         Long userId = authService.getUserIdByToken(token);
+        log.info("User ID: " + userId);
 
         List<ClassModel> classes = classService.findByProfessorIdAndFilters(userId, year, period, filter);
 

@@ -204,7 +204,7 @@ public class ClassService {
         return classRepository.findByProfessors_Id(userId);
     }
 
-    public List<ClassModel> findByProfessorIdAndFilters(Long userId, Integer year, Integer period) {
+    public List<ClassModel> findByProfessorIdAndFilters(Long userId, Integer year, Integer period, String keyword) {
         List<ClassModel> classes = classRepository.findByProfessors_Id(userId);
 
         if (year != null) {
@@ -216,6 +216,13 @@ public class ClassService {
         if (period != null) {
             classes = classes.stream()
                     .filter(c -> c.getPeriod().endsWith(period.toString()))
+                    .toList();
+        }
+
+        if (keyword != null && !keyword.isEmpty()) {
+            String lowerKeyword = keyword.toLowerCase();
+            classes = classes.stream()
+                    .filter(c -> c.getCourse().getName().toLowerCase().contains(lowerKeyword))
                     .toList();
         }
 

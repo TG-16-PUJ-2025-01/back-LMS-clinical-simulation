@@ -273,4 +273,23 @@ public class ClassController {
         return ResponseEntity
                 .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Classes retrieved successfully", classes, null));
     }
+
+    @GetMapping("/all/student")
+    public ResponseEntity<?> getClassesByStudent(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer period,
+            @RequestParam(defaultValue = "") String filter) {
+
+        token = token.substring(7);
+        log.info("Requesting main menu information for student role");
+
+        Long userId = authService.getUserIdByToken(token);
+        log.info("User ID: " + userId);
+
+        List<ClassModel> classes = classService.findByStudentIdAndFilters(userId, year, period, filter);
+
+        return ResponseEntity
+                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Classes retrieved successfully", classes, null));
+    }
 }

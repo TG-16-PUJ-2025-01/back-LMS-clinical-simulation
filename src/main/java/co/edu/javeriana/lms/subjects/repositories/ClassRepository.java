@@ -166,4 +166,9 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
             Long professorId,
             String keyword,
             String period);
+
+    List<ClassModel> findByStudents_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
+            Long studentId,
+            String keyword,
+            String period);
 }

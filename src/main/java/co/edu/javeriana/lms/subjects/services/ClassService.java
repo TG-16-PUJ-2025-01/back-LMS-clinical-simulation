@@ -219,4 +219,18 @@ public class ClassService {
         );
     }
 
+    public List<ClassModel> findByStudentIdAndFilters(Long userId, Integer year, Integer period, String filter) {
+        String periodFilter = "";
+        if (year != null && period != null) {
+            periodFilter = year + "-" + period;
+        } else if (year != null) {
+            periodFilter = year.toString();
+        } else if (period != null) {
+            periodFilter = "-" + period;
+        }
+
+        return classRepository.findByStudents_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
+            userId, filter, periodFilter
+        );
+    }
 }

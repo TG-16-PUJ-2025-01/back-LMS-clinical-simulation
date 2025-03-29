@@ -31,6 +31,11 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
 
     List<Simulation> findByStartDateTimeAfter(Date startDateTime);
 
+    List<Simulation> findByStartDateTimeBetween(Date startDateTime, Date endDateTime);
+
     List<Simulation> findByPracticeIn(List<Practice> practices);
+
+    @Query("SELECT MAX(s.groupNumber) FROM Simulation s WHERE s.practice.id = :practiceId")
+    Integer findMaxGroupNumberByPracticeId(@Param("practiceId") Long practiceId);
 
 }

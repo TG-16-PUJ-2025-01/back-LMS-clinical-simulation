@@ -128,6 +128,14 @@ public class SimulationService {
 
         GradeStatus gradeStatus = practice.getGradeable() ? GradeStatus.PENDING : GradeStatus.NOT_EVALUABLE;
 
+        Integer lastGroupNumber = simulationRepository.findMaxGroupNumberByPracticeId(practice.getId());
+
+        if (lastGroupNumber == null) {
+            lastGroupNumber = 0;
+        }
+
+        lastGroupNumber++;
+
         List<Simulation> createdSimulations = new ArrayList<>();
 
         while (simulationDto.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
@@ -142,12 +150,15 @@ public class SimulationService {
                     .gradeDateTime(null)
                     .gradeStatus(gradeStatus)
                     .grade(null)
+                    .groupNumber(lastGroupNumber)
                     .build();
             createdSimulations.add(simulation);
             simulationRepository.save(simulation);
             simulationDto.setStartDateTime(Date.from(simulationDto.getStartDateTime().toInstant()
                     .atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(duration)
                     .atZone(ZoneId.systemDefault()).toInstant()));
+
+            lastGroupNumber++;
         }
 
         return createdSimulations;
@@ -210,8 +221,11 @@ public class SimulationService {
         simulationRepository.save(simulation);
     }
 
-    public List<TimeSlotDto> findSimulationsSchedule() {
-        List<Simulation> simulations = simulationRepository.findByStartDateTimeAfter(new Date());
+    public List<TimeSlotDto> findSimulationsSchedule(String date) {
+        Date startDate = parseDate(date);
+        Date endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+
+        List<Simulation> simulations = simulationRepository.findByStartDateTimeBetween(startDate, endDate);
 
         List<TimeSlotDto> timeSlots = new ArrayList<>();
 
@@ -281,5 +295,14 @@ public class SimulationService {
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + simulationId));
 
         return simulation.getUsers();
+    }
+
+    private Date parseDate(String date) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            return dateFormat.parse(date);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format");
+        }
     }
 }

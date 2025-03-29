@@ -300,6 +300,7 @@ public class DBInitializer implements CommandLineRunner {
 			.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
 			.gradeStatus(GradeStatus.REGISTERED)
 			.grade(5.0f)
+			.groupNumber(1)
 			.build();
 
 			Simulation simulation2 = Simulation.builder()
@@ -310,6 +311,7 @@ public class DBInitializer implements CommandLineRunner {
 			.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
 			.gradeStatus(GradeStatus.REGISTERED)
 			.grade(5.0f)
+			.groupNumber(2)
 			.build();
 
 			Simulation simulation3 = Simulation.builder()
@@ -320,6 +322,7 @@ public class DBInitializer implements CommandLineRunner {
 			.gradeDateTime(Date.from(LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
 			.gradeStatus(GradeStatus.REGISTERED)
 			.grade(5.0f)
+			.groupNumber(3)
 			.build();
 
 

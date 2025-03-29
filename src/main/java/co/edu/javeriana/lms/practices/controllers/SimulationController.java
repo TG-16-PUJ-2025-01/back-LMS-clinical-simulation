@@ -112,10 +112,10 @@ public class SimulationController {
     }
 
     @GetMapping("/schedule")
-    public ResponseEntity<ApiResponseDto<?>> getSchedule() {
-        log.info("Requesting simulations to show schedule");
+    public ResponseEntity<ApiResponseDto<?>> getSchedule(@RequestParam String date) {
+        log.info("Requesting simulations to show schedule for date: {}", date);
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationsSchedule(), null));
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationsSchedule(date), null));
     }
 
     @GetMapping("/{id}/users")

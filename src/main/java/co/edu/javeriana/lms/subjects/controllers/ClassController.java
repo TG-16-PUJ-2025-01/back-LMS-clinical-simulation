@@ -258,7 +258,6 @@ public class ClassController {
         
     }
 
-
     @Valid
     @PostMapping("/add")
     public ResponseEntity<?> addClass(@Valid @RequestBody ClassDto classModel) {

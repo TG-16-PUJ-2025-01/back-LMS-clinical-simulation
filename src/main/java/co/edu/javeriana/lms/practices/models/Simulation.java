@@ -70,6 +70,9 @@ public class Simulation {
     @JoinColumn(nullable = true)
     private Rubric rubric;
 
+    @ManyToMany
+    @JoinTable(name = "simulation_users", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
+    @JsonIgnore
     private List<User> users;
 
     @ManyToMany

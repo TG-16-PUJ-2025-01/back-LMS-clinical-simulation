@@ -60,7 +60,9 @@ public class SimulationService {
     }
 
     public Page<Simulation> findSimulationsByPracticeId(Long practiceId, Integer page, Integer size) {
-        // TODO filtros
+        practiceRepository.findById(practiceId)
+                .orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + practiceId));
+        
         Pageable pageable = PageRequest.of(page, size);
         return simulationRepository.findByPracticeId(practiceId, pageable);
     }

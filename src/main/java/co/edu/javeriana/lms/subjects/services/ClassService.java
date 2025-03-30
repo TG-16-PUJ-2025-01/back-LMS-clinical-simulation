@@ -222,6 +222,7 @@ public class ClassService {
             userId, filter, periodFilter
         );
     }
+
     public ClassModel updateMember(Long id, Long idMember, Role role) {
         ClassModel classModel = classRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));

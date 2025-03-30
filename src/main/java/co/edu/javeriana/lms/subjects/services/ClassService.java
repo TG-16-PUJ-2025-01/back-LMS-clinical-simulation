@@ -189,6 +189,39 @@ public class ClassService {
         return classModel;
     }
 
+    public List<ClassModel> findByProfessorId(Long userId) {
+        return classRepository.findByProfessors_Id(userId);
+    }
+
+    public List<ClassModel> findByProfessorIdAndFilters(Long userId, Integer year, Integer period, String filter) {
+        String periodFilter = "";
+        if (year != null && period != null) {
+            periodFilter = year + "-" + period;
+        } else if (year != null) {
+            periodFilter = year.toString();
+        } else if (period != null) {
+            periodFilter = "-" + period;
+        }
+
+        return classRepository.findByProfessors_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
+            userId, filter, periodFilter
+        );
+    }
+
+    public List<ClassModel> findByStudentIdAndFilters(Long userId, Integer year, Integer period, String filter) {
+        String periodFilter = "";
+        if (year != null && period != null) {
+            periodFilter = year + "-" + period;
+        } else if (year != null) {
+            periodFilter = year.toString();
+        } else if (period != null) {
+            periodFilter = "-" + period;
+        }
+
+        return classRepository.findByStudents_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
+            userId, filter, periodFilter
+        );
+    }
     public ClassModel updateMember(Long id, Long idMember, Role role) {
         ClassModel classModel = classRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));

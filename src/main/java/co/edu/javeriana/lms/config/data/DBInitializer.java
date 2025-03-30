@@ -72,7 +72,7 @@ public class DBInitializer implements CommandLineRunner {
 		insertRoomsAndTypes();
 		createUsers();
 		insertSimulationsVideosAndComments();
-		insertCoursesAndClasses();
+		insertCoursesClassesAndStudents();
 		insertPractices();
 		insertSimulations();
 		insertRubricTemplates();
@@ -311,6 +311,12 @@ public class DBInitializer implements CommandLineRunner {
 		ClassModel class3 = new ClassModel("2023-1", userRepository.findAllProfessors(), course3, 14L,25);
 		ClassModel class4 = new ClassModel("2024-1", userRepository.findAllProfessors(), course3, 15L,22);
 		ClassModel class5 = new ClassModel("2025-1", userRepository.findAllProfessors(), course3, 16L,30);
+
+		class1.setStudents(Arrays.asList(userRepository.findById(10L).get(), userRepository.findById(11L).get()));
+		class2.setStudents(Arrays.asList(userRepository.findById(10L).get(), userRepository.findById(11L).get()));
+		class3.setStudents(Arrays.asList(userRepository.findById(11L).get()));
+		class4.setStudents(Arrays.asList(userRepository.findById(10L).get()));
+		class5.setStudents(Arrays.asList(userRepository.findById(10L).get()));
 
 		classRepository.save(class1);
 		classRepository.save(class2);

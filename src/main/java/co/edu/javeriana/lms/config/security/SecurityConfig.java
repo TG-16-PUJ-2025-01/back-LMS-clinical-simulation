@@ -77,6 +77,10 @@ public class SecurityConfig {
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name(), Role.COORDINADOR.name())
                         .requestMatchers("/class/add")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name(), Role.COORDINADOR.name())
+                        .requestMatchers("/class/all/professor")
+                        .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name(), Role.COORDINADOR.name())
+                        .requestMatchers("/class/all/student")
+                        .hasAnyAuthority(Role.ADMIN.name(), Role.ESTUDIANTE.name(), Role.COORDINADOR.name())
 
                         .requestMatchers("/rubric/**").hasAnyAuthority(Role.COORDINADOR.name(), Role.PROFESOR.name(),Role.ADMIN.name()) // Coordinador-only
 

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -59,12 +60,18 @@ public class SimulationService {
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
     }
 
-    public Page<Simulation> findSimulationsByPracticeId(Long practiceId, Integer page, Integer size) {
+    public Page<Simulation> findSimulationsByPracticeId(Long practiceId, Integer page, Integer size, String sort, Boolean asc, Integer groupNumber) {
         practiceRepository.findById(practiceId)
                 .orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + practiceId));
-        
-        Pageable pageable = PageRequest.of(page, size);
-        return simulationRepository.findByPracticeId(practiceId, pageable);
+
+        Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+
+        if (groupNumber == null) {
+            return simulationRepository.findByPracticeId(practiceId, pageable);
+        } else {
+            return simulationRepository.findByPracticeIdAndGroupNumber(practiceId, groupNumber, pageable);
+        }
     }
 
     @Transactional

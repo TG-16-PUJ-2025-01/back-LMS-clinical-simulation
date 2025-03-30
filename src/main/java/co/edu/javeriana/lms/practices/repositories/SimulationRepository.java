@@ -38,4 +38,8 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
     @Query("SELECT MAX(s.groupNumber) FROM Simulation s WHERE s.practice.id = :practiceId")
     Integer findMaxGroupNumberByPracticeId(@Param("practiceId") Long practiceId);
 
+    Page<Simulation> findByPracticeIdAndGroupNumberContaining(Long practiceId, String groupNumber, Pageable pageable);
+
+    Page<Simulation> findByPracticeIdAndGroupNumber(Long practiceId, Integer groupNumber, Pageable pageable);
+
 }

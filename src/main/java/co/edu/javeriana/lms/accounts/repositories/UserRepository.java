@@ -5,9 +5,11 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Repository;
 
 import co.edu.javeriana.lms.accounts.models.User;
@@ -32,4 +34,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Buscar todos los profesores
     @Query("SELECT u FROM User u JOIN u.roles r WHERE r = 'PROFESOR'")
     List<User> findAllProfessors();
+
+    @Query("SELECT u FROM User u WHERE u.institutionalId = :idMember")
+    Optional<User> findByInstitutionalId(@Param("idMember") Long idMember);
+    
 }

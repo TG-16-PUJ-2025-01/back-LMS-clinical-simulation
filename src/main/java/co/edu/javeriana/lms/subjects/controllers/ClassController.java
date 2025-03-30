@@ -248,6 +248,26 @@ public class ClassController {
     }
 
     @Valid
+    @PutMapping("/update/{id}/members/professor/{idProfessor}")
+    public ResponseEntity<?> updateClassProfessorMember(@PathVariable Long id, @PathVariable Long idProfessor) {
+        log.info("Updating class members with ID: " + id + " "+idProfessor);    
+        
+        return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
+                    "Class updated successfully.", classService.updateMember(id,idProfessor,Role.PROFESOR), null));
+        
+    }
+
+    @Valid
+    @PutMapping("/update/{id}/members/student/{idStudent}")
+    public ResponseEntity<?> updateClassStudentMember(@PathVariable Long id, @PathVariable Long idStudent) {
+        log.info("Updating class members with ID: " + id + " "+idStudent);    
+        return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
+                    "Class updated successfully.", classService.updateMember(id,idStudent,Role.ESTUDIANTE), null));
+        
+    }
+
+
+    @Valid
     @PostMapping("/add")
     public ResponseEntity<?> addClass(@Valid @RequestBody ClassDto classModel) {
 

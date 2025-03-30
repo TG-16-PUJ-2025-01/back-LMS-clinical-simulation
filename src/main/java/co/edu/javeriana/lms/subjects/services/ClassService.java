@@ -219,9 +219,7 @@ public class ClassService {
             if (member.getRoles().contains(Role.ESTUDIANTE)) {
                 classModel.getStudents().add(member);
                 classModel.getProfessors().remove(member);
-            }
-            else
-            {
+            } else {
                 //ERROR DE QUE NO ES ESTUDIANTE
                 throw new CustomError("El usuario no tiene rol estudiante", ErrorCode.CLASS_MEMBER_HAS_NO_ROLE);
             }

@@ -64,18 +64,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ErrorDto("Validation failed", errors), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorDto> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.warn("Business validation failed: {}", ex.getMessage());
-        ErrorDto errorDto = new ErrorDto(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
-    }
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         log.warn("Invalid request structure: {}", ex.getMessage());
 
         return new ResponseEntity<>(new ErrorDto("Request body error", "Invalid request structure: " + ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorDto> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.warn("Business validation failed: {}", ex.getMessage());
+        ErrorDto errorDto = new ErrorDto(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)

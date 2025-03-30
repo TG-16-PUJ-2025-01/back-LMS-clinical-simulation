@@ -49,6 +49,9 @@ public enum ErrorCode {
     CLASS_ERROR(71),
     CLASS_NOT_FOUND(710),
     CLASS_ALREADY_EXISTS(711),
+    CLASS_MEMBER_ERROR(72),
+    CLASS_MEMBER_NOT_FOUND(720),    
+    CLASS_MEMBER_HAS_NO_ROLE(721),
 
     // Video errors (starts with 8)
     VIDEO_ERROR(8),

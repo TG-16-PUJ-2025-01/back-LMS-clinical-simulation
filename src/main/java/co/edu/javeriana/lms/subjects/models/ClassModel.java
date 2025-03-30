@@ -27,11 +27,12 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ClassModel {
 
-    public ClassModel(String period, List<User> professor, Course course, Long javerianaId) {
+    public ClassModel(String period, List<User> professor, Course course, Long javerianaId, Integer numberOfParticipants) {
         this.period = period;
         this.professors = professor;
         this.course = course;
         this.javerianaId = javerianaId;
+        this.numberOfParticipants = numberOfParticipants;
     }
 
     @Id
@@ -43,6 +44,8 @@ public class ClassModel {
 
     @Column(nullable = false)
     private String period;
+
+    private Integer numberOfParticipants;
 
     @ManyToMany
     @JoinTable(name = "professor_classes", joinColumns = @JoinColumn(name = "classId"), inverseJoinColumns = @JoinColumn(name = "id"))  

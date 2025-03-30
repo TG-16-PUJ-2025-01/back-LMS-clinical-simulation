@@ -4,6 +4,9 @@ import org.springframework.stereotype.Repository;
 
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
+import co.edu.javeriana.lms.subjects.models.Course;
+
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -146,4 +149,16 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
         Page<User> findStudentsNotInClass(@Param("classId") Long classId, @Param("filter") String filter,
                 Pageable pageable);
 
+            
+
+            @Query("SELECT c FROM ClassModel c WHERE c.course = :course AND (LOWER(c.period) LIKE LOWER(CONCAT('%', :period, '%')))")
+            List<ClassModel> findClassesByCourseId(Course course, @Param("period") String period);
+
+
+            @Query("SELECT c FROM ClassModel c WHERE c.course = :course AND (LOWER(c.period) LIKE LOWER(CONCAT('%', :period, '%')) OR CAST(c.javerianaId AS string) LIKE %:filter% OR LOWER(c.period) LIKE LOWER(CONCAT('%', :filter, '%')))")
+            List<ClassModel> findClassesByCourseIdAndNameContaining(Course course, @Param("filter") String filter,  @Param("period") String period);
+
+            @Query("SELECT c FROM ClassModel c LEFT JOIN c.professors p WHERE c.course = :course AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :filter, '%')) OR LOWER(p.lastName) LIKE LOWER(CONCAT('%', :filter, '%')) OR p.institutionalId LIKE CONCAT('%', :filter, '%')  OR LOWER(c.period) LIKE LOWER(CONCAT('%', :filter, '%')))")
+            List<ClassModel> findClassesByCourseByProfessorContaining(Course course, @Param("filter") String filter, @Param("period") String period);
+        
 }

@@ -62,12 +62,11 @@ public class User implements UserDetails {
     private Role preferredRole;
 
     @ManyToMany
-    @JoinTable(name = "professor_classes", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "classId"))  
+    @JoinTable(name = "professor_classes", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "classId"))
     @JsonIgnore
     private List<ClassModel> professorClasses;
 
-
-    @OneToMany(mappedBy = "coordinator", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "coordinator", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Course> courses;
 

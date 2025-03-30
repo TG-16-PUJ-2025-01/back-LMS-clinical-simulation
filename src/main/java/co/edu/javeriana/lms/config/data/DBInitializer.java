@@ -294,7 +294,7 @@ public class DBInitializer implements CommandLineRunner {
 		simulationRepository.save(simulation2);
 	}
 
-	private void insertCoursesAndClasses() {
+	private void insertCoursesClassesAndStudents() {
 		Course course1 = new Course("Cálculo Diferencial", 123456L, userRepository.findById(1L).get(), "medicina", "medicina interna", "pregrado", 1);
 		Course course2 = new Course("Cálculo Integral", 123455L, userRepository.findById(3L).get(), "enfermeria", "medicina interna", "maestria", 2);
 		Course course3 = new Course("Cálculo Vectorial", 123454L, userRepository.findById(3L).get(), "medicina", "medicina critica", "doctorado", 3);

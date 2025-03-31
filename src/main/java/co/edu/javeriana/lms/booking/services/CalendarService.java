@@ -35,6 +35,19 @@ public class CalendarService {
 
     @Autowired
     private UserRepository userRepository;
+
+    public List<EventDto> searchAllEvents(Long idUser){
+        // Retrieve all simulations in the system
+        List<Simulation> simulations = simulationRepository.findAll();
+
+        if (simulations.isEmpty()) {
+            log.info("No simulations found. Returning an empty list.");
+            return new ArrayList<>();
+        }
+
+        log.info("Simulations found: {}", simulations.size());
+        return mapSimulationsToEventDtos(simulations);
+    }
     
     public List<EventDto> searchEvents(Long idUser) {
         // Retrieve user to ensure it exists and fetch simulations directly associated

@@ -38,4 +38,18 @@ public class CalendarController {
 
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Events retrieved successfully", realEvents, null));
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllEvents(@RequestHeader("Authorization") String token) {
+        token = token.substring(7);
+        log.info("Requesting all events for admin user with token: {}", token);
+
+        Long userId = authService.getUserIdByToken(token);
+        log.info("User admin ID found: " + userId);
+
+        // TODO: Fix method to retrieve all events FOR THE DAY
+        List<EventDto> realEvents = calendarService.searchAllEvents(userId);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Events retrieved successfully", realEvents, null));
+    }
 }

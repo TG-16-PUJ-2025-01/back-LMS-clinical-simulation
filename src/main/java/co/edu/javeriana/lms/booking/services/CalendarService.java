@@ -3,6 +3,9 @@ package co.edu.javeriana.lms.booking.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,17 +39,26 @@ public class CalendarService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<EventDto> searchAllEvents(Long idUser){
-        // Retrieve all simulations in the system
-        List<Simulation> simulations = simulationRepository.findAll();
+    public List<EventDto> searchAllEvents(Long idUser, String start, String end) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        try {
+            Date startDate = dateFormat.parse(start);
+            Date endDate = dateFormat.parse(end);
 
-        if (simulations.isEmpty()) {
-            log.info("No simulations found. Returning an empty list.");
-            return new ArrayList<>();
+            List<Simulation> simulations = simulationRepository.findByStartDateTimeBetween(startDate, endDate);
+
+            if (simulations.isEmpty()) {
+                log.info("No simulations found between {} and {}. Returning an empty list.", start, end);
+                return new ArrayList<>();
+            }
+
+            log.info("Number of simulations found between {} and {}: {}", start, end, simulations.size());
+            return mapSimulationsToEventDtos(simulations);
+
+        } catch (ParseException e) {
+            log.error("Error parsing dates: start={}, end={}", start, end, e);
+            throw new IllegalArgumentException("Invalid date format. Expected format: yyyy-MM-dd HH:mm");
         }
-
-        log.info("Simulations found: {}", simulations.size());
-        return mapSimulationsToEventDtos(simulations);
     }
     
     public List<EventDto> searchEvents(Long idUser) {

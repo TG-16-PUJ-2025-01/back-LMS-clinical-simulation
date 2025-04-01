@@ -42,4 +42,8 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
 
     Page<Simulation> findByPracticeIdAndGroupNumber(Long practiceId, Integer groupNumber, Pageable pageable);
 
+    List<Simulation> findByPracticeInAndStartDateTimeBetween(
+            List<Practice> practices,
+            Date startDate,
+            Date endDate);
 }

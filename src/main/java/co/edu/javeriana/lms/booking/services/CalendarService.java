@@ -60,75 +60,86 @@ public class CalendarService {
             throw new IllegalArgumentException("Invalid date format. Expected format: yyyy-MM-dd HH:mm");
         }
     }
-    
-    public List<EventDto> searchEvents(Long idUser) {
-        // Retrieve user to ensure it exists and fetch simulations directly associated
-        // with the user
-        User user = userRepository.findById(idUser)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + idUser));
 
-        List<Simulation> userSimulations = user.getSimulations();
-        log.info("Simulations found directly for user with id {}: {}", idUser, userSimulations.size());
+    public List<EventDto> searchEvents(Long idUser, String start, String end) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        try {
+            Date startDate = dateFormat.parse(start);
+            Date endDate = dateFormat.parse(end);
 
-        // Search classes where user is a professor
-        List<ClassModel> classes = classModelRepository.findByProfessors_Id(idUser);
-        if (classes.isEmpty()) {
-            log.info("No classes found for user with id: {}. Returning only direct simulations.", idUser);
-            if (userSimulations.isEmpty()) {
+            // Retrieve user to ensure it exists
+            User user = userRepository.findById(idUser)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + idUser));
+
+            // Fetch simulations directly associated with the user
+            List<Simulation> userSimulations = user.getSimulations();
+            log.info("Simulations found directly for user with id {}: {}", idUser, userSimulations.size());
+
+            // Search classes where user is a professor
+            List<ClassModel> classes = classModelRepository.findByProfessors_Id(idUser);
+            if (classes.isEmpty()) {
+                log.info("No classes found for user with id: {}. Returning only direct simulations.", idUser);
+                if (userSimulations.isEmpty()) {
+                    log.info("No simulations found between {} and {}. Returning an empty list.", start, end);
+                    return new ArrayList<>();
+                }
+                return mapSimulationsToEventDtos(userSimulations);
+            }
+
+            log.info("Classes found for user with id {}: {}", idUser, classes.size());
+
+            // Search practices associated with those classes
+            List<Practice> practices = practiceRepository.findByClassModelIn(classes);
+            if (practices.isEmpty()) {
+                log.info("No practices found for the classes of user with id: {}. Returning only direct simulations.",
+                        idUser);
+                if (userSimulations.isEmpty()) {
+                    log.info("No simulations found between {} and {}. Returning an empty list.", start, end);
+                    return new ArrayList<>();
+                }
+                return mapSimulationsToEventDtos(userSimulations);
+            }
+
+            log.info("Practices found for user with id {}: {}", idUser, practices.size());
+
+            // Search simulations associated with those practices and within the date range
+            List<Simulation> simulations = simulationRepository.findByPracticeInAndStartDateTimeBetween(practices, startDate, endDate);
+
+            simulations.addAll(userSimulations);
+
+            if (simulations.isEmpty()) {
                 log.info("No simulations found for user with id: {}. Returning an empty list.", idUser);
                 return new ArrayList<>();
             }
-            return mapSimulationsToEventDtos(userSimulations);
+
+            // Remove duplicates
+            List<Simulation> distinctSimulations = simulations.stream().distinct().collect(Collectors.toList());
+
+            return mapSimulationsToEventDtos(distinctSimulations);
+
+        } catch (ParseException e) {
+            log.error("Error parsing dates: start={}, end={}", start, end, e);
+            throw new IllegalArgumentException("Invalid date format. Expected format: yyyy-MM-dd HH:mm");
         }
-
-        log.info("Classes found for user with id {}: {}", idUser, classes.size());
-
-        // Search practices associated with those classes
-        List<Practice> practices = practiceRepository.findByClassModelIn(classes);
-        if (practices.isEmpty()) {
-            log.info("No practices found for the classes of user with id: {}. Returning only direct simulations.",
-                    idUser);
-            if (userSimulations.isEmpty()) {
-                log.info("No simulations found for user with id: {}. Returning an empty list.", idUser);
-                return new ArrayList<>();
-            }
-            return mapSimulationsToEventDtos(userSimulations);
-        }
-
-        log.info("Practices found for user with id {}: {}", idUser, practices.size());
-
-        // Search simulations associated with those practices
-        List<Simulation> simulations = simulationRepository.findByPracticeIn(practices);
-
-        simulations.addAll(userSimulations);
-
-        if (simulations.isEmpty()) {
-            log.info("No simulations found for user with id: {}. Returning an empty list.", idUser);
-            return new ArrayList<>();
-        }
-
-        // Remove duplicates
-        List<Simulation> distinctSimulations = simulations.stream().distinct().collect(Collectors.toList());
-
-        return mapSimulationsToEventDtos(distinctSimulations);
     }
 
     private String getRoomNames(List<Room> rooms) {
         return rooms != null && !rooms.isEmpty()
-            ? rooms.stream().map(Room::getName).collect(Collectors.joining(", "))
-            : "Sin sala";
+                ? rooms.stream().map(Room::getName).collect(Collectors.joining(", "))
+                : "Sin sala";
     }
 
     private List<EventDto> mapSimulationsToEventDtos(List<Simulation> simulations) {
         List<EventDto> eventsDtos = new ArrayList<>();
-        
+
         for (Simulation simulation : simulations) {
             Practice practice = simulation.getPractice();
             ClassModel classModel = practice.getClassModel();
             String calendarId = simulation.getPractice() == null ? "Supervisor" : "Reserva";
             EventDto eventDto = EventDto.builder()
                     .id(simulation.getSimulationId())
-                    .title(practice.getName() + " - " + classModel.getCourse().getName() + " - " + practice.getType().name())
+                    .title(practice.getName() + " - " + classModel.getCourse().getName() + " - "
+                            + practice.getType().name())
                     .description("Clase: " + classModel.getCourse().getName() + " - " + classModel.getJaverianaId())
                     .location(getRoomNames(simulation.getRooms()))
                     .start(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(

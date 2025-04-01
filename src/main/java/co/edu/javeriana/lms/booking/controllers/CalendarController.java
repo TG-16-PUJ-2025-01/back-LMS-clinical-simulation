@@ -28,13 +28,13 @@ public class CalendarController {
     private CalendarService calendarService;
 
     @GetMapping("")
-    public ResponseEntity<?> getEvents(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getEvents(@RequestHeader("Authorization") String token, @RequestParam String start, @RequestParam String end) {
         token = token.substring(7);
         log.info("Requesting events for user with token: {}", token);
 
         Long userId = authService.getUserIdByToken(token);
 
-        List<EventDto> realEvents = calendarService.searchEvents(userId);
+        List<EventDto> realEvents = calendarService.searchEvents(userId, start, end);
 
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Events retrieved successfully", realEvents, null));
     }

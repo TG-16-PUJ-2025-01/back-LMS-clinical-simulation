@@ -46,4 +46,9 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
             List<Practice> practices,
             Date startDate,
             Date endDate);
+
+    List<Simulation> findByUsers_IdAndStartDateTimeBetween(
+            Long userId,
+            Date startDate,
+            Date endDate);
 }

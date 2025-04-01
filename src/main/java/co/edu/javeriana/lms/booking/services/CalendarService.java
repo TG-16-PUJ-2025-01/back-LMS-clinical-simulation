@@ -3,12 +3,13 @@ package co.edu.javeriana.lms.booking.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.Simulation;
@@ -16,12 +17,9 @@ import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
 import lombok.extern.slf4j.Slf4j;
 import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
 import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
-import co.edu.javeriana.lms.accounts.models.User;
-import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 
 import co.edu.javeriana.lms.booking.dtos.EventDto;
 import co.edu.javeriana.lms.booking.models.Room;
-import jakarta.persistence.EntityNotFoundException;
 
 @Slf4j
 @Service
@@ -36,90 +34,77 @@ public class CalendarService {
     @Autowired
     private SimulationRepository simulationRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
     public List<EventDto> searchAllEvents(Long idUser, String start, String end) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        try {
-            Date startDate = dateFormat.parse(start);
-            Date endDate = dateFormat.parse(end);
+        Date startDate = parseDate(start, "yyyy-MM-dd HH:mm");
+        Date endDate = parseDate(end, "yyyy-MM-dd HH:mm");
 
-            List<Simulation> simulations = simulationRepository.findByStartDateTimeBetween(startDate, endDate);
+        List<Simulation> simulations = simulationRepository.findByStartDateTimeBetween(startDate, endDate);
 
-            if (simulations.isEmpty()) {
-                log.info("No simulations found between {} and {}. Returning an empty list.", start, end);
-                return new ArrayList<>();
-            }
-
-            log.info("Number of simulations found between {} and {}: {}", start, end, simulations.size());
-            return mapSimulationsToEventDtos(simulations);
-
-        } catch (ParseException e) {
-            log.error("Error parsing dates: start={}, end={}", start, end, e);
-            throw new IllegalArgumentException("Invalid date format. Expected format: yyyy-MM-dd HH:mm");
+        if (simulations.isEmpty()) {
+            log.info("No simulations found between {} and {}. Returning an empty list.", start, end);
+            return new ArrayList<>();
         }
+
+        log.info("Number of simulations found between {} and {}: {}", start, end, simulations.size());
+        return mapSimulationsToEventDtos(simulations);
     }
 
     public List<EventDto> searchEvents(Long idUser, String start, String end) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        try {
-            Date startDate = dateFormat.parse(start);
-            Date endDate = dateFormat.parse(end);
+        Date startDate = parseDate(start, "yyyy-MM-dd HH:mm");
+        Date endDate = parseDate(end, "yyyy-MM-dd HH:mm");
 
-            // Retrieve user to ensure it exists
-            User user = userRepository.findById(idUser)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + idUser));
+        // Fetch simulations directly associated with the user and within the date range
+        List<Simulation> userSimulations = simulationRepository.findByUsers_IdAndStartDateTimeBetween(idUser, startDate, endDate);
+        log.info("Simulations found directly for user with id {}: {}", idUser, userSimulations.size());
 
-            // Fetch simulations directly associated with the user
-            List<Simulation> userSimulations = user.getSimulations();
-            log.info("Simulations found directly for user with id {}: {}", idUser, userSimulations.size());
-
-            // Search classes where user is a professor
-            List<ClassModel> classes = classModelRepository.findByProfessors_Id(idUser);
-            if (classes.isEmpty()) {
-                log.info("No classes found for user with id: {}. Returning only direct simulations.", idUser);
-                if (userSimulations.isEmpty()) {
-                    log.info("No simulations found between {} and {}. Returning an empty list.", start, end);
-                    return new ArrayList<>();
-                }
-                return mapSimulationsToEventDtos(userSimulations);
-            }
-
-            log.info("Classes found for user with id {}: {}", idUser, classes.size());
-
-            // Search practices associated with those classes
-            List<Practice> practices = practiceRepository.findByClassModelIn(classes);
-            if (practices.isEmpty()) {
-                log.info("No practices found for the classes of user with id: {}. Returning only direct simulations.",
-                        idUser);
-                if (userSimulations.isEmpty()) {
-                    log.info("No simulations found between {} and {}. Returning an empty list.", start, end);
-                    return new ArrayList<>();
-                }
-                return mapSimulationsToEventDtos(userSimulations);
-            }
-
-            log.info("Practices found for user with id {}: {}", idUser, practices.size());
-
-            // Search simulations associated with those practices and within the date range
-            List<Simulation> simulations = simulationRepository.findByPracticeInAndStartDateTimeBetween(practices, startDate, endDate);
-
-            simulations.addAll(userSimulations);
-
-            if (simulations.isEmpty()) {
-                log.info("No simulations found for user with id: {}. Returning an empty list.", idUser);
+        // Search classes where user is a professor
+        List<ClassModel> classes = classModelRepository.findByProfessors_Id(idUser);
+        if (classes.isEmpty()) {
+            if (userSimulations.isEmpty()) {
+                log.info("No simulations found between {} and {}. Returning an empty list.", start, end);
                 return new ArrayList<>();
             }
+            return mapSimulationsToEventDtos(userSimulations);
+        }
 
-            // Remove duplicates
-            List<Simulation> distinctSimulations = simulations.stream().distinct().collect(Collectors.toList());
+        log.info("Classes found for user with id {}: {}", idUser, classes.size());
 
-            return mapSimulationsToEventDtos(distinctSimulations);
+        // Search practices associated with those classes
+        List<Practice> practices = practiceRepository.findByClassModelIn(classes);
+        if (practices.isEmpty()) {
+            if (userSimulations.isEmpty()) {
+                log.info("No simulations found between {} and {}. Returning an empty list.", start, end);
+                return new ArrayList<>();
+            }
+            log.info("Number of simulations found between {} and {}: {}", start, end, userSimulations.size());
+            return mapSimulationsToEventDtos(userSimulations);
+        }
 
-        } catch (ParseException e) {
-            log.error("Error parsing dates: start={}, end={}", start, end, e);
-            throw new IllegalArgumentException("Invalid date format. Expected format: yyyy-MM-dd HH:mm");
+        log.info("Practices found for user with id {}: {}", idUser, practices.size());
+
+        // Search simulations associated with those practices and within the date range
+        List<Simulation> simulations = simulationRepository.findByPracticeInAndStartDateTimeBetween(practices, startDate, endDate);
+
+        simulations.addAll(userSimulations);
+
+        if (simulations.isEmpty()) {
+            log.info("No simulations found between {} and {}. Returning an empty list.", start, end);
+            return new ArrayList<>();
+        }
+
+        // Remove duplicates
+        List<Simulation> distinctSimulations = simulations.stream().distinct().collect(Collectors.toList());
+
+        log.info("Number of simulations found between {} and {}: {}", start, end, distinctSimulations.size());
+        return mapSimulationsToEventDtos(distinctSimulations);
+    }
+
+    private Date parseDate(String date, String format) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+            return dateFormat.parse(date);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Expected format: " + format);
         }
     }
 

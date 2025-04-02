@@ -299,18 +299,21 @@ public class DBInitializer implements CommandLineRunner {
 		Course course2 = new Course("Cálculo Integral", 123455L, userRepository.findById(3L).get(), "enfermeria", "medicina interna", "maestria", 2);
 		Course course3 = new Course("Cálculo Vectorial", 123454L, userRepository.findById(3L).get(), "medicina", "medicina critica", "doctorado", 3);
 		Course course4 = new Course("Cálculo 3", 1232234L, userRepository.findById(3L).get(), "odontologia", "medicina familiar", "pregrado", 4);
+		Course course5 = new Course("Simulación 1", 1232235L, userRepository.findById(9L).get(), "odontologia", "medicina familiar", "pregrado", 4);
 
 	
 		courseRepository.save(course1);
 		courseRepository.save(course2);
 		courseRepository.save(course3);
 		courseRepository.save(course4);
+		courseRepository.save(course5);
 
 		ClassModel class1 = new ClassModel("2024-1", userRepository.findAllProfessors(), course2, 12L, 20);
 		ClassModel class2 = new ClassModel("2026-1", userRepository.findAllProfessors(), course3, 13L,21);
 		ClassModel class3 = new ClassModel("2023-1", userRepository.findAllProfessors(), course3, 14L,25);
 		ClassModel class4 = new ClassModel("2024-1", userRepository.findAllProfessors(), course3, 15L,22);
 		ClassModel class5 = new ClassModel("2025-1", userRepository.findAllProfessors(), course3, 16L,30);
+		ClassModel class6 = new ClassModel("2025-1", userRepository.findAllProfessors(), course5, 17L,30);
 
 		class1.setStudents(Arrays.asList(userRepository.findById(10L).get(), userRepository.findById(11L).get()));
 		class2.setStudents(Arrays.asList(userRepository.findById(10L).get(), userRepository.findById(11L).get()));
@@ -323,6 +326,7 @@ public class DBInitializer implements CommandLineRunner {
 		classRepository.save(class3);
 		classRepository.save(class4);
 		classRepository.save(class5);
+		classRepository.save(class6);
 	}
 
 	private void insertPractices() {

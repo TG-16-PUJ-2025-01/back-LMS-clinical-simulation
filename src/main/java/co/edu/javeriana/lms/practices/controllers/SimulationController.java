@@ -69,12 +69,16 @@ public class SimulationController {
     }
 
     @GetMapping("/practice/{practiceId}")
-    public ResponseEntity<ApiResponseDto<?>> getSimulationsByPracticeId(@PathVariable Long practiceId,
+    public ResponseEntity<ApiResponseDto<?>> getSimulationsByPracticeId(
+            @PathVariable Long practiceId,
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
-            @Min(1) @RequestParam(defaultValue = "10") Integer size) {
-        log.info("Requesting simulations for practice with id: {}", practiceId);
+            @Min(1) @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "simulationId") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(required = false) Integer groupNumber) {
+        log.info("Requesting simulations for practice with id: {}, groupNumber: {}", practiceId, groupNumber);
 
-        Page<Simulation> simulationsPage = simulationService.findSimulationsByPracticeId(practiceId, page, size);
+        Page<Simulation> simulationsPage = simulationService.findSimulationsByPracticeId(practiceId, page, size, sort, asc, groupNumber);
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),
                 simulationsPage.getTotalElements(), simulationsPage.getTotalPages());

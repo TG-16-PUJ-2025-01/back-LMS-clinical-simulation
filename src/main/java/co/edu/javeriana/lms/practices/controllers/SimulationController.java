@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
-import co.edu.javeriana.lms.practices.dtos.SimulationDto;
 import co.edu.javeriana.lms.practices.dtos.CreateSimulationRequestDto;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.services.SimulationService;
@@ -96,7 +95,7 @@ public class SimulationController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDto<?>> updateSimulation(@PathVariable Long id,
-            @Valid @RequestBody SimulationDto simulationDto) {
+            @Valid @RequestBody SimulationByTimeSlotDto simulationDto) {
         log.info("Updating simulation with id: {}", id);
 
         Simulation simulation = simulationService.updateSimulation(id, simulationDto);

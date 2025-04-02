@@ -20,7 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
-import co.edu.javeriana.lms.practices.dtos.SimulationDto;
 import co.edu.javeriana.lms.practices.dtos.TimeSlotDto;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.Simulation;
@@ -164,12 +163,9 @@ public class SimulationService {
         return createdSimulations;
     }
 
-    public Simulation updateSimulation(Long id, SimulationDto simulationDto) {
+    public Simulation updateSimulation(Long id, SimulationByTimeSlotDto simulationDto) {
         Simulation existingSimulation = simulationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
-
-        Practice practice = practiceRepository.findById(simulationDto.getPracticeId()).orElseThrow(
-                () -> new EntityNotFoundException("Practice not found with id: " + simulationDto.getPracticeId()));
 
         List<Room> rooms = new ArrayList<>();
 
@@ -189,19 +185,15 @@ public class SimulationService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Room is not available for the selected dates");
             }
 
-            if (practice.getMaxStudentsGroup() > room.getCapacity()) {
+            if (existingSimulation.getPractice().getMaxStudentsGroup() > room.getCapacity()) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Room capacity is not enough for the selected practice");
             }
         }
 
-        existingSimulation.setPractice(practice);
         existingSimulation.setRooms(rooms);
         existingSimulation.setStartDateTime(simulationDto.getStartDateTime());
         existingSimulation.setEndDateTime(simulationDto.getEndDateTime());
-        existingSimulation.setGradeDateTime(simulationDto.getGradeDateTime());
-        existingSimulation.setGradeStatus(simulationDto.getGradeStatus());
-        existingSimulation.setGrade(simulationDto.getGrade());
         return simulationRepository.save(existingSimulation);
     }
 

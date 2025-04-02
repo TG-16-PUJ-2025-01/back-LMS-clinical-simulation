@@ -39,10 +39,10 @@ public class Simulation {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long simulationId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Date startDateTime;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Date endDateTime;
 
     @Column(nullable = true)
@@ -70,10 +70,12 @@ public class Simulation {
     @JoinColumn(nullable = true)
     private Rubric rubric;
 
+    @ManyToMany
+    @JoinTable(name = "simulation_users", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
+    @JsonIgnore
     private List<User> users;
 
     @ManyToMany
     @JoinTable(name = "simulation_rooms", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
-    @JsonIgnore
     private List<Room> rooms;
 }

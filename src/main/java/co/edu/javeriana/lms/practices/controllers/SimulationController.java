@@ -5,13 +5,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
-import co.edu.javeriana.lms.practices.dtos.SimulationDto;
 import co.edu.javeriana.lms.practices.dtos.CreateSimulationRequestDto;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.services.SimulationService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +40,10 @@ public class SimulationController {
     @GetMapping("/all")
     public ResponseEntity<ApiResponseDto<?>> getAllSimulations(
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
-            @Min(1) @RequestParam(defaultValue = "10") Integer size) {
+            @Min(1) @RequestParam(defaultValue = "10") Integer size,
+            HttpServletRequest request) {
         log.info("Requesting all simulations");
+
 
         Page<Simulation> simulationsPage = simulationService.findAllSimulations(page, size);
 
@@ -67,12 +69,16 @@ public class SimulationController {
     }
 
     @GetMapping("/practice/{practiceId}")
-    public ResponseEntity<ApiResponseDto<?>> getSimulationsByPracticeId(@PathVariable Long practiceId,
+    public ResponseEntity<ApiResponseDto<?>> getSimulationsByPracticeId(
+            @PathVariable Long practiceId,
             @Min(0) @RequestParam(defaultValue = "0") Integer page,
-            @Min(1) @RequestParam(defaultValue = "10") Integer size) {
-        log.info("Requesting simulations for practice with id: {}", practiceId);
+            @Min(1) @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "simulationId") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(required = false) Integer groupNumber) {
+        log.info("Requesting simulations for practice with id: {}, groupNumber: {}", practiceId, groupNumber);
 
-        Page<Simulation> simulationsPage = simulationService.findSimulationsByPracticeId(practiceId, page, size);
+        Page<Simulation> simulationsPage = simulationService.findSimulationsByPracticeId(practiceId, page, size, sort, asc, groupNumber);
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),
                 simulationsPage.getTotalElements(), simulationsPage.getTotalPages());
@@ -93,7 +99,7 @@ public class SimulationController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDto<?>> updateSimulation(@PathVariable Long id,
-            @Valid @RequestBody SimulationDto simulationDto) {
+            @Valid @RequestBody SimulationByTimeSlotDto simulationDto) {
         log.info("Updating simulation with id: {}", id);
 
         Simulation simulation = simulationService.updateSimulation(id, simulationDto);
@@ -106,5 +112,19 @@ public class SimulationController {
 
         simulationService.deleteSimulationById(id);
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Simulation deleted successfully", null, null));
+    }
+
+    @GetMapping("/schedule")
+    public ResponseEntity<ApiResponseDto<?>> getSchedule(@RequestParam String date) {
+        log.info("Requesting simulations to show schedule for date: {}", date);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationsSchedule(date), null));
+    }
+
+    @GetMapping("/{id}/users")
+    public ResponseEntity<ApiResponseDto<?>> getSimulationStudents(@PathVariable Long id) {
+        log.info("Requesting simulation students with id: {}", id);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationStudents(id), null));
     }
 }

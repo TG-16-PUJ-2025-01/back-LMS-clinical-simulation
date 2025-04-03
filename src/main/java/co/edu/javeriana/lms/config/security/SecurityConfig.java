@@ -89,8 +89,8 @@ public class SecurityConfig {
                         .requestMatchers("/reset-password/**").permitAll() // Public endpoint
                         .requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())// Authenticated endpoint
                         .requestMatchers("/room/**").hasAuthority(Role.ADMIN.name())
-                        .requestMatchers("/practice/**")
-                        .hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name(), Role.PROFESOR.name())
+                        .requestMatchers("/practice/class/**").hasAuthority(Role.ESTUDIANTE.name())
+                        .requestMatchers("/practice/**").hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name(), Role.PROFESOR.name())
                         .anyRequest().permitAll())
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {

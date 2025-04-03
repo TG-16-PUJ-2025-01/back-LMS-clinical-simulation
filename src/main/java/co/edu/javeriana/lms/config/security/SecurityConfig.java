@@ -67,7 +67,8 @@ public class SecurityConfig {
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name(), Role.COORDINADOR.name())
                         .requestMatchers("/class/update/{id}")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name(), Role.COORDINADOR.name())
-                        .requestMatchers("/class/delete/{id}").hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name())
+                        .requestMatchers("/class/delete/{id}")
+                        .hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name())
                         .requestMatchers("/class/{id}/member/all").authenticated()
                         .requestMatchers("/class/{id}/member/all/outside")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name(), Role.COORDINADOR.name())
@@ -82,13 +83,17 @@ public class SecurityConfig {
                         .requestMatchers("/class/all/student")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.ESTUDIANTE.name(), Role.COORDINADOR.name())
 
-                        .requestMatchers("/rubric/**").hasAnyAuthority(Role.COORDINADOR.name(), Role.PROFESOR.name(),Role.ADMIN.name()) // Coordinador-only
+                        .requestMatchers("/rubric/**")
+                        .hasAnyAuthority(Role.COORDINADOR.name(), Role.PROFESOR.name(), Role.ADMIN.name()) // Coordinador-only
 
                         .requestMatchers("/auth/login").permitAll() // Public endpoint
                         .requestMatchers("/auth/change-password").authenticated() // Authenticated endpoint
                         .requestMatchers("/reset-password/**").permitAll() // Public endpoint
                         .requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())// Authenticated endpoint
                         .requestMatchers("/room/**").hasAuthority(Role.ADMIN.name())
+                        .requestMatchers("/practice/class/**")
+                        .hasAnyAuthority(Role.ESTUDIANTE.name(), Role.ADMIN.name(), Role.COORDINADOR.name(),
+                                Role.PROFESOR.name())
                         .requestMatchers("/practice/**")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name(), Role.PROFESOR.name())
                         .anyRequest().permitAll())

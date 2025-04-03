@@ -18,6 +18,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -37,10 +39,10 @@ public class Simulation {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long simulationId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Date startDateTime;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Date endDateTime;
 
     @Column(nullable = true)
@@ -53,8 +55,8 @@ public class Simulation {
     @Column(nullable = true)
     private Date gradeDateTime;
 
-    @Column(nullable = true)
-    private Integer groupId;
+    @Column(nullable = false)
+    private Integer groupNumber;
 
     @ManyToOne
     @JsonIgnore
@@ -64,21 +66,16 @@ public class Simulation {
     @JoinColumn(name = "video_id")
     private Video video;
 
-    /*@ManyToMany
-    @JoinTable(name = "simulation_users", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
-    @JsonIgnore
-
-    private List<GroupPerSimulation> groups;*/
-
     @OneToOne
     @JoinColumn(nullable = true)
     private Rubric rubric;
 
+    @ManyToMany
+    @JoinTable(name = "simulation_users", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
+    @JsonIgnore
     private List<User> users;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    @JsonIgnore
-    private Room room;
-
+    @ManyToMany
+    @JoinTable(name = "simulation_rooms", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
+    private List<Room> rooms;
 }

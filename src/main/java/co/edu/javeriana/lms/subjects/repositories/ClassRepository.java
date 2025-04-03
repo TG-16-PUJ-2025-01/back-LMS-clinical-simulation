@@ -149,7 +149,7 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
     Page<User> findStudentsNotInClass(@Param("classId") Long classId, @Param("filter") String filter,
             Pageable pageable);
 
-    List<ClassModel> findByProfessors_Id(Long userId);
+    List<ClassModel> findByProfessors_Id(Long professorId);
 
     @Query("SELECT c FROM ClassModel c WHERE c.course = :course AND (LOWER(c.period) LIKE LOWER(CONCAT('%', :period, '%')))")
     List<ClassModel> findClassesByCourseId(Course course, @Param("period") String period);

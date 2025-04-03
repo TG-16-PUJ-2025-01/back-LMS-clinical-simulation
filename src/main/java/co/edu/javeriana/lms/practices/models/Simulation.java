@@ -53,6 +53,9 @@ public class Simulation {
     @Column(nullable = true)
     private Date gradeDateTime;
 
+    @Column(nullable = true)
+    private Integer groupId;
+
     @ManyToOne
     @JsonIgnore
     private Practice practice;

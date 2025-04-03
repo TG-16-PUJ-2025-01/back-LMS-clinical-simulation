@@ -144,7 +144,7 @@ public class ClassService {
         
         ClassModel classModel = new ClassModel(entity.getPeriod(),
                 professors,
-                courseRepository.findById(entity.getCourseId()).get(), entity.getJaverianaId());
+                courseRepository.findById(entity.getCourseId()).get(), entity.getJaverianaId(), entity.getNumberOfParticipants());
        
        // log.info("unicornio aa2 "+ classModel.getJaverianaId(), classModel.getName(), classModel.getBeginningDate(), classModel.getProfessor().getName(), classModel.getCourse().getCourseId());
 
@@ -174,7 +174,7 @@ public class ClassService {
         // Update fields
         currentClassModel.setPeriod(classModeldto.getPeriod());
         currentClassModel.setCourse(courseRepository.findById(classModeldto.getCourseId()).get());
-
+        currentClassModel.setNumberOfParticipants(classModeldto.getNumberOfParticipants());
         return currentClassModel;
     }
 
@@ -197,6 +197,68 @@ public class ClassService {
 
         classRepository.save(classModel);
         
+        return classModel;
+    }
+
+    public List<ClassModel> findByProfessorId(Long userId) {
+        return classRepository.findByProfessors_Id(userId);
+    }
+
+    public List<ClassModel> findByProfessorIdAndFilters(Long userId, Integer year, Integer period, String filter) {
+        String periodFilter = "";
+        if (year != null && period != null) {
+            periodFilter = year + "-" + period;
+        } else if (year != null) {
+            periodFilter = year.toString();
+        } else if (period != null) {
+            periodFilter = "-" + period;
+        }
+
+        return classRepository.findByProfessors_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
+            userId, filter, periodFilter
+        );
+    }
+
+    public List<ClassModel> findByStudentIdAndFilters(Long userId, Integer year, Integer period, String filter) {
+        String periodFilter = "";
+        if (year != null && period != null) {
+            periodFilter = year + "-" + period;
+        } else if (year != null) {
+            periodFilter = year.toString();
+        } else if (period != null) {
+            periodFilter = "-" + period;
+        }
+
+        return classRepository.findByStudents_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
+            userId, filter, periodFilter
+        );
+    }
+    public ClassModel updateMember(Long id, Long idMember, Role profesor) {
+        ClassModel classModel = classRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
+
+        User member = userRepository.findByInstitutionalId(idMember).get();
+
+        if(profesor.equals(Role.PROFESOR))
+        {
+            //si ya esta en la lista no se hace nada
+            if(classModel.getProfessors().contains(member))
+                return classModel;
+
+            classModel.getProfessors().add(member);
+            classModel.getStudents().remove(member);
+        }
+        else if(profesor.equals(Role.ESTUDIANTE))
+        {
+            //si ya esta en la lista no se hace nada
+            if(classModel.getStudents().contains(member))
+                return classModel;
+            classModel.getStudents().add(member);
+            classModel.getProfessors().remove(member);
+        }
+
+        classRepository.save(classModel);
+
         return classModel;
     }
 

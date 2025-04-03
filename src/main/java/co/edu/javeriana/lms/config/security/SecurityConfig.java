@@ -58,7 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/course/delete/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
                         .requestMatchers("/course/add/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
                         .requestMatchers("/course/update/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
-                        .requestMatchers("/course/all").hasAuthority(Role.ADMIN.name()) // Coordinador-only
+                        .requestMatchers("/course/all").hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name()) // Coordinador-only
                         .requestMatchers("/course/{id}").hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name()) // Coordinador-only
 
                         .requestMatchers("/class/all").hasAnyAuthority(Role.ADMIN.name())
@@ -77,6 +77,10 @@ public class SecurityConfig {
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name(), Role.COORDINADOR.name())
                         .requestMatchers("/class/add")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name(), Role.COORDINADOR.name())
+                        .requestMatchers("/class/all/professor")
+                        .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name(), Role.COORDINADOR.name())
+                        .requestMatchers("/class/all/student")
+                        .hasAnyAuthority(Role.ADMIN.name(), Role.ESTUDIANTE.name(), Role.COORDINADOR.name())
 
                         .requestMatchers("/rubric/**").hasAnyAuthority(Role.COORDINADOR.name(), Role.PROFESOR.name(),Role.ADMIN.name()) // Coordinador-only
 

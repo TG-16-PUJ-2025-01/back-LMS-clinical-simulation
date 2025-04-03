@@ -1,5 +1,7 @@
 package co.edu.javeriana.lms.subjects.services;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.subjects.dtos.CourseDto;
+import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
 import co.edu.javeriana.lms.subjects.repositories.CourseRepository;
@@ -85,6 +88,57 @@ public class CourseService {
 
         // log.info("Updating course with ID: " + currentCourseModel);
         return currentCourseModel;
+    }
+
+    public List<CourseDto> findAllCoordinatorCourses(String filter, String sort, Boolean asc, String email,
+            String searsearchByKey, String period) {
+        User coordinator = userRepository.findByEmail(email).get();
+
+        // Obtener los cursos del coordinador
+
+        List<Course> coordinatorCourses = new ArrayList<>();
+
+        log.info("Searching by key: " + searsearchByKey + " and filter: " + filter+ " and period: " + period);
+
+        if (searsearchByKey.isEmpty() || searsearchByKey.equals("Clases") || searsearchByKey.equals("Profesores")) {
+            coordinatorCourses = courseRepository.findCoursesByCoordinator(coordinator);
+        } else {
+            coordinatorCourses = courseRepository.findCoursesByCoordinatorAndNameContaining(coordinator, filter);
+        }
+
+        List<CourseDto> courses = new ArrayList<>();
+
+        for (Course course : coordinatorCourses) {
+
+            List<ClassModel> sortedClasses = new ArrayList<>();
+            // Buscar las clases del curs o y ordenarlas por periodo de mayor a menor
+            if (searsearchByKey.isEmpty() || searsearchByKey.equals("Asignaturas")) {
+                sortedClasses = classRepository.findClassesByCourseId(course, period); // Convertir el stream en lista
+
+            } else if (searsearchByKey.equals("Clases")) {
+                sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter, period); // Convertir el                                                                                          // lista
+            } else {
+                sortedClasses = classRepository.findClassesByCourseByProfessorContaining(course, filter,period); // Convertir
+                                                                                                          // el stream                                                                                             // en lista
+            }
+
+            // Crear un CourseDto con las clases ordenadas
+            courses.add(new CourseDto(course.getCourseId(), course.getJaverianaId(), course.getName(),
+                    course.getCoordinator().getId(), sortedClasses.stream()
+                            .sorted((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod())) // Ordenar por periodo (mayor
+                                                                                          // a menor)
+                            .toList()));
+
+        }
+
+        // log.info("Courses found: " + courses.toString());
+
+        // enviar el resultado de mayor a menos numero de clases encontradas
+        return courses.stream()
+                .sorted((c1, c2) -> Integer.compare(c2.getClasses().size(), c1.getClasses().size())) // Ordenar por
+                                                                                                     // periodo (mayor a
+                                                                                                     // menor)
+                .toList();
     }
 
 }

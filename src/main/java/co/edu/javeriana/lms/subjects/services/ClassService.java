@@ -214,9 +214,14 @@ public class ClassService {
             periodFilter = "-" + period;
         }
 
-        return classRepository.findByProfessors_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
+        List<ClassModel> classes = classRepository.findByProfessors_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
             userId, filter, periodFilter
         );
+
+        // Sort by period in descending order
+        classes.sort((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod()));
+
+        return classes;
     }
 
     public List<ClassModel> findByStudentIdAndFilters(Long userId, Integer year, Integer period, String filter) {
@@ -229,9 +234,14 @@ public class ClassService {
             periodFilter = "-" + period;
         }
 
-        return classRepository.findByStudents_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
+        List<ClassModel> classes = classRepository.findByStudents_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
             userId, filter, periodFilter
         );
+
+        // Sort by period in descending order
+        classes.sort((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod()));
+
+        return classes;
     }
     public ClassModel updateMember(Long id, Long idMember, Role profesor) {
         ClassModel classModel = classRepository.findById(id)

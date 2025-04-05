@@ -296,11 +296,11 @@ public class DBInitializer implements CommandLineRunner {
 		courseRepository.save(course3);
 		courseRepository.save(course4);
 
-		ClassModel class1 = new ClassModel("2024-1", userRepository.findAllProfessors(), course2, 12L, 20);
-		ClassModel class2 = new ClassModel("2026-1", userRepository.findAllProfessors(), course3, 13L,21);
-		ClassModel class3 = new ClassModel("2023-1", userRepository.findAllProfessors(), course3, 14L,25);
-		ClassModel class4 = new ClassModel("2024-1", userRepository.findAllProfessors(), course3, 15L,22);
-		ClassModel class5 = new ClassModel("2025-1", userRepository.findAllProfessors(), course3, 16L,30);
+		ClassModel class1 = new ClassModel("2024-10", userRepository.findAllProfessors(), course2, 12L, 20);
+		ClassModel class2 = new ClassModel("2026-10", userRepository.findAllProfessors(), course3, 13L,21);
+		ClassModel class3 = new ClassModel("2023-10", userRepository.findAllProfessors(), course3, 14L,25);
+		ClassModel class4 = new ClassModel("2024-10", userRepository.findAllProfessors(), course3, 15L,22);
+		ClassModel class5 = new ClassModel("2025-10", userRepository.findAllProfessors(), course3, 16L,30);
 
 		class1.setStudents(Arrays.asList(userRepository.findById(10L).get(), userRepository.findById(11L).get()));
 		class2.setStudents(Arrays.asList(userRepository.findById(10L).get(), userRepository.findById(11L).get()));

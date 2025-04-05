@@ -68,7 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/class/update/{id}")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name(), Role.COORDINADOR.name())
                         .requestMatchers("/class/delete/{id}")
-                        .hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name())
+                        .hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name(), Role.PROFESOR.name())
                         .requestMatchers("/class/{id}/member/all").authenticated()
                         .requestMatchers("/class/{id}/member/all/outside")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name(), Role.COORDINADOR.name())

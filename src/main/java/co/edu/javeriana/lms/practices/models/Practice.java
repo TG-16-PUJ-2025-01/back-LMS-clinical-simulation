@@ -69,7 +69,6 @@ public class Practice {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    @JsonIgnore
     private ClassModel classModel;
 
    /* @OneToMany(mappedBy = "practice")

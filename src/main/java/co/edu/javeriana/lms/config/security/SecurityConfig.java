@@ -89,10 +89,7 @@ public class SecurityConfig {
                         .requestMatchers("/reset-password/**").permitAll() // Public endpoint
                         .requestMatchers("/user/preferred-role").authenticated()// Authenticated endpoint
                         .requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())// Authenticated endpoint
-                        .requestMatchers("/room/**").hasAuthority(Role.ADMIN.name())
-                        .requestMatchers("/practice/class/**")
-                        .hasAnyAuthority(Role.ESTUDIANTE.name(), Role.ADMIN.name(), Role.COORDINADOR.name(),
-                                Role.PROFESOR.name())
+                        .requestMatchers("/room/**").permitAll()
                         .requestMatchers("/practice/**")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name(), Role.PROFESOR.name())
                         .anyRequest().authenticated())

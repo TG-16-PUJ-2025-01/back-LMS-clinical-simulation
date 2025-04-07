@@ -36,6 +36,10 @@ public class Rubric {
     @Column(columnDefinition = "jsonb")
     private List<EvaluatedCriteria> evaluatedCriterias;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private EvaluatedCriteria total;
+
     @ManyToOne
     @JoinColumn(nullable = true)
     private RubricTemplate rubricTemplate;

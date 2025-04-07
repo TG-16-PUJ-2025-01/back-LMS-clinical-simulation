@@ -18,6 +18,9 @@ public class RubricDto {
     @Valid
     private List<EvaluatedCriteriaDto> evaluatedCriterias;
 
+    @Valid
+    private EvaluatedCriteriaDto total;
+
     @NotNull(message = "rubricTemplateId is required")
     private Long rubricTemplateId;
 
@@ -29,6 +32,7 @@ public class RubricDto {
         rubric.setEvaluatedCriterias(this.evaluatedCriterias.stream().map(EvaluatedCriteriaDto::toEvaluatedCriteria).toList());
         rubric.setSimulation(Simulation.builder().simulationId(this.simulationId).build());
         rubric.setRubricTemplate(RubricTemplate.builder().rubricTemplateId(this.rubricTemplateId).build());
+        rubric.setTotal(this.total.toEvaluatedCriteria());
         return rubric;
     }
 }

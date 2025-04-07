@@ -172,7 +172,7 @@ public class RubricTemplateController {
 
         // return the suggested rubrics if the practice is part of a chosen course
         @GetMapping("/recommended/{idPractice}")
-        public ResponseEntity<?> getRecommendedRubricTemplatesByCoursesById(@PathVariable Long idPractice) {
+        public ResponseEntity<?> getRecommendedRubricTemplatesByPracticeId(@PathVariable Long idPractice) {
                 log.info("Requesting suggested rubric templates with practice ID: " + idPractice);
 
                 List<RubricTemplate> rubricTemplates = rubricTemplateService

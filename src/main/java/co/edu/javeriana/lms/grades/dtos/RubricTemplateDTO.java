@@ -4,7 +4,6 @@ import java.util.List;
 
 import co.edu.javeriana.lms.grades.models.Criteria;
 import co.edu.javeriana.lms.grades.models.RubricColumn;
-import io.micrometer.common.lang.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,9 +20,7 @@ public class RubricTemplateDTO {
     private List<Criteria> criteria;
     @NotNull(message = "columns is required")
     private List<RubricColumn> columns;
-    @Nullable
     private List<Long> courses;
-    @Nullable
     private Long practiceId;
     @NotNull(message = "archived is required")
     Boolean archived;

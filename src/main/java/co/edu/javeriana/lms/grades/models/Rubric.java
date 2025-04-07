@@ -33,35 +33,35 @@ public class Rubric {
     private Long rubricId;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb") 
+    @Column(columnDefinition = "jsonb")
     private List<EvaluatedCriteria> evaluatedCriterias;
 
     @ManyToOne
     @JoinColumn(nullable = true)
     private RubricTemplate rubricTemplate;
-    
+
     @OneToOne
     @JoinColumn(nullable = false)
     @JsonIgnore
     private Simulation simulation;
 
     public void changeEvaluatedCriteria(List<Criteria> previousCriterias) {
-        
-        //Comparar entre previousCriteria y evaluatedCriterias
-        //Si el id es igual se sabe que se debe dejar, de lo contrario
-        //se debe eliminar el evaluatedCriteria
+
+        // Comparar entre previousCriteria y evaluatedCriterias
+        // Si el id es igual se sabe que se debe dejar, de lo contrario
+        // se debe eliminar el evaluatedCriteria
 
         for (EvaluatedCriteria evaluatedCriteria : evaluatedCriterias) {
-            
+
             boolean found = false;
 
             for (Criteria previousCriteria : previousCriterias) {
-                if(evaluatedCriteria.getId().equals(previousCriteria.getId())){
+                if (evaluatedCriteria.getId().equals(previousCriteria.getId())) {
                     found = true;
                 }
             }
 
-            if(!found){
+            if (!found) {
                 this.evaluatedCriterias.remove(evaluatedCriteria);
             }
 

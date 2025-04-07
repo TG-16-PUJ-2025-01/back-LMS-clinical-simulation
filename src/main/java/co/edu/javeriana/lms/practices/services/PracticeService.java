@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import co.edu.javeriana.lms.grades.models.RubricTemplate;
+import co.edu.javeriana.lms.grades.repositories.RubricTemplateRepository;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
@@ -25,6 +27,9 @@ public class PracticeService {
 
     @Autowired
     private ClassRepository classRepository;
+
+    @Autowired
+    private RubricTemplateRepository rubricTemplateRepository;
 
     public Page<Practice> findAll(String keyword, Integer page, Integer size, String sort, Boolean asc) {
         Sort sortOder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
@@ -74,5 +79,18 @@ public class PracticeService {
         List<Practice> practices = practiceRepository.findByClassModel_ClassId(classId, Sort.by(Sort.Direction.ASC, "id"));
 
         return practices;
+    }
+
+    public Practice updateRubric(Long id, Long rubricId) {
+        Practice existingPractice = practiceRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + id));
+        
+        RubricTemplate rubric = rubricTemplateRepository.findById(rubricId)
+                .orElseThrow(() -> new EntityNotFoundException("Rubric not found with id: " + rubricId));
+
+        existingPractice.setRubricTemplate(rubric);
+        practiceRepository.save(existingPractice);
+
+        return existingPractice;
     }
 }

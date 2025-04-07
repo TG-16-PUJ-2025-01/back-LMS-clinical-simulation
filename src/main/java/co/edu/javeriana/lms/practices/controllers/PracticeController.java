@@ -97,4 +97,13 @@ public class PracticeController {
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice deleted successfully", null, null));
     }
 
+    @PutMapping("/{id}/rubric/{rubricId}")
+    public ResponseEntity<ApiResponseDto<?>> updatePracticeRubric(@PathVariable Long id, @PathVariable Long rubricId) {
+        log.info("Updating rubric for practice with id: {}", id);
+
+        Practice updatedPractice = practiceService.updateRubric(id, rubricId);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice rubric updated successfully", updatedPractice, null));
+    }
+
 }

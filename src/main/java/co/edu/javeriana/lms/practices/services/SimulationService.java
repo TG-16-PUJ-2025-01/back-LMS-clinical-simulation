@@ -306,4 +306,39 @@ public class SimulationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format");
         }
     }
+
+    public void joinSimulation(Long id, Long userId) {
+        //TODO: Check the capacity of the group before adding the user
+        //TODO: Check if the user is already in the simulation
+        //TODO: Check if the simulation already happened
+        Simulation simulation = simulationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        if (simulation.getUsers().contains(user)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already joined the simulation");
+        }
+
+        simulation.getPractice().getMaxStudentsGroup();
+
+        if (simulation.getUsers().size() >= simulation.getPractice().getMaxStudentsGroup()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Simulation is full");
+        }
+
+        if (simulation.getStartDateTime() != null && simulation.getEndDateTime() != null) {
+            Date now = new Date();
+            if (now.after(simulation.getStartDateTime()) && now.before(simulation.getEndDateTime())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Simulation is already in progress");
+            }
+        }
+
+        if (simulation.getGradeStatus() == GradeStatus.REGISTERED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Simulation is already graded");
+        }
+
+        simulation.getUsers().add(user);
+        simulationRepository.save(simulation);
+    }
 }

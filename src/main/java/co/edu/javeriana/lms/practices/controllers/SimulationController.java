@@ -5,12 +5,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
+import co.edu.javeriana.lms.accounts.services.AuthService;
 import co.edu.javeriana.lms.practices.dtos.CreateSimulationRequestDto;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.services.SimulationService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import co.edu.javeriana.lms.shared.dtos.PaginationMetadataDto;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -36,6 +39,9 @@ public class SimulationController {
 
     @Autowired
     private SimulationService simulationService;
+
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponseDto<?>> getAllSimulations(
@@ -126,5 +132,17 @@ public class SimulationController {
         log.info("Requesting simulation students with id: {}", id);
 
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationStudents(id), null));
+    }
+
+    @PostMapping("/{id}/join")
+    public ResponseEntity<ApiResponseDto<?>> joinSimulation(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+        log.info("Requesting to join simulation with id: {}", id);
+
+        Long userId = authService.getUserIdByToken(token);
+
+        // Join the simulation
+        simulationService.joinSimulation(id, userId);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", null, null));
     }
 }

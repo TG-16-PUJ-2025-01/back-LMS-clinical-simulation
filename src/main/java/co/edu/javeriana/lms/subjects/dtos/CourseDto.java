@@ -30,17 +30,5 @@ public class CourseDto {
 
     private List<ClassModel> classes;
 
-    @NotNull(message = "faculty is required")
-    private String faculty;
-
-    @NotNull(message = "department is required")
-    private String department;
-
-    @NotNull(message = "program is required")
-    private String program;
-
-    @NotNull(message = "semester is required")
-    @Positive(message = "semester must be a positive number")
-    private Integer semester;
 
 }

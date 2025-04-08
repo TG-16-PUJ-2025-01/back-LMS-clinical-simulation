@@ -17,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import co.edu.javeriana.lms.shared.dtos.ErrorDto;
 import co.edu.javeriana.lms.shared.dtos.ValidationErrorDto;
-import co.edu.javeriana.lms.shared.errors.CustomError;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +35,7 @@ public class GlobalExceptionHandler {
 
         log.info("Validation failed: {}", errors);
 
-        return new ResponseEntity<>(new ErrorDto("Validation failed", errors, null), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Validation failed", errors), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BindException.class)
@@ -49,7 +48,7 @@ public class GlobalExceptionHandler {
 
         log.info("Validation failed: {}", errors);
 
-        return new ResponseEntity<>(new ErrorDto("Validation failed", errors,null), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Validation failed", errors), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(WebExchangeBindException.class)
@@ -62,14 +61,7 @@ public class GlobalExceptionHandler {
 
         log.info("Validation failed: {}", errors);
 
-        return new ResponseEntity<>(new ErrorDto("Validation failed", errors,null), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        log.warn("Invalid request structure: {}", ex.getMessage());
-
-        return new ResponseEntity<>(new ErrorDto("Request body error", "Invalid request structure: " + ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Validation failed", errors), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -79,38 +71,38 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        log.warn("Invalid request structure: {}", ex.getMessage());
+
+        return new ResponseEntity<>(new ErrorDto("Request body error", "Invalid request structure: " + ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
         log.warn("Entity not found: {}", ex.getMessage());
 
-        return new ResponseEntity<>(new ErrorDto("Entity not found", ex.getMessage(),null), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new ErrorDto("Entity not found", ex.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         log.warn("Invalid data or duplicate entry: {}", ex.getMostSpecificCause().getMessage());
 
-        return new ResponseEntity<>(new ErrorDto("Invalid data or duplicate entry", ex.getMostSpecificCause().getMessage(),null), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(new ErrorDto("Invalid data or duplicate entry", ex.getMostSpecificCause().getMessage()), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
         log.warn("Validation failed: {}", ex.getMessage());
 
-        return new ResponseEntity<>(new ErrorDto("Validation failed", ex.getMessage(),null), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Validation failed", ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex) {
         log.warn("Response status exception: {}", ex.getMessage());
 
-        return new ResponseEntity<>(new ErrorDto("Response status exception", ex.getMessage(),null), ex.getStatusCode());
-    }
-
-    @ExceptionHandler(CustomError.class)
-    public ResponseEntity<Object> handleCustomError(CustomError ex) {
-        log.warn("CUSTOM ERROR: {}", ex.getMessage());
-
-        return new ResponseEntity<>(new ErrorDto("Response status exception", ex.getMessage(),ex.getCode()),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorDto("Response status exception", ex.getMessage()), ex.getStatusCode());
     }
 }

@@ -136,9 +136,12 @@ public class SimulationController {
 
     @PostMapping("/{id}/join")
     public ResponseEntity<ApiResponseDto<?>> joinSimulation(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+        token = token.substring(7);
         log.info("Requesting to join simulation with id: {}", id);
 
         Long userId = authService.getUserIdByToken(token);
+
+        log.info("User ID: {}", userId);
 
         // Join the simulation
         simulationService.joinSimulation(id, userId);

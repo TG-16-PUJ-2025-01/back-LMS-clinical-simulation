@@ -350,7 +350,7 @@ public class DBInitializer implements CommandLineRunner {
 			.startDateTime(Date.from(startDateTime.atZone(ZoneId.systemDefault()).toInstant()))
 			.endDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
 			.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
-			.gradeStatus(GradeStatus.REGISTERED)
+			.gradeStatus(GradeStatus.PENDING)
 			.grade(5.0f)
 			.groupNumber(1)
 			.build();
@@ -361,7 +361,7 @@ public class DBInitializer implements CommandLineRunner {
 			.startDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
 			.endDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
 			.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
-			.gradeStatus(GradeStatus.REGISTERED)
+			.gradeStatus(GradeStatus.PENDING)
 			.grade(5.0f)
 			.groupNumber(2)
 			.build();

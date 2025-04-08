@@ -97,4 +97,10 @@ public class PracticeController {
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice deleted successfully", null, null));
     }
 
+    @GetMapping("/{id}/enroled")
+    public ResponseEntity<ApiResponseDto<?>> getEnroledStudents(@PathVariable Long id) {
+        
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", null, null));
+    }
+
 }

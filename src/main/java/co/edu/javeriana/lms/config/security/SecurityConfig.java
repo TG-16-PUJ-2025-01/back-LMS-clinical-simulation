@@ -94,6 +94,9 @@ public class SecurityConfig {
                         .requestMatchers("/practice/class/**")
                         .hasAnyAuthority(Role.ESTUDIANTE.name(), Role.ADMIN.name(), Role.COORDINADOR.name(),
                                 Role.PROFESOR.name())
+                        .requestMatchers("/practice/{id}/enrolled")
+                        .hasAnyAuthority(Role.ESTUDIANTE.name(), Role.ADMIN.name(), Role.COORDINADOR.name(),
+                                Role.PROFESOR.name()) // Ensure ESTUDIANTE role is included
                         .requestMatchers("/practice/**")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name(), Role.PROFESOR.name())
                         .anyRequest().permitAll())

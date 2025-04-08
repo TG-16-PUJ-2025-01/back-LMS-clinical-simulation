@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.javeriana.lms.accounts.services.AuthService;
 import co.edu.javeriana.lms.practices.dtos.PracticeDto;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.services.PracticeService;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @Slf4j
 @RestController
@@ -33,6 +35,9 @@ public class PracticeController {
 
     @Autowired
     private PracticeService practiceService;
+
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponseDto<?>> getAllPractices(
@@ -97,10 +102,17 @@ public class PracticeController {
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice deleted successfully", null, null));
     }
 
-    @GetMapping("/{id}/enroled")
-    public ResponseEntity<ApiResponseDto<?>> getEnroledStudents(@PathVariable Long id) {
+    @GetMapping("/{id}/enrolled")
+    public ResponseEntity<ApiResponseDto<?>> getEnroledSimulation(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+        log.info("Requesting enroled simulation with id: {}", id);
+
+        token = token.substring(7);
+
+        Long userId = authService.getUserIdByToken(token);
+
+        Long simulationId = practiceService.getEnroledSimulation(id, userId);
         
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", null, null));
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationId, null));
     }
 
 }

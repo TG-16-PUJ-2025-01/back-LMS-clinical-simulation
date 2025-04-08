@@ -16,6 +16,9 @@ import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
+import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.practices.models.Simulation;
+
 @Slf4j
 @Service
 public class PracticeService {
@@ -74,5 +77,22 @@ public class PracticeService {
         List<Practice> practices = practiceRepository.findByClassModel_ClassId(classId, Sort.by(Sort.Direction.ASC, "id"));
 
         return practices;
+    }
+
+    public Long getEnroledSimulation(Long practiceId, Long userId) {
+        Practice practice = practiceRepository.findById(practiceId)
+                .orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + practiceId));
+
+        // Iterate through simulations to find the one where the user is enrolled
+        for (Simulation simulation : practice.getSimulations()) {
+            for (User user : simulation.getUsers()) {
+                if (user.getId().equals(userId)) {
+                    return simulation.getSimulationId();
+                }
+            }
+        }
+
+        // Return null if no simulation is found
+        return null;
     }
 }

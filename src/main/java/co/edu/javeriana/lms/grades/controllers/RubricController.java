@@ -28,9 +28,8 @@ public class RubricController {
     private RubricService rubricService;
     
     //editar rubrica
-    @Valid
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateRubricCriterias(@RequestBody List<EvaluatedCriteria> evaluatedCriterias, @PathVariable Long id) {
+    public ResponseEntity<?> updateRubricCriterias(@Valid @RequestBody List<EvaluatedCriteria> evaluatedCriterias, @PathVariable Long id) {
         log.info("Updating rubric with ID: " + id);
 
         Rubric rubricUpdated = rubricService.update(evaluatedCriterias, id);

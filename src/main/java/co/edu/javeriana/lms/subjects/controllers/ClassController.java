@@ -247,7 +247,6 @@ public class ClassController {
 
     }
 
-    @Valid
     @PutMapping("/update/{id}/members/professor/{idProfessor}")
     public ResponseEntity<?> updateClassProfessorMember(@PathVariable Long id, @PathVariable Long idProfessor) {
         log.info("Updating class members with ID: " + id + " "+idProfessor);    
@@ -257,7 +256,6 @@ public class ClassController {
         
     }
 
-    @Valid
     @PutMapping("/update/{id}/members/student/{idStudent}")
     public ResponseEntity<?> updateClassStudentMember(@PathVariable Long id, @PathVariable Long idStudent) {
         log.info("Updating class members with ID: " + id + " "+idStudent);    
@@ -265,7 +263,6 @@ public class ClassController {
                     "Class updated successfully.", classService.updateMember(id,idStudent,Role.ESTUDIANTE), null));
         
     }
-
 
     @Valid
     @PostMapping("/add")

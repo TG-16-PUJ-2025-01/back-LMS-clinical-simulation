@@ -82,18 +82,17 @@ public class SecurityConfig {
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name(), Role.COORDINADOR.name())
                         .requestMatchers("/class/all/student")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.ESTUDIANTE.name(), Role.COORDINADOR.name())
-
                         .requestMatchers("/rubric/**")
                         .hasAnyAuthority(Role.COORDINADOR.name(), Role.PROFESOR.name(), Role.ADMIN.name()) // Coordinador-only
-
                         .requestMatchers("/auth/login").permitAll() // Public endpoint
                         .requestMatchers("/auth/change-password").authenticated() // Authenticated endpoint
                         .requestMatchers("/reset-password/**").permitAll() // Public endpoint
+                        .requestMatchers("/user/preferred-role").authenticated()// Authenticated endpoint
                         .requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())// Authenticated endpoint
                         .requestMatchers("/room/**").permitAll()
                         .requestMatchers("/practice/**")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name(), Role.PROFESOR.name())
-                        .anyRequest().permitAll())
+                        .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

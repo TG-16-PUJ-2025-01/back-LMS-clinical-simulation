@@ -59,7 +59,8 @@ public class SimulationService {
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
     }
 
-    public Page<Simulation> findSimulationsByPracticeId(Long practiceId, Integer page, Integer size, String sort, Boolean asc, Integer groupNumber) {
+    public Page<Simulation> findSimulationsByPracticeId(Long practiceId, Integer page, Integer size, String sort,
+            Boolean asc, Integer groupNumber) {
         practiceRepository.findById(practiceId)
                 .orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + practiceId));
 
@@ -308,37 +309,58 @@ public class SimulationService {
     }
 
     public void joinSimulation(Long id, Long userId) {
-        //TODO: Check the capacity of the group before adding the user
-        //TODO: Check if the user is already in the simulation
-        //TODO: Check if the simulation already happened
+        // Check if the simulation exists
         Simulation simulation = simulationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
 
+        // Check if the user exists
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
+        // Check if the user is not already enrolled in the simulation
         if (simulation.getUsers().contains(user)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already joined the simulation");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already enrolled in the simulation, cannot join group");
         }
 
-        simulation.getPractice().getMaxStudentsGroup();
-
+        // Check if the simulation is not full
         if (simulation.getUsers().size() >= simulation.getPractice().getMaxStudentsGroup()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Simulation is full");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Simulation is full, cannot join group");
         }
 
+        // Check if the simulation has not already started
         if (simulation.getStartDateTime() != null && simulation.getEndDateTime() != null) {
             Date now = new Date();
             if (now.after(simulation.getStartDateTime()) && now.before(simulation.getEndDateTime())) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Simulation is already in progress");
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Simulation is in progress, cannot join group");
             }
         }
 
-        if (simulation.getGradeStatus() == GradeStatus.REGISTERED) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Simulation is already graded");
+        // Check if the simulation already happened
+        if (simulation.getEndDateTime() != null) {
+            Date now = new Date();
+            if (now.after(simulation.getEndDateTime())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Simulation has already happened, cannot join group");
+            }
         }
 
+        // Check if the simulation is already graded
+        if (simulation.getGradeStatus() == GradeStatus.REGISTERED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Simulation is already graded, cannot join group");
+        }
+
+        // Check if the user is already enrolled on another simulation
+        simulation.getPractice().getSimulations().forEach(s -> {
+            if (s.getUsers().contains(user)) {
+                // Remove the user from the simulation
+                s.getUsers().remove(user);
+                simulationRepository.save(s);
+                log.info("User {} removed from simulation {}", user.getId(), s.getSimulationId());
+            }
+        });
+
+        // Add the user to the simulation
         simulation.getUsers().add(user);
         simulationRepository.save(simulation);
+        log.info("User {} added to simulation {}", user.getId(), simulation.getSimulationId());
     }
 }

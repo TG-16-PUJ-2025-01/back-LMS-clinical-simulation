@@ -141,8 +141,6 @@ public class SimulationController {
 
         Long userId = authService.getUserIdByToken(token);
 
-        log.info("User ID: {}", userId);
-
         // Join the simulation
         simulationService.joinSimulation(id, userId);
 

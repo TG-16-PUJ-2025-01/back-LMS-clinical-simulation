@@ -140,8 +140,12 @@ public class ClassService {
         // log.info("unicornio aa2 "+ classModel.getJaverianaId(), classModel.getName(),
         // classModel.getBeginningDate(), classModel.getProfessor().getName(),
         // classModel.getCourse().getCourseId());
+        try {
+            classRepository.save(classModel);
+        } catch (EntityNotFoundException e) {
+            throw new CustomError("El usuario no tiene rol estudiante", ErrorCode.CLASS_MEMBER_HAS_NO_ROLE);
 
-        classRepository.save(classModel);
+        }
 
         return classModel;
     }
@@ -190,6 +194,7 @@ public class ClassService {
     }
 
     public ClassModel updateMember(Long id, Long idMember, Role role) {
+
         ClassModel classModel = classRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
 

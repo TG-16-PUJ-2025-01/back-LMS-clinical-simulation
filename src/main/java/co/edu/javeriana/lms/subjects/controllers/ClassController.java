@@ -124,6 +124,7 @@ public class ClassController {
             @RequestParam(defaultValue = "true") Boolean asc,
             @RequestParam(defaultValue = "") String filter,
             @PathVariable Long id) {
+        
         log.info("Requesting all members out of the class");
 
         Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id, "");
@@ -190,7 +191,6 @@ public class ClassController {
         }
 
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(), "ok", classModel, null));
-
     }
 
     @DeleteMapping("/delete/{id}")

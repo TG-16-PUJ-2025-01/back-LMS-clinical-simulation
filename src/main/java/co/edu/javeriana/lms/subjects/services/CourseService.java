@@ -63,8 +63,7 @@ public class CourseService {
         }
 
         Course newCourse = new Course(course.getName(), course.getJaverianaId(),
-                userRepository.findById(course.getCoordinatorId()).get(), course.getFaculty(), course.getDepartment(),
-                course.getProgram(), course.getSemester());
+                userRepository.findById(course.getCoordinatorId()).get());
 
         courseRepository.save(newCourse);
         return newCourse;
@@ -126,9 +125,9 @@ public class CourseService {
             // Crear un CourseDto con las clases ordenadas
             courses.add(new CourseDto(course.getCourseId(), course.getJaverianaId(), course.getName(),
                     course.getCoordinator().getId(), sortedClasses.stream()
-                            .sorted((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod())) // Ordenar por periodo (mayor                                                          // a menor)
-                            .toList(), course.getFaculty(), course.getDepartment(), course.getProgram(),
-                    course.getSemester()));
+                            .sorted((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod())) // Ordenar por periodo (mayor
+                                                                                          // a menor)
+                            .toList()));
 
         }
 

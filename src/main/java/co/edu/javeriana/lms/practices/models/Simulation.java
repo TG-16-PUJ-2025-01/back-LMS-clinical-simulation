@@ -59,6 +59,7 @@ public class Simulation {
     private Integer groupNumber;
 
     @ManyToOne
+    @JsonIgnore
     private Practice practice;
 
     @OneToOne

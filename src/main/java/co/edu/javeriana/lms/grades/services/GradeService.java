@@ -2,6 +2,7 @@ package co.edu.javeriana.lms.grades.services;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class GradeService {
         }
     
         // Paso 2: Map de estudianteId -> DTO con notas
-        Map<Long, StudentGradeDto> studentGradesMap = new HashMap<>();
+        Map<String, StudentGradeDto> studentGradesMap = new HashMap<>();
     
         // Paso 3: Procesar simulaciones con nota
         for (Simulation simulation : simulations) {
@@ -58,10 +59,10 @@ public class GradeService {
             if (gradePercentage == null) gradePercentage = 0f;
     
             for (User student : simulation.getUsers()) {
-                Long studentId = student.getId();
-                studentGradesMap.putIfAbsent(studentId, new StudentGradeDto(studentId));
+                String studentName = student.getLastName() + " " + student.getName();
+                studentGradesMap.putIfAbsent(studentName, new StudentGradeDto(studentName));
     
-                StudentGradeDto dto = studentGradesMap.get(studentId);
+                StudentGradeDto dto = studentGradesMap.get(studentName);
     
                 // Si ya existe una nota para esta práctica, escoger la más alta
                 Float currentGrade = dto.getPracticeGrades().getOrDefault(practice.getName(), null);
@@ -80,6 +81,15 @@ public class GradeService {
             for (String practiceName : gradeablePractices.keySet()) {
                 dto.getPracticeGrades().putIfAbsent(practiceName, null);
             }
+        }
+
+        // Paso 5: Ordenar las notas de las prácticas por nombre de práctica
+        for (StudentGradeDto dto : studentGradesMap.values()) {
+
+            dto.setPracticeGrades(dto.getPracticeGrades().entrySet().stream()
+                .sorted(Map.Entry.comparingByKey()) // más limpio
+                .collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), LinkedHashMap::putAll));
+            
         }
     
         return new ArrayList<>(studentGradesMap.values());

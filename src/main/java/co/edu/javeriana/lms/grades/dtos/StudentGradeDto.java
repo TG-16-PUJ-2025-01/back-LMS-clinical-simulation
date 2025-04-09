@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudentGradeDto {
-    private Long studentId;
+    private String studentName;
     private Map<String, Float> practiceGrades; // Nombre de práctica -> nota
     private Float finalGrade;
 
@@ -22,8 +22,8 @@ public class StudentGradeDto {
         practiceGrades.put(practiceName, grade);
     }
 
-    public StudentGradeDto(Long studentId) {
-        this.studentId = studentId;
+    public StudentGradeDto(String studentName) {
+        this.studentName = studentName;
         this.practiceGrades = new HashMap<>();
         this.finalGrade = 0f;
     }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
 import co.edu.javeriana.lms.accounts.services.AuthService;
 import co.edu.javeriana.lms.practices.dtos.CreateSimulationRequestDto;
+import co.edu.javeriana.lms.practices.dtos.SimulationAvailabilityDto;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.services.SimulationService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
@@ -50,7 +51,6 @@ public class SimulationController {
             HttpServletRequest request) {
         log.info("Requesting all simulations");
 
-
         Page<Simulation> simulationsPage = simulationService.findAllSimulations(page, size);
 
         if (simulationsPage.isEmpty()) {
@@ -84,23 +84,27 @@ public class SimulationController {
             @RequestParam(required = false) Integer groupNumber) {
         log.info("Requesting simulations for practice with id: {}, groupNumber: {}", practiceId, groupNumber);
 
-        Page<Simulation> simulationsPage = simulationService.findSimulationsByPracticeId(practiceId, page, size, sort, asc, groupNumber);
+        Page<Simulation> simulationsPage = simulationService.findSimulationsByPracticeId(practiceId, page, size, sort,
+                asc, groupNumber);
 
         PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),
                 simulationsPage.getTotalElements(), simulationsPage.getTotalPages());
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(), metadata));
+        return ResponseEntity
+                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(), metadata));
     }
 
     @PostMapping()
-    public ResponseEntity<ApiResponseDto<?>> createSimulations(@Valid @RequestBody CreateSimulationRequestDto simulationRequestDto) {
+    public ResponseEntity<ApiResponseDto<?>> createSimulations(
+            @Valid @RequestBody CreateSimulationRequestDto simulationRequestDto) {
         log.info("Creating simulations {} ", simulationRequestDto.getSimulations().size());
         List<SimulationByTimeSlotDto> SimulationsDto = new ArrayList<>();
         for (int i = 0; i < simulationRequestDto.getSimulations().size(); i++) {
             SimulationsDto.add(simulationRequestDto.getSimulations().get(i));
         }
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Simulations created successfully", simulationService.addSimulations(SimulationsDto), null));
+                .body(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Simulations created successfully",
+                        simulationService.addSimulations(SimulationsDto), null));
     }
 
     @PutMapping("/{id}")
@@ -109,7 +113,8 @@ public class SimulationController {
         log.info("Updating simulation with id: {}", id);
 
         Simulation simulation = simulationService.updateSimulation(id, simulationDto);
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Simulation updated successfully", simulation, null));
+        return ResponseEntity
+                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Simulation updated successfully", simulation, null));
     }
 
     @DeleteMapping("/{id}")
@@ -117,25 +122,29 @@ public class SimulationController {
         log.info("Deleting simulation with id: {}", id);
 
         simulationService.deleteSimulationById(id);
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Simulation deleted successfully", null, null));
+        return ResponseEntity
+                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Simulation deleted successfully", null, null));
     }
 
     @GetMapping("/schedule")
     public ResponseEntity<ApiResponseDto<?>> getSchedule(@RequestParam String date) {
         log.info("Requesting simulations to show schedule for date: {}", date);
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationsSchedule(date), null));
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok",
+                simulationService.findSimulationsSchedule(date), null));
     }
 
     @GetMapping("/{id}/users")
     public ResponseEntity<ApiResponseDto<?>> getSimulationStudents(@PathVariable Long id) {
         log.info("Requesting simulation students with id: {}", id);
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationStudents(id), null));
+        return ResponseEntity.ok(
+                new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationStudents(id), null));
     }
 
     @PostMapping("/{id}/join")
-    public ResponseEntity<ApiResponseDto<?>> joinSimulation(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+    public ResponseEntity<ApiResponseDto<?>> joinSimulation(@RequestHeader("Authorization") String token,
+            @PathVariable Long id) {
         token = token.substring(7);
         log.info("Requesting to join simulation with id: {}", id);
 
@@ -145,5 +154,25 @@ public class SimulationController {
         simulationService.joinSimulation(id, userId);
 
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", null, null));
+    }
+
+    @GetMapping("/practice/{practiceId}/available")
+    public ResponseEntity<ApiResponseDto<?>> getAvailableSimulationsByPracticeId(
+            @PathVariable Long practiceId,
+            @Min(0) @RequestParam(defaultValue = "0") Integer page,
+            @Min(1) @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "simulationId") String sort,
+            @RequestParam(defaultValue = "true") Boolean asc,
+            @RequestParam(required = false) Integer groupNumber) {
+        log.info("Requesting available simulations for practice with id: {}", practiceId);
+
+        Page<SimulationAvailabilityDto> simulationsPage = simulationService
+                .findAvailableSimulationsByPracticeId(practiceId, page, size, sort, asc, groupNumber);
+
+        PaginationMetadataDto metadata = new PaginationMetadataDto(page, simulationsPage.getNumberOfElements(),
+                simulationsPage.getTotalElements(), simulationsPage.getTotalPages());
+
+        return ResponseEntity
+                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(), metadata));
     }
 }

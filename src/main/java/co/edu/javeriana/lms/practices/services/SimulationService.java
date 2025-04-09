@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,6 +23,7 @@ import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
 import co.edu.javeriana.lms.practices.dtos.TimeSlotDto;
+import co.edu.javeriana.lms.practices.dtos.SimulationAvailabilityDto;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
@@ -319,7 +321,8 @@ public class SimulationService {
 
         // Check if the user is not already enrolled in the simulation
         if (simulation.getUsers().contains(user)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already enrolled in the simulation, cannot join group");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "User is already enrolled in the simulation, cannot join group");
         }
 
         // Check if the simulation is not full
@@ -339,7 +342,8 @@ public class SimulationService {
         if (simulation.getEndDateTime() != null) {
             Date now = new Date();
             if (now.after(simulation.getEndDateTime())) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Simulation has already happened, cannot join group");
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Simulation has already happened, cannot join group");
             }
         }
 
@@ -362,5 +366,42 @@ public class SimulationService {
         simulation.getUsers().add(user);
         simulationRepository.save(simulation);
         log.info("User {} added to simulation {}", user.getId(), simulation.getSimulationId());
+    }
+
+    public Page<SimulationAvailabilityDto> findAvailableSimulationsByPracticeId(Long practiceId, Integer page,
+            Integer size, String sort,
+            Boolean asc, Integer groupNumber) {
+
+        practiceRepository.findById(practiceId)
+                .orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + practiceId));
+
+        Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+
+        Page<Simulation> simulations;
+        if (groupNumber == null) {
+            simulations = simulationRepository.findByPracticeId(practiceId, pageable);
+        } else {
+            simulations = simulationRepository.findByPracticeIdAndGroupNumber(practiceId, groupNumber, pageable);
+        }
+
+        List<SimulationAvailabilityDto> simulationDtos = simulations.stream().map(simulation -> {
+            boolean isFull = simulation.getUsers().size() >= simulation.getPractice().getMaxStudentsGroup();
+            boolean hasStarted = simulation.getStartDateTime() != null
+                    && new Date().after(simulation.getStartDateTime());
+            boolean isGraded = simulation.getGradeStatus() == GradeStatus.REGISTERED;
+
+            boolean available = !isFull && !hasStarted && !isGraded;
+
+            return SimulationAvailabilityDto.builder()
+                    .simulationId(simulation.getSimulationId())
+                    .groupNumber(simulation.getGroupNumber())
+                    .startDateTime(simulation.getStartDateTime())
+                    .endDateTime(simulation.getEndDateTime())
+                    .available(available)
+                    .build();
+        }).toList();
+
+        return new PageImpl<>(simulationDtos, pageable, simulations.getTotalElements());
     }
 }

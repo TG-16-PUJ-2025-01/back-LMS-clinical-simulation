@@ -369,8 +369,7 @@ public class SimulationService {
     }
 
     public Page<SimulationAvailabilityDto> findAvailableSimulationsByPracticeId(Long practiceId, Integer page,
-            Integer size, String sort,
-            Boolean asc, Integer groupNumber) {
+            Integer size, String sort, Boolean asc, Integer groupNumber) {
 
         practiceRepository.findById(practiceId)
                 .orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + practiceId));
@@ -385,10 +384,15 @@ public class SimulationService {
             simulations = simulationRepository.findByPracticeIdAndGroupNumber(practiceId, groupNumber, pageable);
         }
 
-        List<SimulationAvailabilityDto> simulationDtos = simulations.stream().map(simulation -> {
+        List<SimulationAvailabilityDto> simulationDtos = mapSimulationsToAvailabilityDtos(simulations.getContent());
+
+        return new PageImpl<>(simulationDtos, pageable, simulations.getTotalElements());
+    }
+
+    private List<SimulationAvailabilityDto> mapSimulationsToAvailabilityDtos(List<Simulation> simulations) {
+        return simulations.stream().map(simulation -> {
             boolean isFull = simulation.getUsers().size() >= simulation.getPractice().getMaxStudentsGroup();
-            boolean hasStarted = simulation.getStartDateTime() != null
-                    && new Date().after(simulation.getStartDateTime());
+            boolean hasStarted = simulation.getStartDateTime() != null && new Date().after(simulation.getStartDateTime());
             boolean isGraded = simulation.getGradeStatus() == GradeStatus.REGISTERED;
 
             boolean available = !isFull && !hasStarted && !isGraded;
@@ -401,7 +405,5 @@ public class SimulationService {
                     .available(available)
                     .build();
         }).toList();
-
-        return new PageImpl<>(simulationDtos, pageable, simulations.getTotalElements());
     }
 }

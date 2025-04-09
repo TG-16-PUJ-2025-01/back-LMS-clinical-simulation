@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
+import co.edu.javeriana.lms.grades.dtos.RubricDto;
 import co.edu.javeriana.lms.practices.dtos.CreateSimulationRequestDto;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.services.SimulationService;
@@ -126,5 +127,13 @@ public class SimulationController {
         log.info("Requesting simulation students with id: {}", id);
 
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.findSimulationStudents(id), null));
+    }
+
+    @PutMapping("/{id}/rubric")
+    public ResponseEntity<ApiResponseDto<?>> updateSimulationRubric(@PathVariable Long id,
+            @RequestBody RubricDto rubric) {
+        log.info("Updating simulation rubric with id: {}", id);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.updateSimulationRubric(id, rubric), null));
     }
 }

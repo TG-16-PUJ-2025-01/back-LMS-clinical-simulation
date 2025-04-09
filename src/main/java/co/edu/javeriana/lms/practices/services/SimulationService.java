@@ -28,7 +28,10 @@ import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
 import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
+import co.edu.javeriana.lms.grades.dtos.RubricDto;
 import co.edu.javeriana.lms.grades.models.GradeStatus;
+import co.edu.javeriana.lms.grades.models.Rubric;
+import co.edu.javeriana.lms.grades.repositories.RubricRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +51,9 @@ public class SimulationService {
 
     @Autowired
     private RoomRepository roomRepository;
+
+    @Autowired
+    private RubricRepository rubricRepository;
 
     public Page<Simulation> findAllSimulations(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -296,6 +302,24 @@ public class SimulationService {
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + simulationId));
 
         return simulation.getUsers();
+    }
+
+    public Rubric updateSimulationRubric(Long id, RubricDto rubricDto) {
+        Simulation simulation = simulationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
+
+        Rubric rubric = rubricDto.toRubric();
+        Rubric existingRubric = simulation.getRubric();
+        if (existingRubric != null) {
+            rubric.setRubricId(existingRubric.getRubricId());
+        } else {
+            rubric.setSimulation(simulation);
+            rubric = rubricRepository.save(rubric);
+        }
+        simulation.setRubric(rubric);
+        simulationRepository.save(simulation);
+
+        return rubric;
     }
 
     private Date parseDate(String date) {

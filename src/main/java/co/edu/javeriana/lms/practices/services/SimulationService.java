@@ -311,13 +311,15 @@ public class SimulationService {
         Rubric rubric = rubricDto.toRubric();
         Rubric existingRubric = simulation.getRubric();
         if (existingRubric != null) {
-            rubric.setRubricId(existingRubric.getRubricId());
+            existingRubric.setEvaluatedCriterias(rubric.getEvaluatedCriterias());
+            existingRubric.setTotal(rubric.getTotal());
+            rubricRepository.save(existingRubric);
         } else {
             rubric.setSimulation(simulation);
             rubric = rubricRepository.save(rubric);
+            simulation.setRubric(rubric);
+            simulationRepository.save(simulation);
         }
-        simulation.setRubric(rubric);
-        simulationRepository.save(simulation);
 
         return rubric;
     }

@@ -17,7 +17,7 @@ public class EvaluatedCriteriaDto {
 
     @Min(value = 0, message = "Criteria id must be greater than or equal to 0")
     @Max(value = 5, message = "Criteria id must be less than or equal to 5")
-    private Integer score;
+    private Float score;
 
     public EvaluatedCriteria toEvaluatedCriteria() {
         UUID uuid = UUID.randomUUID();

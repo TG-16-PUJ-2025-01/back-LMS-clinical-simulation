@@ -90,10 +90,7 @@ public class SecurityConfig {
                         .requestMatchers("/user/all/**")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name())
                         .requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())// Authenticated endpoint
-                        .requestMatchers("/room/**").hasAuthority(Role.ADMIN.name())
-                        .requestMatchers("/practice/class/**")
-                        .hasAnyAuthority(Role.ESTUDIANTE.name(), Role.ADMIN.name(), Role.COORDINADOR.name(),
-                                Role.PROFESOR.name())
+                        .requestMatchers("/room/**").permitAll()
                         .requestMatchers("/practice/{id}/enrolled")
                         .hasAnyAuthority(Role.ESTUDIANTE.name(), Role.ADMIN.name(), Role.COORDINADOR.name(),
                                 Role.PROFESOR.name()) // Ensure ESTUDIANTE role is included

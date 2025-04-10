@@ -67,14 +67,14 @@ public class Practice {
     @Column(nullable = true)
     private Integer maxStudentsGroup;
 
+    @Nullable
+    @Column(nullable = true)
+    private Float gradePercentage;
+
     @ManyToOne
     @JoinColumn(nullable = false)
     @JsonIgnore
     private ClassModel classModel;
-
-   /* @OneToMany(mappedBy = "practice")
-
-    private List<TimeSlot> timeSlot;*/ 
 
     @OneToOne
     @JoinColumn(nullable = true)

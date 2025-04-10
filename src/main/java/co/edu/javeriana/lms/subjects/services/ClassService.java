@@ -3,6 +3,9 @@ package co.edu.javeriana.lms.subjects.services;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +21,7 @@ import co.edu.javeriana.lms.shared.errors.CustomError;
 import co.edu.javeriana.lms.shared.errors.ErrorCode;
 import co.edu.javeriana.lms.subjects.dtos.ClassDto;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
+import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
 import co.edu.javeriana.lms.subjects.repositories.CourseRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -126,20 +130,40 @@ public class ClassService {
 
     public ClassModel save(ClassDto entity) {
 
-        List<User> professors = new ArrayList<>();
-        // mappeo de profesores por stream
-        entity.getProfessorsIds().stream().forEach(professorId -> {
-            professors.add(userRepository.findById(professorId).get());
-        });
+        List<User> professors = entity.getProfessorsIds().stream()
+                .map(professorRawId -> {
+
+                    Optional<User> userOpt = Optional.empty();
+                 
+                   
+                    userOpt = userRepository.findById(professorRawId);
+
+                    // Si no se encontró por ID, intentar con institutionalId
+                    if (userOpt.isEmpty()) {
+                        userOpt = userRepository.findByInstitutionalId(professorRawId);
+                    }
+
+                    return userOpt.orElseThrow(() -> new NoSuchElementException(
+                            "No se encontró el profesor con ID o institutionalId: " + professorRawId));
+
+                })
+                .collect(Collectors.toList());
+
+        Optional<Course> courseOpt = Optional.empty();
+
+        courseOpt = courseRepository.findById(entity.getCourseId());
+
+        if (courseOpt.isEmpty()) {
+            courseOpt = courseRepository.findByJaverianaId(entity.getCourseId());
+        }
 
         ClassModel classModel = new ClassModel(entity.getPeriod(),
                 professors,
-                courseRepository.findById(entity.getCourseId()).get(), entity.getJaverianaId(),
+                courseOpt.get(), entity.getJaverianaId(),
                 entity.getNumberOfParticipants());
 
-        // log.info("unicornio aa2 "+ classModel.getJaverianaId(), classModel.getName(),
-        // classModel.getBeginningDate(), classModel.getProfessor().getName(),
-        // classModel.getCourse().getCourseId());
+       // log.info("unicornio aa2 ");
+
         try {
             classRepository.save(classModel);
         } catch (EntityNotFoundException e) {
@@ -147,6 +171,7 @@ public class ClassService {
 
         }
 
+        
         return classModel;
     }
 
@@ -198,8 +223,10 @@ public class ClassService {
         ClassModel classModel = classRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
 
-        //TO DO FIX ERRORS
-        User member = userRepository.findByInstitutionalId(idMember).orElseThrow(() -> new CustomError("Usuario con ID " + idMember + " no encontrado", ErrorCode.ACCOUNT_NOT_FOUND));;
+        // TO DO FIX ERRORS
+        User member = userRepository.findByInstitutionalId(idMember).orElseThrow(
+                () -> new CustomError("Usuario con ID " + idMember + " no encontrado", ErrorCode.ACCOUNT_NOT_FOUND));
+        ;
 
         if (role.equals(Role.PROFESOR)) {
             // si ya esta en la lista no se hace nada
@@ -209,10 +236,8 @@ public class ClassService {
             if (member.getRoles().contains(Role.PROFESOR)) {
                 classModel.getProfessors().add(member);
                 classModel.getStudents().remove(member);
-            }
-            else
-            {
-                //ERROR DE QUE NO ES PROFESOR
+            } else {
+                // ERROR DE QUE NO ES PROFESOR
                 throw new CustomError("El usuario no tiene rol profesor", ErrorCode.CLASS_MEMBER_HAS_NO_ROLE);
             }
 
@@ -224,10 +249,8 @@ public class ClassService {
             if (member.getRoles().contains(Role.ESTUDIANTE)) {
                 classModel.getStudents().add(member);
                 classModel.getProfessors().remove(member);
-            }
-            else
-            {
-                //ERROR DE QUE NO ES ESTUDIANTE
+            } else {
+                // ERROR DE QUE NO ES ESTUDIANTE
                 throw new CustomError("El usuario no tiene rol estudiante", ErrorCode.CLASS_MEMBER_HAS_NO_ROLE);
             }
         }

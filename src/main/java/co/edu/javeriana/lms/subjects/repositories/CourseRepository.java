@@ -1,6 +1,7 @@
 package co.edu.javeriana.lms.subjects.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,4 +28,7 @@ public interface CourseRepository extends JpaRepository <Course, Long> {
 
     @Query("SELECT c FROM Course c WHERE c.coordinator = :coordinator AND (CAST(c.javerianaId AS string) LIKE %:filter% OR LOWER(TRANSLATE(c.name, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%')))") 
     List<Course> findCoursesByCoordinatorAndNameContaining(User coordinator,  @Param("filter") String filter);
+
+    @Query("SELECT c FROM Course c WHERE  c.javerianaId = :courseId")
+    Optional<Course> findByJaverianaId( @Param("courseId") Long courseId);
 }

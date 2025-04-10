@@ -139,11 +139,6 @@ public class ClassService {
                    
                     userOpt = userRepository.findById(professorRawId);
 
-                    // Si no se encontró por ID, intentar con institutionalId
-                    if (userOpt.isEmpty()) {
-                        userOpt = userRepository.findByInstitutionalId(professorRawId);
-                    }
-
                     return userOpt.orElseThrow(() -> new NoSuchElementException(
                             "No se encontró el profesor con ID o institutionalId: " + professorRawId));
 
@@ -153,10 +148,6 @@ public class ClassService {
         Optional<Course> courseOpt = Optional.empty();
 
         courseOpt = courseRepository.findById(entity.getCourseId());
-
-        if (courseOpt.isEmpty()) {
-            courseOpt = courseRepository.findByJaverianaId(entity.getCourseId());
-        }
 
         ClassModel classModel = new ClassModel(entity.getPeriod(),
                 professors,
@@ -168,7 +159,47 @@ public class ClassService {
         try {
             classRepository.save(classModel);
         } catch (EntityNotFoundException e) {
-            throw new CustomError("El usuario no tiene rol estudiante", ErrorCode.CLASS_MEMBER_HAS_NO_ROLE);
+            throw new CustomError("Error al crear la clase", ErrorCode.CLASS_MEMBER_HAS_NO_ROLE);
+
+        }
+
+        
+        return classModel;
+    }
+
+    public ClassModel saveByExcel(ClassDto entity) {
+
+        //evaluar si el usuario es profesor 
+        List<User> professors = entity.getProfessorsIds().stream()
+                .map(professorRawId -> {
+
+                    Optional<User> userOpt = Optional.empty();
+            
+                    userOpt = userRepository.findByInstitutionalId(professorRawId);
+                        
+                    return userOpt.orElseThrow(() -> new NoSuchElementException(
+                            "No se encontró el profesor con institutionalId: " + professorRawId));
+
+                })
+                .collect(Collectors.toList());
+
+        Optional<Course> courseOpt = Optional.empty();
+
+        
+        courseOpt = courseRepository.findByJaverianaId(entity.getCourseId());
+  
+
+        ClassModel classModel = new ClassModel(entity.getPeriod(),
+                professors,
+                courseOpt.get(), entity.getJaverianaId(),
+                entity.getNumberOfParticipants());
+
+       // log.info("unicornio aa2 ");
+
+        try {
+            classRepository.save(classModel);
+        } catch (EntityNotFoundException e) {
+            throw new CustomError("Error al crear la clase", ErrorCode.CLASS_MEMBER_HAS_NO_ROLE);
 
         }
 

@@ -58,7 +58,8 @@ public class SecurityConfig {
                         .requestMatchers("/course/delete/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
                         .requestMatchers("/course/add/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
                         .requestMatchers("/course/update/**").hasAuthority(Role.ADMIN.name()) // Coordinador-only
-                        .requestMatchers("/course/all").hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name(), Role.PROFESOR.name()) // Coordinador-only
+                        .requestMatchers("/course/all")
+                        .hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name(), Role.PROFESOR.name()) // Coordinador-only
                         .requestMatchers("/course/{id}").hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name()) // Coordinador-only
 
                         .requestMatchers("/class/all").hasAnyAuthority(Role.ADMIN.name())
@@ -90,7 +91,10 @@ public class SecurityConfig {
                         .requestMatchers("/user/all/**")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name())
                         .requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())// Authenticated endpoint
-                        .requestMatchers("/room/**").permitAll()
+                        .requestMatchers("/room/**").authenticated()
+                        .requestMatchers("/practice/class/**")
+                        .hasAnyAuthority(Role.ESTUDIANTE.name(), Role.ADMIN.name(), Role.COORDINADOR.name(),
+                                Role.PROFESOR.name())
                         .requestMatchers("/practice/{id}/enrolled")
                         .hasAnyAuthority(Role.ESTUDIANTE.name(), Role.ADMIN.name(), Role.COORDINADOR.name(),
                                 Role.PROFESOR.name()) // Ensure ESTUDIANTE role is included

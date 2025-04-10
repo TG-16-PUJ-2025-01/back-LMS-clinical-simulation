@@ -263,4 +263,12 @@ public class ClassController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<ClassModel>(
                 HttpStatus.CREATED.value(), "Class added successfully.", classService.save(classModel), null));
     }
+
+    @Valid
+    @PostMapping("/add/excel")
+    public ResponseEntity<?> addClassByExcel(@Valid @RequestBody ClassDto classModel) {
+       
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<ClassModel>(
+                HttpStatus.CREATED.value(), "Class added successfully.", classService.saveByExcel(classModel), null));
+    }
 }

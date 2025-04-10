@@ -195,6 +195,7 @@ public class ClassService {
                 entity.getNumberOfParticipants());
 
        // log.info("unicornio aa2 ");
+        //manejar si esta repetido 
 
         try {
             classRepository.save(classModel);

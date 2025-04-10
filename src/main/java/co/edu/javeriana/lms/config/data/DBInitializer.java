@@ -315,9 +315,9 @@ public class DBInitializer implements CommandLineRunner {
 
 	private void insertCoursesClassesAndStudents() {
 		Course course1 = new Course("Cálculo Diferencial", 123456L, userRepository.findById(1L).get());
-		Course course2 = new Course("Cálculo Integral", 123455L, userRepository.findById(3L).get());
-		Course course3 = new Course("Cálculo Vectorial", 123454L, userRepository.findById(3L).get());
-		Course course4 = new Course("Cálculo 3", 1232234L, userRepository.findById(3L).get());
+		Course course2 = new Course("Cálculo Integral", 123455L, userRepository.findById(16L).get());
+		Course course3 = new Course("Cálculo Vectorial", 123454L, userRepository.findById(16L).get());
+		Course course4 = new Course("Cálculo 3", 1232234L, userRepository.findById(16L).get());
 	
 		courseRepository.save(course1);
 		courseRepository.save(course2);

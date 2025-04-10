@@ -130,6 +130,7 @@ public class ClassService {
 
     public ClassModel save(ClassDto entity) {
 
+        //evaluar si el usuario es profesor 
         List<User> professors = entity.getProfessorsIds().stream()
                 .map(professorRawId -> {
 

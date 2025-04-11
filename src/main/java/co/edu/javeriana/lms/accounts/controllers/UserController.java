@@ -58,7 +58,7 @@ public class UserController {
 
     @PostMapping("/add/excel")
     public ResponseEntity<?> addUserExcel(@Valid @RequestBody RegisterUserDto registerUserDTO) {
-        User user = userService.addUser(registerUserDTO.toUser());
+        User user = userService.addUserExcel(registerUserDTO.toUser());
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.CREATED.value(), "User created successfully", user, null));
     }
 

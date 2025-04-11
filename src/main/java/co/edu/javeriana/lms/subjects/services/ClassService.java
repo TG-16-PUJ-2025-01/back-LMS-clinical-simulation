@@ -124,19 +124,17 @@ public class ClassService {
     }
 
     public ClassModel findById(Long id) {
-
         return classRepository.findById(id).get();
     }
 
     public ClassModel save(ClassDto entity) {
 
-        //evaluar si el usuario es profesor 
+        // evaluar si el usuario es profesor
         List<User> professors = entity.getProfessorsIds().stream()
                 .map(professorRawId -> {
 
                     Optional<User> userOpt = Optional.empty();
-                 
-                   
+
                     userOpt = userRepository.findById(professorRawId);
 
                     return userOpt.orElseThrow(() -> new NoSuchElementException(
@@ -154,7 +152,7 @@ public class ClassService {
                 courseOpt.get(), entity.getJaverianaId(),
                 entity.getNumberOfParticipants());
 
-       // log.info("unicornio aa2 ");
+        // log.info("unicornio aa2 ");
 
         try {
             classRepository.save(classModel);
@@ -163,20 +161,23 @@ public class ClassService {
 
         }
 
-        
         return classModel;
     }
 
     public ClassModel saveByExcel(ClassDto entity) {
 
-        //evaluar si el usuario es profesor 
+        // evaluar si el usuario es profesor
         List<User> professors = entity.getProfessorsIds().stream()
                 .map(professorRawId -> {
 
                     Optional<User> userOpt = Optional.empty();
-            
+
                     userOpt = userRepository.findByInstitutionalId(professorRawId);
-                        
+
+                    if (!userOpt.get().getRoles().contains(Role.PROFESOR)) {
+                        throw new CustomError("Error al crear la clase", ErrorCode.CLASS_PROFESSOR_IS_NO_PROFESSOR);
+                    }
+
                     return userOpt.orElseThrow(() -> new NoSuchElementException(
                             "No se encontró el profesor con institutionalId: " + professorRawId));
 
@@ -185,26 +186,23 @@ public class ClassService {
 
         Optional<Course> courseOpt = Optional.empty();
 
-        
         courseOpt = courseRepository.findByJaverianaId(entity.getCourseId());
-  
 
         ClassModel classModel = new ClassModel(entity.getPeriod(),
                 professors,
                 courseOpt.get(), entity.getJaverianaId(),
                 entity.getNumberOfParticipants());
 
-       // log.info("unicornio aa2 ");
-        //manejar si esta repetido 
+        // log.info("unicornio aa2 ");
+        // manejar si esta repetido
 
         try {
             classRepository.save(classModel);
         } catch (EntityNotFoundException e) {
-            throw new CustomError("Error al crear la clase", ErrorCode.CLASS_MEMBER_HAS_NO_ROLE);
+            throw new CustomError("Error al crear la clase", ErrorCode.CLASS_ERROR);
 
         }
 
-        
         return classModel;
     }
 

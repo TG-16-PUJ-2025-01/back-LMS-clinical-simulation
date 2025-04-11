@@ -52,6 +52,7 @@ public enum ErrorCode {
     CLASS_MEMBER_ERROR(72),
     CLASS_MEMBER_NOT_FOUND(720),    
     CLASS_MEMBER_HAS_NO_ROLE(721),
+    CLASS_PROFESSOR_IS_NO_PROFESSOR(722),
 
     // Video errors (starts with 8)
     VIDEO_ERROR(8),

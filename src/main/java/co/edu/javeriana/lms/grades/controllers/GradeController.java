@@ -25,7 +25,7 @@ public class GradeController {
         return ResponseEntity.ok(new ApiResponseDto<>(
                 200,
                 "ok",
-                gradeService.getFinalGradesByClass(1L),
+                gradeService.getFinalGradesByClass(classId),
                 null));
     }
 }

@@ -43,7 +43,7 @@ public class GradeController {
 
         Long userId = authService.getUserIdByToken(token);
 
-        StudentGradeDto studentGrades = gradeService.getGradesUserAndClass(classId, userId);
+        StudentGradeDto studentGrades = gradeService.getGradesByUserAndClass(classId, userId);
 
         return ResponseEntity.ok(new ApiResponseDto<>(
                 200,

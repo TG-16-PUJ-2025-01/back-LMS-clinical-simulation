@@ -99,7 +99,7 @@ public class GradeService {
         return new ArrayList<>(studentGradesMap.values());
     }
 
-    public StudentGradeDto getGradesUserAndClass(Long classId, Long userId){
+    public StudentGradeDto getGradesByUserAndClass(Long classId, Long userId){
         // Search for the class by id
         ClassModel classModel = classRepository.findById(classId)
                 .orElseThrow(() -> new RuntimeException("Class not found"));

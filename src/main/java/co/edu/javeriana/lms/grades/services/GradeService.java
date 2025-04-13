@@ -134,7 +134,7 @@ public class GradeService {
                         Float grade = simulation.getGrade();
                         if (grade != null) {
                             studentGradeDto.addPracticeGrade(practice.getName(), grade);
-                            studentGradeDto.setFinalGrade(studentGradeDto.getFinalGrade() + (grade * practice.getGradePercentage() / 100f));
+                            studentGradeDto.setFinalGrade(0f);
                         } else {
                             studentGradeDto.addPracticeGrade(practice.getName(), null);
                         }

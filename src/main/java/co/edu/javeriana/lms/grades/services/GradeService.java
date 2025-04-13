@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.grades.dtos.StudentGradeDto;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.Simulation;
@@ -26,6 +27,9 @@ public class GradeService {
 
     @Autowired
     private ClassRepository classRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
 
     public List<StudentGradeDto> getFinalGradesByClass(Long classModelId) {
@@ -93,5 +97,65 @@ public class GradeService {
         }
     
         return new ArrayList<>(studentGradesMap.values());
+    }
+
+    public StudentGradeDto getGradesUserAndClass(Long classId, Long userId){
+        // Search for the class by id
+        ClassModel classModel = classRepository.findById(classId)
+                .orElseThrow(() -> new RuntimeException("Class not found"));
+
+        // Search for the user by id
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Search for practices of the class
+        List<Practice> practices = classModel.getPractices();
+
+        // Search for the simulation of the user in the class, extract the grade from there
+        List<Simulation> simulations = simulationRepository.findAllByPractice_ClassModel(classModel);
+        List<Simulation> userSimulations = new ArrayList<>();
+        for (Simulation simulation : simulations) {
+            if (simulation.getUsers().contains(user)) {
+                userSimulations.add(simulation);
+            }
+        }
+
+        // Create a StudentGradeDto object to store the grades
+        StudentGradeDto studentGradeDto = new StudentGradeDto(user.getLastName() + " " + user.getName());
+        studentGradeDto.setFinalGrade(0f);
+        studentGradeDto.setPracticeGrades(new LinkedHashMap<>());
+
+        // Iterate through the practices and add the grades to the StudentGradeDto object
+        for (Practice practice : practices) {
+            if (Boolean.TRUE.equals(practice.getGradeable())) {
+                // Check if the user has a simulation for this practice
+                for (Simulation simulation : userSimulations) {
+                    if (simulation.getPractice().equals(practice)) {
+                        Float grade = simulation.getGrade();
+                        if (grade != null) {
+                            studentGradeDto.addPracticeGrade(practice.getName(), grade);
+                            studentGradeDto.setFinalGrade(studentGradeDto.getFinalGrade() + (grade * practice.getGradePercentage() / 100f));
+                        } else {
+                            studentGradeDto.addPracticeGrade(practice.getName(), null);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Ensure that all practices are included in the StudentGradeDto object
+        for (Practice practice : practices) {
+            if (Boolean.TRUE.equals(practice.getGradeable()) && !studentGradeDto.getPracticeGrades().containsKey(practice.getName())) {
+                studentGradeDto.addPracticeGrade(practice.getName(), null);
+            }
+        }
+
+        // Sort the practice grades by name
+        studentGradeDto.setPracticeGrades(studentGradeDto.getPracticeGrades().entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), LinkedHashMap::putAll));
+
+        // Return the StudentGradeDto object
+        return studentGradeDto;
     }
 }

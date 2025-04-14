@@ -122,12 +122,12 @@ public class GradeService {
 
         // Create a StudentGradeDto object to store the grades
         StudentGradeDto studentGradeDto = new StudentGradeDto(user.getLastName() + " " + user.getName());
-        studentGradeDto.setFinalGrade(0f);
+        studentGradeDto.setFinalGrade(0f); // TODO: Fix this calculation
         studentGradeDto.setPracticeGrades(new LinkedHashMap<>());
 
         // Iterate through the practices and add the grades to the StudentGradeDto object
         for (Practice practice : practices) {
-            if (Boolean.TRUE.equals(practice.getGradeable())) {
+            if (Boolean.TRUE.equals(practice.getGradeable())) { // Check if the practice is gradeable
                 // Check if the user has a simulation for this practice
                 for (Simulation simulation : userSimulations) {
                     if (simulation.getPractice().equals(practice)) {
@@ -149,11 +149,6 @@ public class GradeService {
                 studentGradeDto.addPracticeGrade(practice.getName(), null);
             }
         }
-
-        // Sort the practice grades by name
-        studentGradeDto.setPracticeGrades(studentGradeDto.getPracticeGrades().entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), LinkedHashMap::putAll));
 
         // Return the StudentGradeDto object
         return studentGradeDto;

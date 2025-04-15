@@ -64,7 +64,8 @@ public class CourseService {
         }
 
         Course newCourse = new Course(course.getName(), course.getJaverianaId(),
-                userRepository.findById(course.getCoordinatorId()).get());
+                userRepository.findById(course.getCoordinatorId()).get(), course.getFaculty(), course.getDepartment(),
+                course.getProgram(), course.getSemester());
 
         courseRepository.save(newCourse);
         return newCourse;
@@ -129,8 +130,10 @@ public class CourseService {
             courses.add(new CourseDto(course.getCourseId(), course.getJaverianaId(), course.getName(),
                     course.getCoordinator().getId(), sortedClasses.stream()
                             .sorted((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod())) // Ordenar por periodo (mayor
-                                                                                          // a menor)
-                            .toList()));
+                                                                                          // // a menor)
+                            .toList(),
+                    course.getFaculty(), course.getDepartment(), course.getProgram(),
+                    course.getSemester()));
 
         }
 
@@ -144,7 +147,8 @@ public class CourseService {
                 .toList();
     }
 
-    public Page<RubricTemplate> findRecommendedRubricsByCourseId(Long courseId, String filter, Integer page, Integer size,
+    public Page<RubricTemplate> findRecommendedRubricsByCourseId(Long courseId, String filter, Integer page,
+            Integer size,
             String sort, Boolean asc) {
         Pageable pageable = PageRequest.of(page, size);
         Course course = courseRepository.findById(courseId)

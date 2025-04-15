@@ -10,9 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.grades.dtos.PracticePercentageDto;
+import co.edu.javeriana.lms.grades.dtos.PracticesPercentagesDto;
 import co.edu.javeriana.lms.grades.dtos.StudentGradeDto;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.Simulation;
+import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
 import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
@@ -26,6 +29,9 @@ public class GradeService {
 
     @Autowired
     private ClassRepository classRepository;
+
+   @Autowired
+   private PracticeRepository practiceRepository; 
 
 
     public List<StudentGradeDto> getFinalGradesByClass(Long classModelId) {
@@ -46,6 +52,11 @@ public class GradeService {
     
         // Paso 2: Map de estudianteId -> DTO con notas
         Map<String, StudentGradeDto> studentGradesMap = new HashMap<>();
+
+        for (User student : classModel.getStudents()) {
+            String studentName = student.getLastName() + " " + student.getName();
+            studentGradesMap.putIfAbsent(studentName, new StudentGradeDto(studentName));
+        }
     
         // Paso 3: Procesar simulaciones con nota
         for (Simulation simulation : simulations) {
@@ -93,5 +104,17 @@ public class GradeService {
         }
     
         return new ArrayList<>(studentGradesMap.values());
+    }
+
+
+    public void updateClassGradePercentages(PracticesPercentagesDto practicesPercentagesDto) {
+
+        for (PracticePercentageDto practicePercentage : practicesPercentagesDto.getPracticesPercentages()) {
+            log.info("Updating grade percentage for practice ID: {}", practicePercentage.getPracticeId());
+            Practice practice = practiceRepository.findById(practicePercentage.getPracticeId())
+                    .orElseThrow(() -> new RuntimeException("Practice not found"));
+            practice.setGradePercentage(practicePercentage.getPercentage());
+            practiceRepository.save(practice);
+        }
     }
 }

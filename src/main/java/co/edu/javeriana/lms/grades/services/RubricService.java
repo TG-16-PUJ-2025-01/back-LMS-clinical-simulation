@@ -35,5 +35,4 @@ public class RubricService {
 
         return rubricRepository.save(rubric);
     }
-
 }

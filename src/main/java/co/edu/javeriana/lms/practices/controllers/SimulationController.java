@@ -136,4 +136,11 @@ public class SimulationController {
 
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.updateSimulationRubric(id, rubric), null));
     }
+    
+    @PutMapping("/{id}/publish")
+    public ResponseEntity<ApiResponseDto<?>> publishGrade(@PathVariable Long id) {
+        log.info("Publishing grade of simulation with id: {}", id);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.publishGrade(id), null));
+    }
 }

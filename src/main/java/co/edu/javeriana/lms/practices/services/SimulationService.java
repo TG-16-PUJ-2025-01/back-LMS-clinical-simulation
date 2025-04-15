@@ -324,6 +324,14 @@ public class SimulationService {
         return rubric;
     }
 
+    public Simulation publishGrade(Long id) {
+        Simulation simulation = simulationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
+
+        simulation.setGradeStatus(GradeStatus.REGISTERED);
+        return simulationRepository.save(simulation);
+    }
+
     private Date parseDate(String date) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

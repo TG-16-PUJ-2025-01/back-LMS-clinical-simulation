@@ -25,8 +25,8 @@ public class RubricController {
 
     @Autowired
     private RubricService rubricService;
-    
-    //editar rubrica
+
+    // editar rubrica
     @PutMapping("/{id}")
     public ResponseEntity<?> updateRubricCriteria(@Valid @RequestBody RubricDto rubricDto, @PathVariable Long id) {
         log.info("Updating rubric with ID: " + id);
@@ -44,10 +44,11 @@ public class RubricController {
         Rubric rubricCreated = rubricService.create(rubricDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponseDto<Rubric>(HttpStatus.CREATED.value(), "Rubric created successfully.", rubricCreated, null));
+                .body(new ApiResponseDto<Rubric>(HttpStatus.CREATED.value(), "Rubric created successfully.",
+                        rubricCreated, null));
     }
 
-    //ver rubrica
+    // ver rubrica
     @GetMapping("/{id}")
     public ResponseEntity<?> getRubricById(@PathVariable Long id) {
         log.info("Requesting rubric with ID: " + id);
@@ -60,5 +61,5 @@ public class RubricController {
         }
 
         return ResponseEntity.ok(new ApiResponseDto<Rubric>(HttpStatus.OK.value(), "ok", rubric, null));
-    } 
+    }
 }

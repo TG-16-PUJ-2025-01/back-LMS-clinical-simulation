@@ -217,6 +217,31 @@ public class DBInitializer implements CommandLineRunner {
 		student2.setInstitutionalId("111224");
 		student2.setRoles(Set.of(Role.ESTUDIANTE));
 
+		User student3 = new User();
+		student3.setEmail("estudiante3@gmail.com");
+		student3.setPassword(passwordEncoder.encode("estudiante2"));
+		student3.setName("estudiante3");
+		student3.setLastName("estudiante3");
+		student3.setInstitutionalId("911225");
+		student3.setRoles(Set.of(Role.ESTUDIANTE));
+
+		User student4 = new User();
+		student4.setEmail("estudiante4@gmail.com");
+		student4.setPassword(passwordEncoder.encode("estudiante4"));
+		student4.setName("estudiante4");
+		student4.setLastName("estudiante4");
+		student4.setInstitutionalId("911226");
+		student4.setRoles(Set.of(Role.ESTUDIANTE));
+		
+		User student5 = new User();
+		student5.setEmail("estudiante5@gmail.com");
+		student5.setPassword(passwordEncoder.encode("estudiante5"));
+		student5.setName("estudiante5");
+		student5.setLastName("estudiante5");
+		student5.setInstitutionalId("911227");
+		student5.setRoles(Set.of(Role.ESTUDIANTE));
+
+
 		User profesor3 = new User();
 		profesor3.setEmail("profesor@gmail.com");
 		profesor3.setPassword(passwordEncoder.encode("profesor"));
@@ -244,6 +269,9 @@ public class DBInitializer implements CommandLineRunner {
 		userRepository.save(superAdmin);
 		userRepository.save(student);
 		userRepository.save(student2);
+		userRepository.save(student3);
+		userRepository.save(student4);
+		userRepository.save(student5);
 		userRepository.save(profesor3);
 		userRepository.save(coordinator);
 	}
@@ -286,38 +314,33 @@ public class DBInitializer implements CommandLineRunner {
 	}
 
 	private void insertCoursesClassesAndStudents() {
-		Course course1 = new Course("Cálculo Diferencial", 123456L, userRepository.findById(1L).get(), "medicina", "medicina interna", "pregrado", 1);
-		Course course2 = new Course("Cálculo Integral", 123455L, userRepository.findById(3L).get(), "enfermeria", "medicina interna", "maestria", 2);
-		Course course3 = new Course("Cálculo Vectorial", 123454L, userRepository.findById(3L).get(), "medicina", "medicina critica", "doctorado", 3);
-		Course course4 = new Course("Cálculo 3", 1232234L, userRepository.findById(3L).get(), "odontologia", "medicina familiar", "pregrado", 4);
-		Course course5 = new Course("Simulación 1", 1232235L, userRepository.findById(9L).get(), "odontologia", "medicina familiar", "pregrado", 4);
-
+		Course course1 = new Course("Cálculo Diferencial", 123456L, userRepository.findById(1L).get());
+		Course course2 = new Course("Cálculo Integral", 123455L, userRepository.findById(16L).get());
+		Course course3 = new Course("Cálculo Vectorial", 123454L, userRepository.findById(16L).get());
+		Course course4 = new Course("Cálculo 3", 1232234L, userRepository.findById(16L).get());
 	
 		courseRepository.save(course1);
 		courseRepository.save(course2);
 		courseRepository.save(course3);
 		courseRepository.save(course4);
-		courseRepository.save(course5);
 
-		ClassModel class1 = new ClassModel("2024-1", userRepository.findAllProfessors(), course2, 12L, 20);
-		ClassModel class2 = new ClassModel("2026-1", userRepository.findAllProfessors(), course3, 13L,21);
-		ClassModel class3 = new ClassModel("2023-1", userRepository.findAllProfessors(), course3, 14L,25);
-		ClassModel class4 = new ClassModel("2024-1", userRepository.findAllProfessors(), course3, 15L,22);
-		ClassModel class5 = new ClassModel("2025-1", userRepository.findAllProfessors(), course3, 16L,30);
-		ClassModel class6 = new ClassModel("2025-1", userRepository.findAllProfessors(), course5, 17L,30);
+		ClassModel class1 = new ClassModel("2024-10", userRepository.findAllProfessors(), course2, 12L, 20);
+		ClassModel class2 = new ClassModel("2026-10", userRepository.findAllProfessors(), course3, 13L,21);
+		ClassModel class3 = new ClassModel("2023-10", userRepository.findAllProfessors(), course3, 14L,25);
+		ClassModel class4 = new ClassModel("2024-10", userRepository.findAllProfessors(), course3, 15L,22);
+		ClassModel class5 = new ClassModel("2025-10", userRepository.findAllProfessors(), course3, 16L,30);
 
-		class1.setStudents(Arrays.asList(userRepository.findById(10L).get(), userRepository.findById(11L).get()));
-		class2.setStudents(Arrays.asList(userRepository.findById(10L).get(), userRepository.findById(11L).get()));
-		class3.setStudents(Arrays.asList(userRepository.findById(11L).get()));
-		class4.setStudents(Arrays.asList(userRepository.findById(10L).get()));
-		class5.setStudents(Arrays.asList(userRepository.findById(10L).get()));
+		class1.setStudents(userRepository.findAllStudents());
+		class2.setStudents(userRepository.findAllStudents());
+		class3.setStudents(userRepository.findAllStudents());
+		class4.setStudents(userRepository.findAllStudents());
+		class5.setStudents(userRepository.findAllStudents());
 
 		classRepository.save(class1);
 		classRepository.save(class2);
 		classRepository.save(class3);
 		classRepository.save(class4);
 		classRepository.save(class5);
-		classRepository.save(class6);
 	}
 
 	private void insertPractices() {
@@ -358,9 +381,10 @@ public class DBInitializer implements CommandLineRunner {
 			.gradeStatus(GradeStatus.PENDING)
 			.grade(5.0f)
 			.groupNumber(1)
+			.users(userRepository.findAllStudents())
 			.build();
 
-			Simulation simulation2 = Simulation.builder()
+		Simulation simulation2 = Simulation.builder()
 			.practice(practiceRepository.findById(1L).get())
 			.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
 			.startDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
@@ -371,7 +395,7 @@ public class DBInitializer implements CommandLineRunner {
 			.groupNumber(2)
 			.build();
 
-			Simulation simulation3 = Simulation.builder()
+		Simulation simulation3 = Simulation.builder()
 			.practice(practiceRepository.findById(1L).get())
 			.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
 			.startDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))

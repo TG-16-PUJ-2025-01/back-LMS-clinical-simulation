@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
+import co.edu.javeriana.lms.grades.dtos.RubricDto;
 import co.edu.javeriana.lms.accounts.services.AuthService;
 import co.edu.javeriana.lms.practices.dtos.CreateSimulationRequestDto;
 import co.edu.javeriana.lms.practices.dtos.SimulationAvailabilityDto;
@@ -174,5 +175,20 @@ public class SimulationController {
 
         return ResponseEntity
                 .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationsPage.getContent(), metadata));
+    }
+
+    @PutMapping("/{id}/rubric")
+    public ResponseEntity<ApiResponseDto<?>> updateSimulationRubric(@PathVariable Long id,
+            @RequestBody RubricDto rubric) {
+        log.info("Updating simulation rubric with id: {}", id);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.updateSimulationRubric(id, rubric), null));
+    }
+    
+    @PutMapping("/{id}/publish")
+    public ResponseEntity<ApiResponseDto<?>> publishGrade(@PathVariable Long id) {
+        log.info("Publishing grade of simulation with id: {}", id);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.publishGrade(id), null));
     }
 }

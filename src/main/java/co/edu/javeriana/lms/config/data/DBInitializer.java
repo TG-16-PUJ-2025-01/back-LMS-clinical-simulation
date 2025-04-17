@@ -314,11 +314,11 @@ public class DBInitializer implements CommandLineRunner {
 	}
 
 	private void insertCoursesClassesAndStudents() {
-		Course course1 = new Course("Cálculo Diferencial", 123456L, userRepository.findById(1L).get());
-		Course course2 = new Course("Cálculo Integral", 123455L, userRepository.findById(16L).get());
-		Course course3 = new Course("Cálculo Vectorial", 123454L, userRepository.findById(16L).get());
-		Course course4 = new Course("Cálculo 3", 1232234L, userRepository.findById(16L).get());
-	
+		Course course1 = new Course("Cálculo Diferencial", 123456L, userRepository.findById(1L).get(), "medicina", "medicina interna", "pregrado", 1);
+		Course course2 = new Course("Cálculo Integral", 123455L, userRepository.findById(3L).get(), "enfermeria", "medicina interna", "maestria", 2);
+		Course course3 = new Course("Cálculo Vectorial", 123454L, userRepository.findById(3L).get(), "medicina", "medicina critica", "doctorado", 3);
+		Course course4 = new Course("Cálculo 3", 1232234L, userRepository.findById(3L).get(), "odontologia", "medicina familiar", "pregrado", 4);
+
 		courseRepository.save(course1);
 		courseRepository.save(course2);
 		courseRepository.save(course3);
@@ -401,7 +401,7 @@ public class DBInitializer implements CommandLineRunner {
 			.startDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
 			.endDateTime(Date.from(startDateTime.plusMinutes(90).atZone(ZoneId.systemDefault()).toInstant()))
 			.gradeDateTime(Date.from(LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
-			.gradeStatus(GradeStatus.REGISTERED)
+			.gradeStatus(GradeStatus.PENDING)
 			.grade(5.0f)
 			.groupNumber(3)
 			.build();

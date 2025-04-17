@@ -28,12 +28,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Course {
-    
 
-    public Course(String name, Long javerianaId, User coordinator) {
+    public Course(String name, Long javerianaId, User coordinator, String faculty, String department, String program,
+            Integer semester) {
         this.name = name;
         this.javerianaId = javerianaId;
         this.coordinator = coordinator;
+        this.faculty = faculty;
+        this.department = department;
+        this.program = program;
+        this.semester = semester;
     }
 
     @Id
@@ -46,6 +50,14 @@ public class Course {
     @Column(unique = true, nullable = false)
     private String name;
 
+    private String faculty;
+
+    private String department;
+
+    private String program;
+
+    private Integer semester;
+
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<ClassModel> classModels;
@@ -55,7 +67,6 @@ public class Course {
     private User coordinator;
 
     @ManyToMany
-    @JoinTable(name = "Rubric_Template_Course", joinColumns = @JoinColumn(name = "courseId"), inverseJoinColumns = @JoinColumn(name = "rubricTemplateId"))  
+    @JoinTable(name = "Rubric_Template_Course", joinColumns = @JoinColumn(name = "courseId"), inverseJoinColumns = @JoinColumn(name = "rubricTemplateId"))
     private List<RubricTemplate> rubricTemplates;
-
 }

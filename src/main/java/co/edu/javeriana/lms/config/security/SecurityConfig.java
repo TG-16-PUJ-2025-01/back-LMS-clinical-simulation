@@ -88,6 +88,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login").permitAll() // Public endpoint
                         .requestMatchers("/auth/change-password").authenticated() // Authenticated endpoint
                         .requestMatchers("/reset-password/**").permitAll() // Public endpoint
+                        .requestMatchers("/user/preferred-role").authenticated()
                         .requestMatchers("/user/all/**")
                         .hasAnyAuthority(Role.ADMIN.name(), Role.PROFESOR.name())
                         .requestMatchers("/user/**").hasAuthority(Role.ADMIN.name())// Authenticated endpoint

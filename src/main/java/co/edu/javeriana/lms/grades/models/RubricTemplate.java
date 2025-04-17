@@ -26,15 +26,16 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 
 @Entity
 @Table(name = "Rubric_Template")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RubricTemplate {
 
@@ -46,11 +47,11 @@ public class RubricTemplate {
     private String title;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb") 
+    @Column(columnDefinition = "jsonb")
     private List<Criteria> criteria;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb") 
+    @Column(columnDefinition = "jsonb")
     private List<RubricColumn> columns;
 
     @Column(nullable = false)
@@ -64,17 +65,18 @@ public class RubricTemplate {
     @JsonIgnore
     private List<Course> courses;
 
-    //no se deberian borrar las practicas si se borra la rubrica
-    //revisar que poner
+    // no se deberian borrar las practicas si se borra la rubrica
+    // revisar que poner
     @OneToOne
     @JsonIgnore
     private Practice practice;
 
-    @OneToMany(mappedBy = "rubricTemplate", cascade = CascadeType.DETACH, orphanRemoval = false)    @JsonIgnore
+    @OneToMany(mappedBy = "rubricTemplate", cascade = CascadeType.DETACH, orphanRemoval = false)
+    @JsonIgnore
     private List<Rubric> rubrics;
 
     @ManyToOne
     @JoinColumn(nullable = false)
     private User creator;
-    
+
 }

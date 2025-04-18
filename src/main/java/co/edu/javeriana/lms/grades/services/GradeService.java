@@ -143,9 +143,11 @@ public class GradeService {
             }
         }
 
+        // Variable to accumulate the weighted grades
+        Float finalGrade = 0f;
+
         // Create a StudentGradeDto object to store the grades
         StudentGradeDto studentGradeDto = new StudentGradeDto(user.getLastName() + " " + user.getName());
-        studentGradeDto.setFinalGrade(0f); // TODO: Fix this calculation
         studentGradeDto.setPracticeGrades(new LinkedHashMap<>());
 
         // Iterate through the practices and add the grades to the StudentGradeDto object
@@ -157,7 +159,9 @@ public class GradeService {
                         Float grade = simulation.getGrade();
                         if (grade != null) {
                             studentGradeDto.addPracticeGrade(practice.getName(), grade);
-                            studentGradeDto.setFinalGrade(0f);
+                            // Calculate the weighted grade
+                            Float gradePercentage = practice.getGradePercentage() != null ? practice.getGradePercentage() : 0f;
+                            finalGrade += grade * (gradePercentage / 100f);
                         } else {
                             studentGradeDto.addPracticeGrade(practice.getName(), null);
                         }
@@ -165,6 +169,9 @@ public class GradeService {
                 }
             }
         }
+
+        // Set the final grade in the StudentGradeDto object
+        studentGradeDto.setFinalGrade(finalGrade);
 
         // Ensure that all practices are included in the StudentGradeDto object
         for (Practice practice : practices) {

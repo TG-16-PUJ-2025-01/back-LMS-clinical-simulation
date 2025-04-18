@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
+import co.edu.javeriana.lms.shared.errors.CustomError;
+import co.edu.javeriana.lms.shared.errors.ErrorCode;
 import co.edu.javeriana.lms.subjects.dtos.ClassDto;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
@@ -273,7 +275,7 @@ public class ClassService {
                 () -> new CustomError("Usuario con ID " + idMember + " no encontrado", ErrorCode.ACCOUNT_NOT_FOUND));
         ;
 
-        if(profesor.equals(Role.PROFESOR))
+        if(role.equals(Role.PROFESOR))
         {
             //si ya esta en la lista no se hace nada
             if(classModel.getProfessors().contains(member))

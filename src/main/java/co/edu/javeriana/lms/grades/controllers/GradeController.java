@@ -3,6 +3,8 @@ package co.edu.javeriana.lms.grades.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.javeriana.lms.accounts.services.AuthService;
 import co.edu.javeriana.lms.grades.dtos.StudentGradeDto;
+import co.edu.javeriana.lms.grades.dtos.PracticesPercentagesDto;
 import co.edu.javeriana.lms.grades.services.GradeService;
 import co.edu.javeriana.lms.shared.dtos.ApiResponseDto;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +52,18 @@ public class GradeController {
                 200,
                 "ok",
                 studentGrades,
+                null));
+    }
+
+    @PutMapping("/class/{classId}/percentages")
+    public ResponseEntity<?> updateClassGradePercentages(
+            @RequestBody PracticesPercentagesDto classGradePercentagesDto) {
+        log.info("Requesting to update grade percentages");
+        gradeService.updateClassGradePercentages(classGradePercentagesDto);
+        return ResponseEntity.ok(new ApiResponseDto<>(
+                200,
+                "ok",
+                null,
                 null));
     }
 }

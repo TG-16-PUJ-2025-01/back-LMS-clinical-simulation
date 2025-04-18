@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
-import co.edu.javeriana.lms.shared.errors.CustomError;
-import co.edu.javeriana.lms.shared.errors.ErrorCode;
 import co.edu.javeriana.lms.subjects.dtos.ClassDto;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
@@ -46,12 +44,13 @@ public class ClassService {
         return classRepository.searchClasses(filter, pageable);
     }
 
-    public Page<User> findAllMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id,
-            String role) {
+    public Page<User>findAllMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id, String role)
+    {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         Pageable pageable = PageRequest.of(page, size, sortOrder);
 
-        if (role.equals(Role.PROFESOR.name())) {
+        if(role.equals(Role.PROFESOR.name()))
+        {
             return classRepository.findProfessorsMembers(id, filter, pageable).map(user -> {
                 user.getRoles().clear();
                 ArrayList<Role> roles = new ArrayList<>();
@@ -59,7 +58,9 @@ public class ClassService {
                 user.setRoles(new HashSet<>(roles));
                 return user;
             });
-        } else if (role.equals(Role.ESTUDIANTE.name())) {
+        }
+        else if(role.equals(Role.ESTUDIANTE.name()))
+        {
             return classRepository.findStudentsMembers(id, filter, pageable).map(user -> {
                 user.getRoles().clear();
                 ArrayList<Role> roles = new ArrayList<>();
@@ -67,21 +68,26 @@ public class ClassService {
                 user.setRoles(new HashSet<>(roles));
                 return user;
             });
-        } else {
+        }
+        else
+        {
             ClassModel classModel = classRepository.findById(id).get();
             Page<User> members = classRepository.findMembers(id, filter, pageable);
 
-            // iterar sobre los miembros de la clase y manipular el rol
-            // si pertenece a profesor, se le asigna el rol de profesor
-            // si pertenece a estudiante, se le asigna el rol de estudiante
+            //iterar sobre los miembros de la clase y manipular el rol
+            //si pertenece a profesor, se le asigna el rol de profesor
+            //si pertenece a estudiante, se le asigna el rol de estudiante
 
             members.forEach(user -> {
-                if (classModel.getProfessors().contains(user)) {
+                if(classModel.getProfessors().contains(user))
+                {
                     user.getRoles().clear();
                     ArrayList<Role> roles = new ArrayList<>();
                     roles.add(Role.PROFESOR);
                     user.setRoles(new HashSet<>(roles));
-                } else if (classModel.getStudents().contains(user)) {
+                }
+                else if(classModel.getStudents().contains(user))
+                {
                     user.getRoles().clear();
                     ArrayList<Role> roles = new ArrayList<>();
                     roles.add(Role.ESTUDIANTE);
@@ -94,12 +100,13 @@ public class ClassService {
 
     }
 
-    public Page<User> findAllNonMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id,
-            String role) {
+    public Page<User>findAllNonMembers(String filter, Integer page, Integer size, String sort, Boolean asc, Long id,String role)
+    {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-
-        if (role.equals(Role.PROFESOR.name())) {
+        
+        if(role.equals(Role.PROFESOR.name()))
+        {
             return classRepository.findProfessorsNotInClass(id, filter, pageable).map(user -> {
                 user.getRoles().clear();
                 ArrayList<Role> roles = new ArrayList<>();
@@ -107,7 +114,9 @@ public class ClassService {
                 user.setRoles(new HashSet<>(roles));
                 return user;
             });
-        } else if (role.equals(Role.ESTUDIANTE.name())) {
+        }
+        else if(role.equals(Role.ESTUDIANTE.name()))
+        {
             return classRepository.findStudentsNotInClass(id, filter, pageable).map(user -> {
                 user.getRoles().clear();
                 ArrayList<Role> roles = new ArrayList<>();
@@ -115,7 +124,8 @@ public class ClassService {
                 user.setRoles(new HashSet<>(roles));
                 return user;
             });
-        } else
+        }
+        else
             return classRepository.findUsersNotInClass(id, filter, pageable).map(user -> {
                 user.getRoles().remove(Role.COORDINADOR);
                 user.setRoles(user.getRoles());
@@ -211,15 +221,17 @@ public class ClassService {
         classRepository.deleteById(id);
     }
 
-    public ClassModel update(ClassModel classModel) {
+    public ClassModel update(ClassModel classModel) { 
         classRepository.save(classModel);
 
         return classModel;
     }
 
-    public ClassModel fromDtoToClass(ClassDto classModeldto, Long id) {
+    public ClassModel fromDtoToClass(ClassDto classModeldto, Long id)
+    {
         ClassModel currentClassModel = classRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
+       
 
         currentClassModel.setJaverianaId(classModeldto.getJaverianaId());
         // Update fields
@@ -234,18 +246,20 @@ public class ClassService {
         ClassModel classModel = classRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
 
-        // anadir los profesores a la clase en members buscando precisamente los
-        // profesores con role
+        //anadir los profesores a la clase en members buscando precisamente los profesores con role
         members.stream().forEach(member -> {
-            if (member.getRoles().contains(Role.PROFESOR)) {
+            if(member.getRoles().contains(Role.PROFESOR))
+            {
                 classModel.getProfessors().add(userRepository.findById(member.getId()).get());
-            } else if (member.getRoles().contains(Role.ESTUDIANTE)) {
+            }
+            else if(member.getRoles().contains(Role.ESTUDIANTE))
+            {
                 classModel.getStudents().add(userRepository.findById(member.getId()).get());
             }
         });
 
         classRepository.save(classModel);
-
+        
         return classModel;
     }
 
@@ -259,9 +273,10 @@ public class ClassService {
                 () -> new CustomError("Usuario con ID " + idMember + " no encontrado", ErrorCode.ACCOUNT_NOT_FOUND));
         ;
 
-        if (role.equals(Role.PROFESOR)) {
-            // si ya esta en la lista no se hace nada
-            if (classModel.getProfessors().contains(member))
+        if(profesor.equals(Role.PROFESOR))
+        {
+            //si ya esta en la lista no se hace nada
+            if(classModel.getProfessors().contains(member))
                 return classModel;
 
             if (member.getRoles().contains(Role.PROFESOR)) {

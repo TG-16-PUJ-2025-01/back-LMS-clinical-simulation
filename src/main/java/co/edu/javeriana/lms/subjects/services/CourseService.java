@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
+import co.edu.javeriana.lms.grades.models.RubricTemplate;
 import co.edu.javeriana.lms.subjects.dtos.CourseDto;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
@@ -99,7 +100,7 @@ public class CourseService {
 
         List<Course> coordinatorCourses = new ArrayList<>();
 
-        log.info("Searching by key: " + searsearchByKey + " and filter: " + filter+ " and period: " + period);
+        log.info("Searching by key: " + searsearchByKey + " and filter: " + filter + " and period: " + period);
 
         if (searsearchByKey.isEmpty() || searsearchByKey.equals("Clases") || searsearchByKey.equals("Profesores")) {
             coordinatorCourses = courseRepository.findCoursesByCoordinator(coordinator);
@@ -117,17 +118,21 @@ public class CourseService {
                 sortedClasses = classRepository.findClassesByCourseId(course, period); // Convertir el stream en lista
 
             } else if (searsearchByKey.equals("Clases")) {
-                sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter, period); // Convertir el                                                                                          // lista
+                sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter, period); // Convertir
+                                                                                                                // el //
+                                                                                                                // lista
             } else {
-                sortedClasses = classRepository.findClassesByCourseByProfessorContaining(course, filter,period); // Convertir
-                                                                                                          // el stream                                                                                             // en lista
+                sortedClasses = classRepository.findClassesByCourseByProfessorContaining(course, filter, period); // Convertir
+                // el stream // en lista
             }
 
             // Crear un CourseDto con las clases ordenadas
             courses.add(new CourseDto(course.getCourseId(), course.getJaverianaId(), course.getName(),
                     course.getCoordinator().getId(), sortedClasses.stream()
-                            .sorted((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod())) // Ordenar por periodo (mayor                                                          // a menor)
-                            .toList(), course.getFaculty(), course.getDepartment(), course.getProgram(),
+                            .sorted((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod())) // Ordenar por periodo (mayor
+                                                                                          // // a menor)
+                            .toList(),
+                    course.getFaculty(), course.getDepartment(), course.getProgram(),
                     course.getSemester()));
 
         }
@@ -142,4 +147,14 @@ public class CourseService {
                 .toList();
     }
 
+    public Page<RubricTemplate> findRecommendedRubricsByCourseId(Long courseId, String filter, Integer page,
+            Integer size,
+            String sort, Boolean asc) {
+        Pageable pageable = PageRequest.of(page, size);
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new EntityNotFoundException("Course with ID " + courseId + " not found"));
+
+        return courseRepository.findByCourseIdAndTitleContainingIgnoreCase(course.getCourseId(), filter,
+                pageable);
+    }
 }

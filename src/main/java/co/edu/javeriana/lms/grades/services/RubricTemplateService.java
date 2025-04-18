@@ -136,7 +136,7 @@ public class RubricTemplateService {
         newRubric.setRubricTemplate(rubricTemplateModel);
         newRubric.setEvaluatedCriterias(new ArrayList<EvaluatedCriteria>());
         rubricTemplateModel.getCriteria().forEach(criteria -> {
-            newRubric.addEvaluatedCriteria(new EvaluatedCriteria(criteria.getId(), "", 0));
+            newRubric.addEvaluatedCriteria(new EvaluatedCriteria(criteria.getId(), "", 0F));
         });
 
         // get the simulations from practice

@@ -42,5 +42,4 @@ public class CourseDto {
     @NotNull(message = "semester is required")
     @Positive(message = "semester must be a positive number")
     private Integer semester;
-
 }

@@ -28,9 +28,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Course {
-    
 
-    public Course(String name, Long javerianaId, User coordinator, String faculty, String department, String program, Integer semester) {
+    public Course(String name, Long javerianaId, User coordinator, String faculty, String department, String program,
+            Integer semester) {
         this.name = name;
         this.javerianaId = javerianaId;
         this.coordinator = coordinator;
@@ -67,9 +67,6 @@ public class Course {
     private User coordinator;
 
     @ManyToMany
-    @JoinTable(name = "Rubric_Template_Course", joinColumns = @JoinColumn(name = "courseId"), inverseJoinColumns = @JoinColumn(name = "rubricTemplateId"))  
+    @JoinTable(name = "Rubric_Template_Course", joinColumns = @JoinColumn(name = "courseId"), inverseJoinColumns = @JoinColumn(name = "rubricTemplateId"))
     private List<RubricTemplate> rubricTemplates;
-
-
-
 }

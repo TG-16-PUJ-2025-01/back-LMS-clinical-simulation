@@ -176,4 +176,25 @@ public class GradeService {
         // Return the StudentGradeDto object
         return studentGradeDto;
     }
+
+
+    public List<PracticePercentageDto> getPracticesPercentagesByClass(Long classId) {
+        // Search for the class by id
+        ClassModel classModel = classRepository.findById(classId)
+                .orElseThrow(() -> new RuntimeException("Class not found"));
+
+        // Create a list to store the practice percentages
+        List<PracticePercentageDto> practicesPercentages = new ArrayList<>();
+
+        // Iterate through the practices and add the percentages to the list
+        for (Practice practice : classModel.getPractices()) {
+            if (Boolean.TRUE.equals(practice.getGradeable())) { // Check if the practice is gradeable
+                PracticePercentageDto practicePercentageDto = new PracticePercentageDto(practice.getId(), practice.getGradePercentage());
+                practicesPercentages.add(practicePercentageDto);
+            }
+        }
+
+        // Return the PracticesPercentagesDto object
+        return practicesPercentages;
+    }
 }

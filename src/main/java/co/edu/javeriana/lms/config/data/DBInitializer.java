@@ -348,11 +348,11 @@ public class DBInitializer implements CommandLineRunner {
 				Practice.builder().name("Practica 1").description(
 						"Descripcion de la practica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(5)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(30).build(),
+						.classModel(classRepository.findById(1L).get()).simulationDuration(30).gradePercentage(10F).build(),
 				Practice.builder().name("Practica 2").description(
 						"Descripcion de la practica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(2).maxStudentsGroup(5)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build(),
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(50F).build(),
 				Practice.builder().name("Practica 3").description(
 						"Descripcion de la practica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(10).maxStudentsGroup(5)

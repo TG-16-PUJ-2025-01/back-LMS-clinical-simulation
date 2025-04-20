@@ -61,6 +61,23 @@ public class UserService implements UserDetailsService {
         return savedUser;
     }
 
+    public User addUserExcel(User user) {
+        log.info("Creating user: " + user.getEmail());
+        if (userRepository.existsByEmail(user.getEmail())) {
+            return userRepository.findByEmail(user.getEmail()).orElseThrow();
+        }
+        String password = PasswordGenerator.generatePassword();
+        user.setPassword(passwordEncoder.encode(password));
+        User savedUser =  userRepository.save(user);
+
+        String subject = "Bienvenido a LMS - Tus credenciales de acceso";
+        String body = "Hola " + user.getEmail() + ",\n\nTu cuenta ha sido creada exitosamente.\n" +
+                  "Tu contraseña temporal es: " + password + "\n\nPor favor, cambia tu contraseña después de iniciar sesión.";
+        emailService.sendEmail(user.getEmail(), subject, body);
+
+        return savedUser;
+    }
+
     public User findById(Long id) {
         log.info("Getting user by id: " + id);
         return userRepository.findById(id)

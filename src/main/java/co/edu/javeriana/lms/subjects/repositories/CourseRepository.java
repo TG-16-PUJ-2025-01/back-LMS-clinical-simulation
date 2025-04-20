@@ -1,6 +1,7 @@
 package co.edu.javeriana.lms.subjects.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,4 +34,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             @Param("courseId") Long courseId,
             @Param("title") String title,
             Pageable pageable);
+
+    @Query("SELECT c FROM Course c WHERE  c.javerianaId = :courseId")
+    Optional<Course> findByJaverianaId( @Param("courseId") Long courseId);
 }

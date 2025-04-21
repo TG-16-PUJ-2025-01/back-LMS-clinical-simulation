@@ -73,15 +73,16 @@ public class Practice {
 
     @ManyToOne
     @JoinColumn(nullable = false)
+    @JsonIgnore
     private ClassModel classModel;
 
     @OneToOne
     @JoinColumn(nullable = true)
+    @JsonIgnore
     private RubricTemplate rubricTemplate;
     
     
     @OneToMany(mappedBy = "practice")
     @JsonIgnore
     private List<Simulation> simulations;
-
 }

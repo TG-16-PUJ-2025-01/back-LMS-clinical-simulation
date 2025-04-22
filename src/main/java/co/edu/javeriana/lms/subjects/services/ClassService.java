@@ -7,7 +7,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -137,14 +136,7 @@ public class ClassService {
     }
 
     public ClassModel findById(Long id) {
-        ClassModel classModel = classRepository.findById(id).orElse(null);        
-
-        if (classModel != null) {
-            // Inicializar las colecciones lazy
-            Hibernate.initialize(classModel.getStudents());
-            Hibernate.initialize(classModel.getProfessors());
-        }
-        return classModel;
+        return classRepository.findById(id).get();
     }
 
     public ClassModel save(ClassDto entity) {

@@ -35,7 +35,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        token = token.substring(7); // Eliminar el prefijo "Bearer "
+        token = token.substring(7); // Eliminar el prefijo "Bearer"
         Long userId = authService.getUserIdByToken(token);
         String[] userRoles = authService.getRolesByToken(token);
 
@@ -43,10 +43,33 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         String requestURI = request.getRequestURI();
         Long classId = extractClassIdFromURI(requestURI);
 
+        log.info("User ID: {} and Class ID: {} found in the request", userId, classId);
+
+        /*
+            TODO: La siguiente url no esta siendo interceptada
+            Faltan las siguientes urls:
+
+            Practicas:
+            http://localhost:5173/profesor/clases/3/practicas/1
+            http://localhost:5173/coordinador/clases/3/practicas/1
+
+            Calificaciones:
+            http://localhost:5173/profesor/clases/1/calificaciones
+            http://localhost:5173/estudiante/clases/1/calificaciones
+
+            Miembros:
+            http://localhost:5173/estudiante/clases/1/miembros
+
+            Simulacion:
+            http://localhost:5173/coordinador/simulacion/1
+            (Estudiante y eso)
+        */
+
         if (classId != null) {
             // Verificar si el usuario tiene acceso a la clase según su rol
             if (!isUserAuthorizedForClass(userId, userRoles, classId)) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                log.warn("Forbidden: user with id {} does not have access to class with id {}", userId, classId);
                 response.getWriter().write("Forbidden: You do not have access to this class");
                 return false;
             }

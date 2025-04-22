@@ -1,15 +1,19 @@
 package co.edu.javeriana.lms.config.security;
 
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerInterceptor;
-
 import co.edu.javeriana.lms.accounts.services.AuthService;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.services.ClassService;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@Slf4j
 @Component
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
@@ -23,26 +27,27 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        log.info("AuthorizationInterceptor: Checking authorization for request: {}", request.getRequestURI());
         String token = request.getHeader("Authorization");
         if (token == null || !token.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Unauthorized: Missing or invalid token");
             return false;
         }
 
         token = token.substring(7); // Eliminar el prefijo "Bearer "
         Long userId = authService.getUserIdByToken(token);
-        String[] userRole = authService.getRolesByToken(token);
+        String[] userRoles = authService.getRolesByToken(token);
 
-        // Obtener la URL y extraer el ID del recurso
+        // Obtener la URL y extraer el ID de la clase
         String requestURI = request.getRequestURI();
+        Long classId = extractClassIdFromURI(requestURI);
 
-        // Verificar acceso a clases
-        if (requestURI.matches("/coordinador/clases/\\d+/practicas")) {
-            Long classId = extractIdFromURI(requestURI);
-
+        if (classId != null) {
             // Verificar si el usuario tiene acceso a la clase según su rol
-            if (!isUserAuthorizedForClass(userId, userRole, classId)) {
+            if (!isUserAuthorizedForClass(userId, userRoles, classId)) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("Forbidden: You do not have access to this class");
                 return false;
             }
         }
@@ -50,9 +55,14 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         return true; // Permitir la solicitud si pasa todas las verificaciones
     }
 
-    private Long extractIdFromURI(String uri) {
-        String[] parts = uri.split("/");
-        return Long.parseLong(parts[parts.length - 2]); // Extraer el ID de la clase
+    private Long extractClassIdFromURI(String uri) {
+        // Usar una expresión regular para extraer el ID de la clase
+        Pattern pattern = Pattern.compile("/class/(\\d+)");
+        Matcher matcher = pattern.matcher(uri);
+        if (matcher.find()) {
+            return Long.parseLong(matcher.group(1));
+        }
+        return null; // No se encontró un ID de clase en la URL
     }
 
     private boolean isUserAuthorizedForClass(Long userId, String[] userRoles, Long classId) {
@@ -62,17 +72,31 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         }
 
         for (String role : userRoles) {
-            if ("ESTUDIANTE".equals(role)) {
-                // Verificar si el estudiante está inscrito en la clase
-                return classModel.getStudents().stream().anyMatch(student -> student.getId().equals(userId));
-            } else if ("PROFESOR".equals(role)) {
-                // Verificar si el profesor está asociado a la clase
-                return classModel.getProfessors().stream().anyMatch(professor -> professor.getId().equals(userId));
-            } else if ("COORDINADOR".equals(role)) {
-                // Verificar si el coordinador está asociado a la asignatura de la clase
-                return classModel.getCourse().getCoordinator().getId().equals(userId);
+            switch (role) {
+                case "ESTUDIANTE":
+                    // Verificar si el estudiante está inscrito en la clase
+                    if (classModel.getStudents().stream().anyMatch(student -> student.getId().equals(userId))) {
+                        return true;
+                    }
+                    break;
+                case "PROFESOR":
+                    // Verificar si el profesor está asociado a la clase
+                    if (classModel.getProfessors().stream().anyMatch(professor -> professor.getId().equals(userId))) {
+                        return true;
+                    }
+                    break;
+                case "COORDINADOR":
+                    // Verificar si el coordinador está asociado a la asignatura de la clase
+                    if (classModel.getCourse().getCoordinator().getId().equals(userId)) {
+                        return true;
+                    }
+                    break;
+                default:
+                    // Rol no reconocido, continuar con la verificación
+                    break;
             }
         }
-        return false; // Rol no autorizado
+
+        return false; // Ningún rol tiene acceso
     }
 }

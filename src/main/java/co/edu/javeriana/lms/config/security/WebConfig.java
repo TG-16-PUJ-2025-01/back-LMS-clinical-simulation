@@ -14,6 +14,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authorizationInterceptor)
-                .addPathPatterns("/coordinador/clases/**"); // Rutas protegidas
+                .addPathPatterns("/class/**", "/estudiante/clases/**", "/profesor/clases/**", "/coordinador/clases/**");
     }
 }

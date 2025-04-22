@@ -326,11 +326,11 @@ public class DBInitializer implements CommandLineRunner {
 
 		ClassModel class1 = new ClassModel("2024-10", userRepository.findAllProfessors(), course2, 12L, 20);
 		ClassModel class2 = new ClassModel("2026-10", userRepository.findAllProfessors(), course3, 13L,21);
-		ClassModel class3 = new ClassModel("2023-10", userRepository.findAllProfessors(), course3, 14L,25);
+		ClassModel class3 = new ClassModel("2023-10", userRepository.findById(8L).map(Arrays::asList).orElseGet(List::of), course3, 14L,25);
 		ClassModel class4 = new ClassModel("2024-10", userRepository.findAllProfessors(), course3, 15L,22);
 		ClassModel class5 = new ClassModel("2025-10", userRepository.findAllProfessors(), course3, 16L,30);
 
-		class1.setStudents(userRepository.findAllStudents());
+		class1.setStudents(userRepository.findById(1L).map(Arrays::asList).orElseGet(List::of));
 		class2.setStudents(userRepository.findAllStudents());
 		class3.setStudents(userRepository.findAllStudents());
 		class4.setStudents(userRepository.findAllStudents());

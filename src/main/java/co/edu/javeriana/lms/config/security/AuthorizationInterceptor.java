@@ -1,6 +1,8 @@
 package co.edu.javeriana.lms.config.security;
 
 import co.edu.javeriana.lms.accounts.services.AuthService;
+import co.edu.javeriana.lms.practices.models.Simulation;
+import co.edu.javeriana.lms.practices.services.SimulationService;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.services.ClassService;
 import org.springframework.stereotype.Component;
@@ -19,15 +21,18 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 
     private final AuthService authService;
     private final ClassService classService;
+    private final SimulationService simulationService;
 
-    public AuthorizationInterceptor(AuthService authService, ClassService classService) {
+    public AuthorizationInterceptor(AuthService authService, ClassService classService, SimulationService simulationService) {
         this.authService = authService;
         this.classService = classService;
+        this.simulationService = simulationService;
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.info("AuthorizationInterceptor: Checking authorization for request: {}", request.getRequestURI());
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
+        log.error("AuthorizationInterceptor: Checking authorization for request: {}", request.getRequestURI());
         String token = request.getHeader("Authorization");
         if (token == null || !token.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -39,39 +44,34 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         Long userId = authService.getUserIdByToken(token);
         String[] userRoles = authService.getRolesByToken(token);
 
-        // Obtener la URL y extraer el ID de la clase
         String requestURI = request.getRequestURI();
-        Long classId = extractClassIdFromURI(requestURI);
 
-        log.info("User ID: {} and Class ID: {} found in the request", userId, classId);
+        // Validación para rutas relacionadas con clases
+        if (requestURI.contains("/class/")) {
+            Long classId = extractClassIdFromURI(requestURI);
+            if (classId != null) {
+                if (!isUserAuthorizedForClass(userId, userRoles, classId)) {
+                    log.error("User {} is not authorized for class {}", userId, classId);
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Forbidden: You do not have access to this class");
+                    return false;
+                }
+            }
+        }
 
-        /*
-            TODO: La siguiente url no esta siendo interceptada
-            Faltan las siguientes urls:
+        // Validación para rutas relacionadas con simulaciones
+        if (requestURI.contains("/simulation/")) {
+            Long simulationId = extractSimulationIdFromURI(requestURI);
+            if (simulationId != null) {
+                Simulation simulation = simulationService.findSimulationById(simulationId);
+                Long classId = simulation.getPractice().getClassModel().getClassId();
 
-            Practicas:
-            http://localhost:5173/profesor/clases/3/practicas/1
-            http://localhost:5173/coordinador/clases/3/practicas/1
-
-            Calificaciones:
-            http://localhost:5173/profesor/clases/1/calificaciones
-            http://localhost:5173/estudiante/clases/1/calificaciones
-
-            Miembros:
-            http://localhost:5173/estudiante/clases/1/miembros
-
-            Simulacion:
-            http://localhost:5173/coordinador/simulacion/1
-            (Estudiante y eso)
-        */
-
-        if (classId != null) {
-            // Verificar si el usuario tiene acceso a la clase según su rol
-            if (!isUserAuthorizedForClass(userId, userRoles, classId)) {
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                log.warn("Forbidden: user with id {} does not have access to class with id {}", userId, classId);
-                response.getWriter().write("Forbidden: You do not have access to this class");
-                return false;
+                if (!isUserAuthorizedForSimulation(userId, userRoles, simulationId, classId)) {
+                    log.error("User {} is not authorized for simulation {}", userId, simulationId);
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Forbidden: You do not have access to this simulation");
+                    return false;
+                }
             }
         }
 
@@ -86,6 +86,16 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             return Long.parseLong(matcher.group(1));
         }
         return null; // No se encontró un ID de clase en la URL
+    }
+
+    private Long extractSimulationIdFromURI(String uri) {
+        // Usar una expresión regular para extraer el ID de la simulación
+        Pattern pattern = Pattern.compile("/simulation/(\\d+)");
+        Matcher matcher = pattern.matcher(uri);
+        if (matcher.find()) {
+            return Long.parseLong(matcher.group(1));
+        }
+        return null; // No se encontró un ID de simulación en la URL
     }
 
     private boolean isUserAuthorizedForClass(Long userId, String[] userRoles, Long classId) {
@@ -120,6 +130,41 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             }
         }
 
+        return false; // Ningún rol tiene acceso
+    }
+
+    private boolean isUserAuthorizedForSimulation(Long userId, String[] userRoles, Long simulationId, Long classId) {
+        Simulation simulation = simulationService.findSimulationById(simulationId);
+        if (simulation == null) {
+            return false; // La simulación no existe
+        }
+    
+        for (String role : userRoles) {
+            switch (role) {
+                case "ESTUDIANTE":
+                    if (simulation.getUsers().stream().anyMatch(user -> user.getId().equals(userId))) {
+                        return true;
+                    }
+                    break;
+                case "PROFESOR":
+                    ClassModel classModel = classService.findById(classId);
+                    if (classModel != null && classModel.getProfessors().stream().anyMatch(professor -> professor.getId().equals(userId))) {
+                        return true;
+                    }
+                    break;
+                case "COORDINADOR":
+                    ClassModel coordinatorClass = classService.findById(classId);
+                    if (coordinatorClass != null && coordinatorClass.getCourse().getCoordinator().getId().equals(userId)) {
+                        return true;
+                    }
+                    break;
+                case "ADMIN":
+                    return true; // El administrador tiene acceso a todo
+                default:
+                    break;
+            }
+        }
+    
         return false; // Ningún rol tiene acceso
     }
 }

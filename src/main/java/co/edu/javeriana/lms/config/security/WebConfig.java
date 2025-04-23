@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -13,8 +16,10 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        log.info("Adding AuthorizationInterceptor for patterns");
         registry.addInterceptor(authorizationInterceptor)
                 .addPathPatterns("/class/**",
-                        "/*/clases/**");
+                        "/*/clases/**",
+                        "/simulation/**");
     }
 }

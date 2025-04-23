@@ -136,7 +136,8 @@ public class ClassService {
     }
 
     public ClassModel findById(Long id) {
-        return classRepository.findById(id).get();
+        return classRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
+                "Class with ID " + id + " not found"));
     }
 
     public ClassModel save(ClassDto entity) {

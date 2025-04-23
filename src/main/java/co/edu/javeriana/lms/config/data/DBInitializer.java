@@ -364,7 +364,11 @@ public class DBInitializer implements CommandLineRunner {
 				Practice.builder().name("Practica 5").description(
 						"Descripcion de la practica 5. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build());
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build(),
+				Practice.builder().name("Practica 6").description(
+						"Descripcion de la practica 6. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5)
+						.classModel(classRepository.findById(3L).get()).simulationDuration(15).build());
 		practiceRepository.saveAll(practices);
 	}
 
@@ -396,7 +400,7 @@ public class DBInitializer implements CommandLineRunner {
 			.build();
 
 		Simulation simulation3 = Simulation.builder()
-			.practice(practiceRepository.findById(1L).get())
+			.practice(practiceRepository.findById(6L).get())
 			.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
 			.startDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
 			.endDateTime(Date.from(startDateTime.plusMinutes(90).atZone(ZoneId.systemDefault()).toInstant()))

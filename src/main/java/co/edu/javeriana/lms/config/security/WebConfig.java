@@ -20,6 +20,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(authorizationInterceptor)
                 .addPathPatterns("/class/**",
                         "/*/clases/**",
-                        "/simulation/**");
+                        "/simulation/**",
+                        "/grade/class/**",
+                        "/grade/student/**");
     }
 }

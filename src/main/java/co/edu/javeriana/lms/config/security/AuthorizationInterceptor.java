@@ -47,7 +47,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         String requestURI = request.getRequestURI();
 
         // Validación para rutas relacionadas con clases
-        if (requestURI.contains("/class/")) {
+        if (requestURI.contains("/class/") || requestURI.contains("/grade/")) {
             Long classId = extractClassIdFromURI(requestURI);
             if (classId != null) {
                 if (!isUserAuthorizedForClass(userId, userRoles, classId)) {
@@ -80,7 +80,8 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 
     private Long extractClassIdFromURI(String uri) {
         // Usar una expresión regular para extraer el ID de la clase
-        Pattern pattern = Pattern.compile("/class/(\\d+)");
+        Pattern pattern = Pattern.compile("/class/(\\d+)"); //TODO: No esta atrapando bien el id de la clase de calificaciones
+        // TODO: Creo que es por el de percentages, tambien atrapa esa y creo no es necesaria
         Matcher matcher = pattern.matcher(uri);
         if (matcher.find()) {
             return Long.parseLong(matcher.group(1));

@@ -88,7 +88,6 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
                     return false;
                 }
             }
-            return true; // TODO: Esto es para que no revise otras validaciones si ya paso esta. Revisar.
         }
 
         // Checks for routes related to classes
@@ -171,7 +170,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     private boolean isUserAuthorizedForClass(Long userId, String[] userRoles, Long classId) {
         ClassModel classModel = classService.findById(classId);
         if (classModel == null) {
-            return false;
+            return false; // Class does not exist, return false
         }
 
         for (String role : userRoles) {
@@ -194,8 +193,9 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
                         return true;
                     }
                     break;
+                case "ADMIN":
+                    return true; // Admin does not have restrictions
                 default:
-                    // Rol not recognized, continue with the verification
                     break;
             }
         }
@@ -247,11 +247,12 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         if (practice == null) {
             return false; // Practice does not exist, return false
         }
-    
+
         // Obtain the ID of the class associated with the practice
         Long classId = practice.getClassModel().getClassId();
-    
-        // Reutilize the logic of isUserAuthorizedForClass to validate access to the class
+
+        // Reutilize the logic of isUserAuthorizedForClass to validate access to the
+        // class
         return isUserAuthorizedForClass(userId, userRoles, classId);
     }
 }

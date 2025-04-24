@@ -45,13 +45,13 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        token = token.substring(7); // Eliminar el prefijo "Bearer"
+        token = token.substring(7);
         Long userId = authService.getUserIdByToken(token);
         String[] userRoles = authService.getRolesByToken(token);
 
         String requestURI = request.getRequestURI();
 
-        // Validación para rutas relacionadas con prácticas
+        // Checks for routes related to practices
         if (requestURI.contains("/practice/")) {
             Long practiceId = extractPracticeIdFromURI(requestURI);
             if (practiceId != null) {
@@ -64,7 +64,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             }
         }
 
-        // Validación para rutas relacionadas con calificaciones
+        // Check for routes related to grades
         if (requestURI.contains("/grade/")) {
             Long classId = extractClassIdFromURIForGrades(requestURI);
             if (classId != null) {
@@ -77,7 +77,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             }
         }
 
-        // Validación para rutas relacionadas con miembros de la clase
+        // Checks for routes related to class members
         if (requestURI.contains("/member/")) {
             Long classId = extractClassIdFromURIForMembers(requestURI);
             if (classId != null) {
@@ -91,8 +91,8 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             return true; // TODO: Esto es para que no revise otras validaciones si ya paso esta. Revisar.
         }
 
-        // Validación para rutas relacionadas con clases
-        if (requestURI.contains("/class/") || requestURI.contains("/grade/")) {
+        // Checks for routes related to classes
+        if (requestURI.contains("/class/")) {
             Long classId = extractClassIdFromURI(requestURI);
             if (classId != null) {
                 if (!isUserAuthorizedForClass(userId, userRoles, classId)) {
@@ -104,7 +104,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             }
         }
 
-        // Validación para rutas relacionadas con simulaciones
+        // Checks for routes related to simulations
         if (requestURI.contains("/simulation/")) {
             Long simulationId = extractSimulationIdFromURI(requestURI);
             if (simulationId != null) {
@@ -120,108 +120,105 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             }
         }
 
-        return true; // Permitir la solicitud si pasa todas las verificaciones
+        return true; // Allow the request if it passes all checks
     }
 
     private Long extractClassIdFromURI(String uri) {
-        // Usar una expresión regular para extraer el ID de la clase
         Pattern pattern = Pattern.compile("/class/(\\d+)");
         Matcher matcher = pattern.matcher(uri);
         if (matcher.find()) {
             return Long.parseLong(matcher.group(1));
         }
-        return null; // No se encontró un ID de clase en la URL
+        return null;
     }
 
     private Long extractClassIdFromURIForMembers(String uri) {
-        // Usar una expresión regular para extraer el ID de la clase
         Pattern pattern = Pattern.compile("/class/(\\d+)/member");
         Matcher matcher = pattern.matcher(uri);
         if (matcher.find()) {
             return Long.parseLong(matcher.group(1));
         }
-        return null; // No se encontró un ID de clase en la URL
+        return null;
     }
 
     private Long extractClassIdFromURIForGrades(String uri) {
-        // Usar una expresión regular para extraer el ID de la clase
         Pattern pattern = Pattern.compile("/grade/class/(\\d+)");
         Matcher matcher = pattern.matcher(uri);
         if (matcher.find()) {
             return Long.parseLong(matcher.group(1));
         }
-        return null; // No se encontró un ID de clase en la URL
+        return null;
     }
 
     private Long extractPracticeIdFromURI(String uri) {
-        // Usar una expresión regular para extraer el ID de la práctica
         Pattern pattern = Pattern.compile("/practice/(\\d+)");
         Matcher matcher = pattern.matcher(uri);
         if (matcher.find()) {
             return Long.parseLong(matcher.group(1));
         }
-        return null; // No se encontró un ID de práctica en la URL
+        return null;
     }
 
     private Long extractSimulationIdFromURI(String uri) {
-        // Usar una expresión regular para extraer el ID de la simulación
         Pattern pattern = Pattern.compile("/simulation/(\\d+)");
         Matcher matcher = pattern.matcher(uri);
         if (matcher.find()) {
             return Long.parseLong(matcher.group(1));
         }
-        return null; // No se encontró un ID de simulación en la URL
+        return null;
     }
 
     private boolean isUserAuthorizedForClass(Long userId, String[] userRoles, Long classId) {
         ClassModel classModel = classService.findById(classId);
         if (classModel == null) {
-            return false; // La clase no existe
+            return false;
         }
 
         for (String role : userRoles) {
             switch (role) {
                 case "ESTUDIANTE":
-                    // Verificar si el estudiante está inscrito en la clase
+                    // Check if the student is enrolled in the class
                     if (classModel.getStudents().stream().anyMatch(student -> student.getId().equals(userId))) {
                         return true;
                     }
                     break;
                 case "PROFESOR":
-                    // Verificar si el profesor está asociado a la clase
+                    // Check if the professor is associated with the class
                     if (classModel.getProfessors().stream().anyMatch(professor -> professor.getId().equals(userId))) {
                         return true;
                     }
                     break;
                 case "COORDINADOR":
-                    // Verificar si el coordinador está asociado a la asignatura de la clase
+                    // Check if the coordinator is associated with the course of the class
                     if (classModel.getCourse().getCoordinator().getId().equals(userId)) {
                         return true;
                     }
                     break;
                 default:
-                    // Rol no reconocido, continuar con la verificación
+                    // Rol not recognized, continue with the verification
                     break;
             }
         }
 
-        return false; // Ningún rol tiene acceso
+        return false; // No role has access to the class
     }
 
     private boolean isUserAuthorizedForSimulation(Long userId, String[] userRoles, Long simulationId, Long classId) {
         Simulation simulation = simulationService.findSimulationById(simulationId);
         if (simulation == null) {
-            return false; // La simulación no existe
+            return false; // Simulation does not exist, return false
         }
 
         for (String role : userRoles) {
             switch (role) {
                 case "ESTUDIANTE":
+                    // Check if the student is enrolled in the simulation
                     if (simulation.getUsers().stream().anyMatch(user -> user.getId().equals(userId))) {
                         return true;
                     }
                     break;
                 case "PROFESOR":
+                    // Check if the professor is associated with the class of the simulation
                     ClassModel classModel = classService.findById(classId);
                     if (classModel != null && classModel.getProfessors().stream()
                             .anyMatch(professor -> professor.getId().equals(userId))) {
@@ -236,26 +233,25 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
                     }
                     break;
                 case "ADMIN":
-                    return true; // El administrador tiene acceso a todo
+                    return true; // Admin does not have restrictions
                 default:
                     break;
             }
         }
 
-        return false; // Ningún rol tiene acceso
+        return false; // No role has access
     }
 
     private boolean isUserAuthorizedForPractice(Long userId, String[] userRoles, Long practiceId) {
-        // Obtener la práctica por su ID
         Practice practice = practiceService.findById(practiceId);
         if (practice == null) {
-            return false; // La práctica no existe
+            return false; // Practice does not exist, return false
         }
     
-        // Obtener el ID de la clase asociada a la práctica
+        // Obtain the ID of the class associated with the practice
         Long classId = practice.getClassModel().getClassId();
     
-        // Reutilizar la lógica de isUserAuthorizedForClass para validar el acceso a la clase
+        // Reutilize the logic of isUserAuthorizedForClass to validate access to the class
         return isUserAuthorizedForClass(userId, userRoles, classId);
     }
 }

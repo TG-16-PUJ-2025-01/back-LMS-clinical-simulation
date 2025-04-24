@@ -23,12 +23,14 @@ import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
-import co.edu.javeriana.lms.grades.models.GradeStatus;
+import co.edu.javeriana.lms.practices.dtos.CreateSimulationRequestDto;
+import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.PracticeType;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
 import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
+import co.edu.javeriana.lms.practices.services.SimulationService;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
@@ -67,6 +69,9 @@ public class DBInitializer implements CommandLineRunner {
 	@Autowired
 	private SimulationRepository simulationRepository;
 
+	@Autowired 
+	private SimulationService simulationService;
+
 	@Override
 	public void run(String... args) throws Exception {
 		insertRoomsAndTypes();
@@ -74,7 +79,6 @@ public class DBInitializer implements CommandLineRunner {
 		insertCoursesClassesAndStudents();
 		insertPractices();
 		insertSimulations();
-		insertRubricTemplates();
 		insertSimulationsVideosAndComments();
 	}
 
@@ -123,157 +127,123 @@ public class DBInitializer implements CommandLineRunner {
 	}
 
 	private void createUsers() {
-		// crear usuarios profesores
-		User professor1 = new User();
-		User professor2 = new User();
-		professor1.setEmail("saristizabal10@javeriana.edu.co");
-		professor1.setPassword(passwordEncoder.encode("123456"));
-		professor1.setName("Santiago");
-		professor1.setLastName("Aristizabal");
-		professor1.setInstitutionalId("123456");
-		professor1.setRoles(Set.of(Role.PROFESOR));
 
-		professor2.setEmail("pedro10@javeriana.edu.co");
-		professor2.setPassword(passwordEncoder.encode("123456"));
-		professor2.setName("Pepo");
-		professor2.setLastName("Pascal");
-		professor2.setInstitutionalId("1256");
-		professor2.setRoles(Set.of(Role.PROFESOR));
+		List<User> users = Arrays.asList(
+				// Profesores
+				User.builder().email("maria.lopez@javeriana.edu.co").password(passwordEncoder.encode("123456"))
+						.name("María").lastName("López").institutionalId("00000010001")
+						.roles(Set.of(Role.PROFESOR)).build(),
 
-		// crear usuarios coordinadores
-		User coord1 = new User();
-		User coord2 = new User();
+				User.builder().email("carlos.gomez@javeriana.edu.co").password(passwordEncoder.encode("123456"))
+						.name("Carlos").lastName("Gómez").institutionalId("00000010002")
+						.roles(Set.of(Role.PROFESOR)).build(),
 
-		coord1.setEmail("saabal10@javeriana.edu.co");
-		coord1.setPassword(passwordEncoder.encode("123456"));
-		coord1.setName("Salomon");
-		coord1.setLastName("Pira");
-		coord1.setInstitutionalId("456");
-		coord1.setRoles(Set.of(Role.COORDINADOR));
+				User.builder().email("andres.vera@javeriana.edu.co").password(passwordEncoder.encode("profesor"))
+						.name("Andrés").lastName("Vera").institutionalId("00000010003")
+						.roles(Set.of(Role.PROFESOR)).build(),
 
-		coord2.setEmail("pucoeocents0@javeriana.edu.co");
-		coord2.setPassword(passwordEncoder.encode("123456"));
-		coord2.setName("Pedro");
-		coord2.setLastName("Puentes");
-		coord2.setInstitutionalId("56");
-		coord2.setRoles(Set.of(Role.COORDINADOR));
+				// Coordinadores
+				User.builder().email("laura.martinez@javeriana.edu.co").password(passwordEncoder.encode("123456"))
+						.name("Laura").lastName("Martínez").institutionalId("00000020001")
+						.roles(Set.of(Role.COORDINADOR)).build(),
 
-		// crear usuarios con ambos tags
-		User both1 = new User();
-		User both2 = new User();
+				User.builder().email("felipe.ramirez@javeriana.edu.co").password(passwordEncoder.encode("123456"))
+						.name("Felipe").lastName("Ramírez").institutionalId("00000020002")
+						.roles(Set.of(Role.COORDINADOR)).build(),
 
-		both1.setEmail("saaal10@javeriana.edu.co");
-		both1.setPassword(passwordEncoder.encode("123456"));
-		both1.setName("Salomon ndienid");
-		both1.setLastName("Pira");
-		both1.setInstitutionalId("45996");
-		both1.setRoles(new HashSet<>(Arrays.asList(Role.PROFESOR, Role.COORDINADOR)));
+				User.builder().email("mariana.nieto@javeriana.edu.co").password(passwordEncoder.encode("coordinador"))
+						.name("Mariana").lastName("Nieto").institutionalId("00000020003")
+						.roles(Set.of(Role.COORDINADOR)).build(),
 
-		both2.setEmail("puenjnjnts0@javeriana.edu.co");
-		both2.setPassword(passwordEncoder.encode("123456"));
-		both2.setName("Pedro idjei");
-		both2.setLastName("Puentes");
-		both2.setInstitutionalId("5690");
-		both2.setRoles(new HashSet<>(Arrays.asList(Role.PROFESOR, Role.COORDINADOR)));
+				// Profesores + Coordinadores
+				User.builder().email("juan.perez@javeriana.edu.co").password(passwordEncoder.encode("123456"))
+						.name("Juan").lastName("Pérez").institutionalId("00000030001")
+						.roles(new HashSet<>(Arrays.asList(Role.PROFESOR, Role.COORDINADOR))).build(),
 
-		// Admin
-		User admin = new User();
-		admin.setEmail("andresgarciam@javeriana.edu.co");
-		admin.setPassword(passwordEncoder.encode("Peter2010?"));
-		admin.setName("Andres");
-		admin.setLastName("Garcia");
-		admin.setInstitutionalId("98675");
-		admin.setRoles(Set.of(Role.ADMIN));
+				User.builder().email("ana.torres@javeriana.edu.co").password(passwordEncoder.encode("123456"))
+						.name("Ana").lastName("Torres").institutionalId("00000030002")
+						.roles(new HashSet<>(Arrays.asList(Role.PROFESOR, Role.COORDINADOR))).build(),
 
-		User admin2 = new User();
-		admin2.setEmail("admin@gmail.com");
-		admin2.setPassword(passwordEncoder.encode("admin"));
-		admin2.setName("admin");
-		admin2.setLastName("admin");
-		admin2.setInstitutionalId("111222");
-		admin2.setRoles(Set.of(Role.ADMIN));
+				// Administradores
+				User.builder().email("andres.garcia@javeriana.edu.co").password(passwordEncoder.encode("Peter2010?"))
+						.name("Andrés").lastName("García").institutionalId("00000040001")
+						.roles(Set.of(Role.ADMIN)).build(),
 
-		User superAdmin = new User();
-		superAdmin.setEmail("superadmin@gmail.com");
-		superAdmin.setPassword(passwordEncoder.encode("superadmin"));
-		superAdmin.setName("super");
-		superAdmin.setLastName("admin");
-		superAdmin.setInstitutionalId("111223");
-		superAdmin.setRoles(Set.of(Role.ADMIN, Role.COORDINADOR, Role.PROFESOR, Role.ESTUDIANTE));
+				User.builder().email("admin@javeriana.edu.co").password(passwordEncoder.encode("admin"))
+						.name("Administrador").lastName("General").institutionalId("00000040002")
+						.roles(Set.of(Role.ADMIN)).build(),
 
-		User student = new User();
-		student.setEmail("sopita@javeriana.edu.co");
-		student.setPassword(passwordEncoder.encode("123"));
-		student.setName("Sophie");
-		student.setLastName("Aristi");
-		student.setInstitutionalId("19281");
-		student.setRoles(Set.of(Role.ESTUDIANTE));
+				// SuperAdmin (todos los roles)
+				User.builder().email("sofia.admin@javeriana.edu.co").password(passwordEncoder.encode("superadmin"))
+						.name("Sofía").lastName("Admin").institutionalId("00000090001")
+						.roles(Set.of(Role.ADMIN, Role.COORDINADOR, Role.PROFESOR, Role.ESTUDIANTE)).build(),
 
-		User student2 = new User();
-		student2.setEmail("estudiante@gmail.com");
-		student2.setPassword(passwordEncoder.encode("estudiante"));
-		student2.setName("estudiante");
-		student2.setLastName("estudiante");
-		student2.setInstitutionalId("111224");
-		student2.setRoles(Set.of(Role.ESTUDIANTE));
+				// Estudiantes
+				User.builder().email("camilo.mendoza@javeriana.edu.co").password(passwordEncoder.encode("123"))
+						.name("Camilo").lastName("Mendoza").institutionalId("00000050001")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
 
-		User student3 = new User();
-		student3.setEmail("estudiante3@gmail.com");
-		student3.setPassword(passwordEncoder.encode("estudiante2"));
-		student3.setName("estudiante3");
-		student3.setLastName("estudiante3");
-		student3.setInstitutionalId("911225");
-		student3.setRoles(Set.of(Role.ESTUDIANTE));
+				User.builder().email("jessica.palacios@javeriana.edu.co").password(passwordEncoder.encode("estudiante"))
+						.name("Jessica").lastName("Palacios").institutionalId("00000050002")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
 
-		User student4 = new User();
-		student4.setEmail("estudiante4@gmail.com");
-		student4.setPassword(passwordEncoder.encode("estudiante4"));
-		student4.setName("estudiante4");
-		student4.setLastName("estudiante4");
-		student4.setInstitutionalId("911226");
-		student4.setRoles(Set.of(Role.ESTUDIANTE));
-		
-		User student5 = new User();
-		student5.setEmail("estudiante5@gmail.com");
-		student5.setPassword(passwordEncoder.encode("estudiante5"));
-		student5.setName("estudiante5");
-		student5.setLastName("estudiante5");
-		student5.setInstitutionalId("911227");
-		student5.setRoles(Set.of(Role.ESTUDIANTE));
+				User.builder().email("daniel.rojas@javeriana.edu.co").password(passwordEncoder.encode("estudiante2"))
+						.name("Daniel").lastName("Rojas").institutionalId("00000050003")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
 
+				User.builder().email("valeria.morales@javeriana.edu.co").password(passwordEncoder.encode("estudiante4"))
+						.name("Valeria").lastName("Morales").institutionalId("00000050004")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
 
-		User profesor3 = new User();
-		profesor3.setEmail("profesor@gmail.com");
-		profesor3.setPassword(passwordEncoder.encode("profesor"));
-		profesor3.setName("profesor");
-		profesor3.setLastName("profesor");
-		profesor3.setInstitutionalId("111225");
-		profesor3.setRoles(Set.of(Role.PROFESOR));
+				User.builder().email("julian.fernandez@javeriana.edu.co")
+						.password(passwordEncoder.encode("estudiante5"))
+						.name("Julián").lastName("Fernández").institutionalId("00000050005")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
 
-		User coordinator = new User();
-		coordinator.setEmail("coordinador@gmail.com");
-		coordinator.setPassword(passwordEncoder.encode("coordinador"));
-		coordinator.setName("coordinador");
-		coordinator.setLastName("coordinador");
-		coordinator.setInstitutionalId("111226");
-		coordinator.setRoles(Set.of(Role.COORDINADOR));
+				User.builder().email("sofia.navarro@javeriana.edu.co").password(passwordEncoder.encode("est123"))
+						.name("Sofía").lastName("Navarro").institutionalId("00000050006")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
 
-		userRepository.save(professor1);
-		userRepository.save(professor2);
-		userRepository.save(coord1);
-		userRepository.save(coord2);
-		userRepository.save(both1);
-		userRepository.save(both2);
-		userRepository.save(admin);
-		userRepository.save(admin2);
-		userRepository.save(superAdmin);
-		userRepository.save(student);
-		userRepository.save(student2);
-		userRepository.save(student3);
-		userRepository.save(student4);
-		userRepository.save(student5);
-		userRepository.save(profesor3);
-		userRepository.save(coordinator);
+				User.builder().email("mateo.silva@javeriana.edu.co").password(passwordEncoder.encode("est456"))
+						.name("Mateo").lastName("Silva").institutionalId("00000050007")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
+
+				User.builder().email("isabella.reyes@javeriana.edu.co").password(passwordEncoder.encode("est789"))
+						.name("Isabella").lastName("Reyes").institutionalId("00000050008")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
+
+				User.builder().email("sebastian.ruiz@javeriana.edu.co").password(passwordEncoder.encode("est234"))
+						.name("Sebastián").lastName("Ruiz").institutionalId("00000050009")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
+
+				User.builder().email("valentina.castillo@javeriana.edu.co").password(passwordEncoder.encode("est345"))
+						.name("Valentina").lastName("Castillo").institutionalId("00000050010")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
+
+				User.builder().email("nicolas.mejia@javeriana.edu.co").password(passwordEncoder.encode("est567"))
+						.name("Nicolás").lastName("Mejía").institutionalId("00000050011")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
+
+				User.builder().email("camila.ospina@javeriana.edu.co").password(passwordEncoder.encode("est678"))
+						.name("Camila").lastName("Ospina").institutionalId("00000050012")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
+
+				User.builder().email("daniela.barrera@javeriana.edu.co").password(passwordEncoder.encode("est890"))
+						.name("Daniela").lastName("Barrera").institutionalId("00000050013")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
+
+				User.builder().email("santiago.ortiz@javeriana.edu.co").password(passwordEncoder.encode("est901"))
+						.name("Santiago").lastName("Ortiz").institutionalId("00000050014")
+						.roles(Set.of(Role.ESTUDIANTE)).build(),
+
+				User.builder().email("juliana.perez@javeriana.edu.co").password(passwordEncoder.encode("est012"))
+						.name("Juliana").lastName("Pérez").institutionalId("00000050015")
+						.roles(Set.of(Role.ESTUDIANTE)).build()
+
+		);
+
+		// Guardar todos los usuarios
+		userRepository.saveAll(users);
 	}
 
 	private void insertSimulationsVideosAndComments() throws ParseException {
@@ -284,7 +254,8 @@ public class DBInitializer implements CommandLineRunner {
 						.expirationDate(new Date()).duration(62L).size(8.3).build(),
 				Video.builder().name("10350-224234500_small.mp4").recordingDate(dateFormat.parse("2023-01-31"))
 						.expirationDate(new Date()).duration(600L).size(31.2).build(),
-				Video.builder().name("CCrit1-1__2025_03_03_18_25_12_Movie.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+						.recordingDate(dateFormat.parse("2023-01-31"))
 						.expirationDate(new Date()).duration(600L).size(31.2).build(),
 				Video.builder().name("unavailable1.mp4").recordingDate(dateFormat.parse("2023-01-31"))
 						.expirationDate(new Date()).duration(210L).size(300.0).available(false).build(),
@@ -314,105 +285,261 @@ public class DBInitializer implements CommandLineRunner {
 	}
 
 	private void insertCoursesClassesAndStudents() {
-		Course course1 = new Course("Cálculo Diferencial", 123456L, userRepository.findById(1L).get(), "medicina", "medicina interna", "pregrado", 1);
-		Course course2 = new Course("Cálculo Integral", 123455L, userRepository.findById(3L).get(), "enfermeria", "medicina interna", "maestria", 2);
-		Course course3 = new Course("Cálculo Vectorial", 123454L, userRepository.findById(3L).get(), "medicina", "medicina critica", "doctorado", 3);
-		Course course4 = new Course("Cálculo 3", 1232234L, userRepository.findById(3L).get(), "odontologia", "medicina familiar", "pregrado", 4);
+		List<Course> courses = List.of(
+				Course.builder()
+						.name("Semiología Clínica")
+						.javerianaId(100001L)
+						.coordinator(userRepository.findById(3L).get())
+						.faculty("medicina")
+						.department("medicina interna")
+						.program("pregrado")
+						.semester(1)
+						.build(),
 
-		courseRepository.save(course1);
-		courseRepository.save(course2);
-		courseRepository.save(course3);
-		courseRepository.save(course4);
+				Course.builder()
+						.name("Farmacología General")
+						.javerianaId(100002L)
+						.coordinator(userRepository.findById(5L).get())
+						.faculty("medicina")
+						.department("farmacología")
+						.program("pregrado")
+						.semester(2)
+						.build(),
 
-		ClassModel class1 = new ClassModel("2024-10", userRepository.findAllProfessors(), course2, 12L, 20);
-		ClassModel class2 = new ClassModel("2026-10", userRepository.findAllProfessors(), course3, 13L,21);
-		ClassModel class3 = new ClassModel("2023-10", userRepository.findAllProfessors(), course3, 14L,25);
-		ClassModel class4 = new ClassModel("2024-10", userRepository.findAllProfessors(), course3, 15L,22);
-		ClassModel class5 = new ClassModel("2025-10", userRepository.findAllProfessors(), course3, 16L,30);
+				Course.builder()
+						.name("Cuidados de Enfermería en el Adulto")
+						.javerianaId(100003L)
+						.coordinator(userRepository.findById(4L).get())
+						.faculty("enfermeria")
+						.department("cuidados intensivos")
+						.program("pregrado")
+						.semester(3)
+						.build(),
 
-		class1.setStudents(userRepository.findAllStudents());
-		class2.setStudents(userRepository.findAllStudents());
-		class3.setStudents(userRepository.findAllStudents());
-		class4.setStudents(userRepository.findAllStudents());
-		class5.setStudents(userRepository.findAllStudents());
+				Course.builder()
+						.name("Fisiopatología Clínica")
+						.javerianaId(100004L)
+						.coordinator(userRepository.findById(5L).get())
+						.faculty("medicina")
+						.department("medicina interna")
+						.program("maestria")
+						.semester(4)
+						.build(),
 
-		classRepository.save(class1);
-		classRepository.save(class2);
-		classRepository.save(class3);
-		classRepository.save(class4);
-		classRepository.save(class5);
+				Course.builder()
+						.name("Terapia Intravenosa y Manejo de Vía Aérea")
+						.javerianaId(100005L)
+						.coordinator(userRepository.findById(6L).get())
+						.faculty("enfermeria")
+						.department("emergencias")
+						.program("especialización")
+						.semester(5)
+						.build(),
+
+				Course.builder()
+						.name("Simulación Clínica Avanzada")
+						.javerianaId(100006L)
+						.coordinator(userRepository.findById(6L).get())
+						.faculty("medicina")
+						.department("medicina crítica")
+						.program("doctorado")
+						.semester(6)
+						.build(),
+
+				Course.builder()
+						.name("Atención Primaria en Salud")
+						.javerianaId(100007L)
+						.coordinator(userRepository.findById(4L).get())
+						.faculty("medicina")
+						.department("medicina familiar")
+						.program("pregrado")
+						.semester(7)
+						.build(),
+
+				Course.builder()
+						.name("Ética y Humanismo Médico")
+						.javerianaId(100008L)
+						.coordinator(userRepository.findById(3L).get())
+						.faculty("medicina")
+						.department("ética médica")
+						.program("pregrado")
+						.semester(8)
+						.build());
+
+		courseRepository.saveAll(courses);
+
+		List<User> allProfessors = userRepository.findAllProfessors();
+		List<User> allStudents = userRepository.findAllStudents();
+
+		List<ClassModel> classes = List.of(
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courses.get(1))
+						.javerianaId(20001L)
+						.numberOfParticipants(9)
+						.build(),
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courses.get(1))
+						.javerianaId(20002L)
+						.numberOfParticipants(6)
+						.build(),
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courses.get(2))
+						.javerianaId(20003L)
+						.numberOfParticipants(15)
+						.build(),
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courses.get(3))
+						.javerianaId(20004L)
+						.numberOfParticipants(15)
+						.build(),
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courses.get(4))
+						.javerianaId(20005L)
+						.numberOfParticipants(15)
+						.build(),
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courses.get(5))
+						.javerianaId(20006L)
+						.numberOfParticipants(15)
+						.build(),
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courses.get(6))
+						.javerianaId(20007L)
+						.numberOfParticipants(15)
+						.build(),
+				ClassModel.builder()
+						.period("2025-30")
+						.professors(allProfessors)
+						.course(courses.get(7))
+						.javerianaId(20008L)
+						.numberOfParticipants(15)
+						.build());
+
+		classes.forEach(c -> c.setStudents(allStudents));
+
+		classRepository.saveAll(classes);
 	}
 
 	private void insertPractices() {
 		List<Practice> practices = Arrays.asList(
 				Practice.builder().name("Practica 1").description(
 						"Descripcion de la practica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(5)
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(30).build(),
 				Practice.builder().name("Practica 2").description(
 						"Descripcion de la practica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(2).maxStudentsGroup(5)
+						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(9).maxStudentsGroup(1)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build(),
 				Practice.builder().name("Practica 3").description(
 						"Descripcion de la practica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(10).maxStudentsGroup(5)
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build(),
 				Practice.builder().name("Practica 4").description(
 						"Descripcion de la practica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(60).build(),
-				Practice.builder().name("Practica 5").description(
-						"Descripcion de la practica 5. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(5).maxStudentsGroup(5)
+						.type(PracticeType.GRUPAL).gradeable(false).numberOfGroups(5).maxStudentsGroup(5)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build());
 		practiceRepository.saveAll(practices);
 	}
 
+	/* 
 	private void insertSimulations() {
 
-		LocalDateTime startDateTime = LocalDateTime.now().plusDays(1).withHour(11).withMinute(0).withSecond(0).withNano(0);
+		LocalDateTime startDateTime = LocalDateTime.now().plusDays(1).withHour(11).withMinute(0).withSecond(0)
+				.withNano(0);
 
 		Simulation simulation1 = Simulation.builder()
-			.practice(practiceRepository.findById(1L).get())
-			.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
-			.startDateTime(Date.from(startDateTime.atZone(ZoneId.systemDefault()).toInstant()))
-			.endDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
-			.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
-			.gradeStatus(GradeStatus.PENDING)
-			.grade(5.0f)
-			.groupNumber(1)
-			.users(userRepository.findAllStudents())
-			.build();
+				.practice(practiceRepository.findById(1L).get())
+				.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
+				.startDateTime(Date.from(startDateTime.atZone(ZoneId.systemDefault()).toInstant()))
+				.endDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+				.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
+				.gradeStatus(GradeStatus.PENDING)
+				.grade(5.0f)
+				.groupNumber(1)
+				.users(userRepository.findAllStudents())
+				.build();
 
 		Simulation simulation2 = Simulation.builder()
-			.practice(practiceRepository.findById(1L).get())
-			.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
-			.startDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
-			.endDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
-			.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
-			.gradeStatus(GradeStatus.PENDING)
-			.grade(5.0f)
-			.groupNumber(2)
-			.build();
+				.practice(practiceRepository.findById(1L).get())
+				.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
+				.startDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+				.endDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
+				.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
+				.gradeStatus(GradeStatus.PENDING)
+				.grade(5.0f)
+				.groupNumber(2)
+				.build();
 
 		Simulation simulation3 = Simulation.builder()
-			.practice(practiceRepository.findById(1L).get())
-			.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
-			.startDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
-			.endDateTime(Date.from(startDateTime.plusMinutes(90).atZone(ZoneId.systemDefault()).toInstant()))
-			.gradeDateTime(Date.from(LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
-			.gradeStatus(GradeStatus.PENDING)
-			.grade(5.0f)
-			.groupNumber(3)
-			.build();
+				.practice(practiceRepository.findById(1L).get())
+				.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
+				.startDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
+				.endDateTime(Date.from(startDateTime.plusMinutes(90).atZone(ZoneId.systemDefault()).toInstant()))
+				.gradeDateTime(Date.from(LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
+				.gradeStatus(GradeStatus.PENDING)
+				.grade(5.0f)
+				.groupNumber(3)
+				.build();
 
-
-			simulationRepository.save(simulation1);
-			simulationRepository.save(simulation2);
-			simulationRepository.save(simulation3);
+		simulationRepository.save(simulation1);
+		simulationRepository.save(simulation2);
+		simulationRepository.save(simulation3);
 	}
+	*/
 
-	private void insertRubricTemplates() {
+	private void insertSimulations() {	
+		LocalDateTime baseDate = LocalDateTime.now()
+				.withHour(9).withMinute(0).withSecond(0).withNano(0)
+				.with(java.time.DayOfWeek.MONDAY)
+				.minusWeeks(LocalDateTime.now().getDayOfWeek() == java.time.DayOfWeek.MONDAY ? 1 : 0);
+
+		List<SimulationByTimeSlotDto> simulationsPractice1 = Arrays.asList(
+			
+				SimulationByTimeSlotDto.builder().practiceId(1L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date.from(baseDate.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+						.build(),
+
+				SimulationByTimeSlotDto.builder().practiceId(1L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date.from(baseDate.plusDays(1).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+						.build(),
+
+				SimulationByTimeSlotDto.builder().practiceId(1L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.plusDays(2).atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date.from(baseDate.plusDays(2).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+						.build()
+		);
+
+		simulationService.addSimulations(simulationsPractice1);
+
+		List<SimulationByTimeSlotDto> simulationsPractice2 = Arrays.asList(
+				SimulationByTimeSlotDto.builder().practiceId(2L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.plusWeeks(1L).atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date.from(baseDate.plusWeeks(1L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
+						.build()
+		);
+		
+		simulationService.addSimulations(simulationsPractice2);
+
 
 	}
 }

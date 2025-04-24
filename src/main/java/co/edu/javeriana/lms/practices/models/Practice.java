@@ -61,7 +61,7 @@ public class Practice {
 
     @Nullable
     @Column(nullable = true)
-    private Integer numberOfGroups;
+    private Integer numberOfGroups; 
 
     @Nullable
     @Column(nullable = true)

@@ -18,10 +18,12 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         log.info("Adding AuthorizationInterceptor for patterns");
         registry.addInterceptor(authorizationInterceptor)
-                .addPathPatterns("/class/**",
-                        "/*/clases/**",
+                .addPathPatterns(
+                        "/class/**",
+                        "/class/*/member/**",
                         "/simulation/**",
                         "/grade/class/**",
-                        "/grade/student/**");
+                        "/grade/student/**",
+                        "/practice/**");
     }
 }

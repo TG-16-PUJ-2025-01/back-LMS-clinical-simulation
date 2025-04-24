@@ -1,7 +1,9 @@
 package co.edu.javeriana.lms.config.security;
 
 import co.edu.javeriana.lms.accounts.services.AuthService;
+import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.Simulation;
+import co.edu.javeriana.lms.practices.services.PracticeService;
 import co.edu.javeriana.lms.practices.services.SimulationService;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.services.ClassService;
@@ -22,17 +24,20 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     private final AuthService authService;
     private final ClassService classService;
     private final SimulationService simulationService;
+    private final PracticeService practiceService;
 
-    public AuthorizationInterceptor(AuthService authService, ClassService classService, SimulationService simulationService) {
+    public AuthorizationInterceptor(AuthService authService, ClassService classService,
+            SimulationService simulationService, PracticeService practiceService) {
         this.authService = authService;
         this.classService = classService;
         this.simulationService = simulationService;
+        this.practiceService = practiceService;
     }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        log.error("AuthorizationInterceptor: Checking authorization for request: {}", request.getRequestURI());
+        log.info("AuthorizationInterceptor: Checking authorization for request: {}", request.getRequestURI());
         String token = request.getHeader("Authorization");
         if (token == null || !token.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -45,6 +50,46 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         String[] userRoles = authService.getRolesByToken(token);
 
         String requestURI = request.getRequestURI();
+
+        // Validación para rutas relacionadas con prácticas
+        if (requestURI.contains("/practice/")) {
+            Long practiceId = extractPracticeIdFromURI(requestURI);
+            if (practiceId != null) {
+                if (!isUserAuthorizedForPractice(userId, userRoles, practiceId)) {
+                    log.error("User {} is not authorized for practice {}", userId, practiceId);
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Forbidden: You do not have access to this practice");
+                    return false;
+                }
+            }
+        }
+
+        // Validación para rutas relacionadas con calificaciones
+        if (requestURI.contains("/grade/")) {
+            Long classId = extractClassIdFromURIForGrades(requestURI);
+            if (classId != null) {
+                if (!isUserAuthorizedForClass(userId, userRoles, classId)) {
+                    log.error("User {} is not authorized for class {} grades ", userId, classId);
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Forbidden: You do not have access to this class");
+                    return false;
+                }
+            }
+        }
+
+        // Validación para rutas relacionadas con miembros de la clase
+        if (requestURI.contains("/member/")) {
+            Long classId = extractClassIdFromURIForMembers(requestURI);
+            if (classId != null) {
+                if (!isUserAuthorizedForClass(userId, userRoles, classId)) {
+                    log.error("User {} is not authorized to access members of class {}", userId, classId);
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Forbidden: You do not have access to this class members");
+                    return false;
+                }
+            }
+            return true; // TODO: Esto es para que no revise otras validaciones si ya paso esta. Revisar.
+        }
 
         // Validación para rutas relacionadas con clases
         if (requestURI.contains("/class/") || requestURI.contains("/grade/")) {
@@ -80,13 +125,42 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 
     private Long extractClassIdFromURI(String uri) {
         // Usar una expresión regular para extraer el ID de la clase
-        Pattern pattern = Pattern.compile("/class/(\\d+)"); //TODO: No esta atrapando bien el id de la clase de calificaciones
-        // TODO: Creo que es por el de percentages, tambien atrapa esa y creo no es necesaria
+        Pattern pattern = Pattern.compile("/class/(\\d+)");
         Matcher matcher = pattern.matcher(uri);
         if (matcher.find()) {
             return Long.parseLong(matcher.group(1));
         }
         return null; // No se encontró un ID de clase en la URL
+    }
+
+    private Long extractClassIdFromURIForMembers(String uri) {
+        // Usar una expresión regular para extraer el ID de la clase
+        Pattern pattern = Pattern.compile("/class/(\\d+)/member");
+        Matcher matcher = pattern.matcher(uri);
+        if (matcher.find()) {
+            return Long.parseLong(matcher.group(1));
+        }
+        return null; // No se encontró un ID de clase en la URL
+    }
+
+    private Long extractClassIdFromURIForGrades(String uri) {
+        // Usar una expresión regular para extraer el ID de la clase
+        Pattern pattern = Pattern.compile("/grade/class/(\\d+)");
+        Matcher matcher = pattern.matcher(uri);
+        if (matcher.find()) {
+            return Long.parseLong(matcher.group(1));
+        }
+        return null; // No se encontró un ID de clase en la URL
+    }
+
+    private Long extractPracticeIdFromURI(String uri) {
+        // Usar una expresión regular para extraer el ID de la práctica
+        Pattern pattern = Pattern.compile("/practice/(\\d+)");
+        Matcher matcher = pattern.matcher(uri);
+        if (matcher.find()) {
+            return Long.parseLong(matcher.group(1));
+        }
+        return null; // No se encontró un ID de práctica en la URL
     }
 
     private Long extractSimulationIdFromURI(String uri) {
@@ -139,7 +213,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         if (simulation == null) {
             return false; // La simulación no existe
         }
-    
+
         for (String role : userRoles) {
             switch (role) {
                 case "ESTUDIANTE":
@@ -149,13 +223,15 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
                     break;
                 case "PROFESOR":
                     ClassModel classModel = classService.findById(classId);
-                    if (classModel != null && classModel.getProfessors().stream().anyMatch(professor -> professor.getId().equals(userId))) {
+                    if (classModel != null && classModel.getProfessors().stream()
+                            .anyMatch(professor -> professor.getId().equals(userId))) {
                         return true;
                     }
                     break;
                 case "COORDINADOR":
                     ClassModel coordinatorClass = classService.findById(classId);
-                    if (coordinatorClass != null && coordinatorClass.getCourse().getCoordinator().getId().equals(userId)) {
+                    if (coordinatorClass != null
+                            && coordinatorClass.getCourse().getCoordinator().getId().equals(userId)) {
                         return true;
                     }
                     break;
@@ -165,7 +241,21 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
                     break;
             }
         }
-    
+
         return false; // Ningún rol tiene acceso
+    }
+
+    private boolean isUserAuthorizedForPractice(Long userId, String[] userRoles, Long practiceId) {
+        // Obtener la práctica por su ID
+        Practice practice = practiceService.findById(practiceId);
+        if (practice == null) {
+            return false; // La práctica no existe
+        }
+    
+        // Obtener el ID de la clase asociada a la práctica
+        Long classId = practice.getClassModel().getClassId();
+    
+        // Reutilizar la lógica de isUserAuthorizedForClass para validar el acceso a la clase
+        return isUserAuthorizedForClass(userId, userRoles, classId);
     }
 }

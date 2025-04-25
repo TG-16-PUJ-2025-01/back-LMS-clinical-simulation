@@ -346,7 +346,7 @@ public class DBInitializer implements CommandLineRunner {
 		List<ClassModel> classes = List.of(
 				ClassModel.builder()
 						.period("2025-10")
-						.professors(allProfessors)
+						.professors(allProfessors.subList(0, 5))
 						.course(courseRepository.findById(1L).get())
 						.javerianaId(20001L)
 						.numberOfParticipants(9)
@@ -354,7 +354,7 @@ public class DBInitializer implements CommandLineRunner {
 						.build(),
 				ClassModel.builder()
 						.period("2025-10")
-						.professors(allProfessors)
+						.professors(allProfessors.subList(0, 4))
 						.course(courseRepository.findById(1L).get())
 						.javerianaId(20002L)
 						.numberOfParticipants(6)
@@ -362,7 +362,7 @@ public class DBInitializer implements CommandLineRunner {
 						.build(),
 				ClassModel.builder()
 						.period("2025-10")
-						.professors(allProfessors)
+						.professors(allProfessors.subList(1, 2))
 						.course(courseRepository.findById(2L).get())
 						.javerianaId(20003L)
 						.numberOfParticipants(15)
@@ -370,7 +370,7 @@ public class DBInitializer implements CommandLineRunner {
 						.build(),
 				ClassModel.builder()
 						.period("2025-10")
-						.professors(allProfessors)
+						.professors(allProfessors.subList(3, 5))
 						.course(courseRepository.findById(3L).get())
 						.javerianaId(20004L)
 						.numberOfParticipants(15)
@@ -386,7 +386,7 @@ public class DBInitializer implements CommandLineRunner {
 						.build(),
 				ClassModel.builder()
 						.period("2025-10")
-						.professors(allProfessors)
+						.professors(allProfessors.subList(4, 5))
 						.course(courseRepository.findById(5L).get())
 						.javerianaId(20006L)
 						.numberOfParticipants(15)
@@ -394,7 +394,7 @@ public class DBInitializer implements CommandLineRunner {
 						.build(),
 				ClassModel.builder()
 						.period("2025-10")
-						.professors(allProfessors)
+						.professors(allProfessors.subList(0, 1))
 						.course(courseRepository.findById(6L).get())
 						.javerianaId(20007L)
 						.numberOfParticipants(15)
@@ -402,7 +402,7 @@ public class DBInitializer implements CommandLineRunner {
 						.build(),
 				ClassModel.builder()
 						.period("2025-30")
-						.professors(allProfessors)
+						.professors(allProfessors.subList(0, 3))
 						.course(courseRepository.findById(7L).get())
 						.javerianaId(20008L)
 						.numberOfParticipants(15)

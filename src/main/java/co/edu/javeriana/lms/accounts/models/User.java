@@ -73,7 +73,7 @@ public class User implements UserDetails {
     @ManyToMany
     @JoinTable(name = "class_students", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "classId"))
     @JsonIgnore
-    private List<ClassModel> studentClassses;
+    private List<ClassModel> studentClasses;
 
     @ManyToMany
     @JoinTable(name = "simulation_users", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "simulationId"))

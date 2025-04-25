@@ -4,10 +4,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
@@ -23,7 +26,7 @@ import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
-import co.edu.javeriana.lms.practices.dtos.CreateSimulationRequestDto;
+import co.edu.javeriana.lms.grades.models.GradeStatus;
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.PracticeType;
@@ -76,9 +79,11 @@ public class DBInitializer implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		insertRoomsAndTypes();
 		createUsers();
-		insertCoursesClassesAndStudents();
+		insertCourses();
+		insertClasses();
 		insertPractices();
 		insertSimulations();
+		asignStudentsAndGradesToSimulations();
 		insertSimulationsVideosAndComments();
 	}
 
@@ -130,7 +135,7 @@ public class DBInitializer implements CommandLineRunner {
 
 		List<User> users = Arrays.asList(
 				// Profesores
-				User.builder().email("maria.lopez@javeriana.edu.co").password(passwordEncoder.encode("123456"))
+				User.builder().email("profesor@gmail.com").password(passwordEncoder.encode("profesor"))
 						.name("María").lastName("López").institutionalId("00000010001")
 						.roles(Set.of(Role.PROFESOR)).build(),
 
@@ -143,7 +148,7 @@ public class DBInitializer implements CommandLineRunner {
 						.roles(Set.of(Role.PROFESOR)).build(),
 
 				// Coordinadores
-				User.builder().email("laura.martinez@javeriana.edu.co").password(passwordEncoder.encode("123456"))
+				User.builder().email("coordinador@gmail.com").password(passwordEncoder.encode("coordinador"))
 						.name("Laura").lastName("Martínez").institutionalId("00000020001")
 						.roles(Set.of(Role.COORDINADOR)).build(),
 
@@ -165,7 +170,7 @@ public class DBInitializer implements CommandLineRunner {
 						.roles(new HashSet<>(Arrays.asList(Role.PROFESOR, Role.COORDINADOR))).build(),
 
 				// Administradores
-				User.builder().email("andres.garcia@javeriana.edu.co").password(passwordEncoder.encode("Peter2010?"))
+				User.builder().email("admin@gmail.com").password(passwordEncoder.encode("admin"))
 						.name("Andrés").lastName("García").institutionalId("00000040001")
 						.roles(Set.of(Role.ADMIN)).build(),
 
@@ -174,12 +179,12 @@ public class DBInitializer implements CommandLineRunner {
 						.roles(Set.of(Role.ADMIN)).build(),
 
 				// SuperAdmin (todos los roles)
-				User.builder().email("sofia.admin@javeriana.edu.co").password(passwordEncoder.encode("superadmin"))
+				User.builder().email("superadmin@gmail.com").password(passwordEncoder.encode("superadmin"))
 						.name("Sofía").lastName("Admin").institutionalId("00000090001")
 						.roles(Set.of(Role.ADMIN, Role.COORDINADOR, Role.PROFESOR, Role.ESTUDIANTE)).build(),
 
 				// Estudiantes
-				User.builder().email("camilo.mendoza@javeriana.edu.co").password(passwordEncoder.encode("123"))
+				User.builder().email("estudiante@gmail.com").password(passwordEncoder.encode("estudiante"))
 						.name("Camilo").lastName("Mendoza").institutionalId("00000050001")
 						.roles(Set.of(Role.ESTUDIANTE)).build(),
 
@@ -239,11 +244,277 @@ public class DBInitializer implements CommandLineRunner {
 				User.builder().email("juliana.perez@javeriana.edu.co").password(passwordEncoder.encode("est012"))
 						.name("Juliana").lastName("Pérez").institutionalId("00000050015")
 						.roles(Set.of(Role.ESTUDIANTE)).build()
-
 		);
 
 		// Guardar todos los usuarios
 		userRepository.saveAll(users);
+	}
+
+	private void insertCourses() {
+
+		List<User> allCoordinators = userRepository.findAllCoordinators();
+
+		List<Course> courses = List.of(
+				Course.builder()
+						.name("Semiología Clínica")
+						.javerianaId(100001L)
+						.coordinator(allCoordinators.get(0))
+						.faculty("medicina")
+						.department("medicina interna")
+						.program("pregrado")
+						.semester(1)
+						.build(),
+
+				Course.builder()
+						.name("Farmacología General")
+						.javerianaId(100002L)
+						.coordinator(allCoordinators.get(1))
+						.faculty("medicina")
+						.department("farmacología")
+						.program("pregrado")
+						.semester(2)
+						.build(),
+
+				Course.builder()
+						.name("Cuidados de Enfermería en el Adulto")
+						.javerianaId(100003L)
+						.coordinator(allCoordinators.get(2))
+						.faculty("enfermeria")
+						.department("cuidados intensivos")
+						.program("pregrado")
+						.semester(3)
+						.build(),
+
+				Course.builder()
+						.name("Fisiopatología Clínica")
+						.javerianaId(100004L)
+						.coordinator(allCoordinators.get(3))
+						.faculty("medicina")
+						.department("medicina interna")
+						.program("maestria")
+						.semester(4)
+						.build(),
+
+				Course.builder()
+						.name("Terapia Intravenosa y Manejo de Vía Aérea")
+						.javerianaId(100005L)
+						.coordinator(allCoordinators.get(4))
+						.faculty("enfermeria")
+						.department("emergencias")
+						.program("especialización")
+						.semester(5)
+						.build(),
+
+				Course.builder()
+						.name("Simulación Clínica Avanzada")
+						.javerianaId(100006L)
+						.coordinator(allCoordinators.get(0))
+						.faculty("medicina")
+						.department("medicina crítica")
+						.program("doctorado")
+						.semester(6)
+						.build(),
+
+				Course.builder()
+						.name("Atención Primaria en Salud")
+						.javerianaId(100007L)
+						.coordinator(allCoordinators.get(0))
+						.faculty("medicina")
+						.department("medicina familiar")
+						.program("pregrado")
+						.semester(7)
+						.build(),
+
+				Course.builder()
+						.name("Ética y Humanismo Médico")
+						.javerianaId(100008L)
+						.coordinator(userRepository.findById(3L).get())
+						.faculty("medicina")
+						.department("ética médica")
+						.program("pregrado")
+						.semester(8)
+						.build());
+
+		courseRepository.saveAll(courses);
+	}
+
+	private void insertClasses() {
+
+		List<User> allProfessors = userRepository.findAllProfessors();
+		List<User> allStudents = userRepository.findAllStudents();
+
+		List<ClassModel> classes = List.of(
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courseRepository.findById(1L).get())
+						.javerianaId(20001L)
+						.numberOfParticipants(9)
+						.students(allStudents.subList(0,9))
+						.build(),
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courseRepository.findById(1L).get())
+						.javerianaId(20002L)
+						.numberOfParticipants(6)
+						.students(allStudents.subList(9,15))
+						.build(),
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courseRepository.findById(2L).get())
+						.javerianaId(20003L)
+						.numberOfParticipants(15)
+						.students(allStudents)
+						.build(),
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courseRepository.findById(3L).get())
+						.javerianaId(20004L)
+						.numberOfParticipants(15)
+						.students(allStudents)
+						.build(),
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courseRepository.findById(4L).get())
+						.javerianaId(20005L)
+						.numberOfParticipants(15)
+						.students(allStudents)
+						.build(),
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courseRepository.findById(5L).get())
+						.javerianaId(20006L)
+						.numberOfParticipants(15)
+						.students(allStudents)
+						.build(),
+				ClassModel.builder()
+						.period("2025-10")
+						.professors(allProfessors)
+						.course(courseRepository.findById(6L).get())
+						.javerianaId(20007L)
+						.numberOfParticipants(15)
+						.students(allStudents)
+						.build(),
+				ClassModel.builder()
+						.period("2025-30")
+						.professors(allProfessors)
+						.course(courseRepository.findById(7L).get())
+						.javerianaId(20008L)
+						.numberOfParticipants(15)
+						.build());
+
+		classRepository.saveAll(classes);
+	}
+
+	private void insertPractices() {
+		List<Practice> practices = Arrays.asList(
+				Practice.builder().name("Practica 1").description(
+						"Descripcion de la practica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(30).gradePercentage(30f).build(),
+				Practice.builder().name("Practica 2").description(
+						"Descripcion de la practica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(9).maxStudentsGroup(1)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(40f).build(),
+				Practice.builder().name("Practica 3").description(
+						"Descripcion de la practica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(30f).build(),
+				Practice.builder().name("Practica 4").description(
+						"Descripcion de la practica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.GRUPAL).gradeable(false).numberOfGroups(5).maxStudentsGroup(5)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build());
+		practiceRepository.saveAll(practices);
+	}
+
+	private void insertSimulations() {	
+		LocalDateTime baseDate = LocalDateTime.now()
+				.withHour(9).withMinute(0).withSecond(0).withNano(0)
+				.with(java.time.DayOfWeek.MONDAY)
+				.minusWeeks(2L);
+
+		List<SimulationByTimeSlotDto> simulationsPractice1 = Arrays.asList(
+			
+				SimulationByTimeSlotDto.builder().practiceId(1L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date.from(baseDate.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+						.build(),
+
+				SimulationByTimeSlotDto.builder().practiceId(1L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date.from(baseDate.plusDays(1).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+						.build(),
+
+				SimulationByTimeSlotDto.builder().practiceId(1L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.plusDays(2).atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date.from(baseDate.plusDays(2).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+						.build()
+		);
+
+		simulationService.addSimulations(simulationsPractice1);
+
+		List<SimulationByTimeSlotDto> simulationsPractice2 = Arrays.asList(
+				SimulationByTimeSlotDto.builder().practiceId(2L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.plusWeeks(1L).atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date.from(baseDate.plusWeeks(1L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
+						.build()
+		);
+		
+		simulationService.addSimulations(simulationsPractice2);
+
+		List<SimulationByTimeSlotDto> simulationsPractice3 = Arrays.asList(
+				SimulationByTimeSlotDto.builder().practiceId(3L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.plusWeeks(2L).atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date.from(baseDate.plusWeeks(2L).plusMinutes(45).atZone(ZoneId.systemDefault()).toInstant()))
+						.build()
+		);
+
+		simulationService.addSimulations(simulationsPractice3);
+	}
+
+	@Transactional
+	private void asignStudentsAndGradesToSimulations() {
+		ClassModel classModel = classRepository.findById(1L).get();
+		List<User> students = classRepository.findStudentsMembers(1L);
+		List<Practice> practices =  practiceRepository.findByClassModel_ClassId(classModel.getClassId());
+
+		for (Practice practice: practices){
+			List<User> tempUsers = new ArrayList<>(students);
+			int numberOfGroups = practice.getNumberOfGroups();
+			int maxStudentsGroup = practice.getMaxStudentsGroup();
+			
+			// Create groups of students and assign them to simulations
+			List<List<User>> groups = new ArrayList<>();
+			for (int i = 0; i < numberOfGroups; i++) {
+				List<User> group = new ArrayList<>();
+				for (int j = 0; j < maxStudentsGroup; j++) {
+					if (!tempUsers.isEmpty()) {
+						group.add(tempUsers.remove(0));
+					}
+				}
+				groups.add(group);
+			}
+
+			for (Simulation simulation: simulationRepository.findByPracticeId(practice.getId())){
+				simulation.setUsers(groups.remove(0));
+				Random random = new Random();
+				float grade = 3.0f + random.nextFloat() * 2.0f; 
+				simulation.setGrade((float) (Math.round(grade * 10.0) / 10.0)); 
+				simulation.setGradeStatus(GradeStatus.REGISTERED);
+				simulation.setGradeDateTime(new Date());
+				simulationRepository.save(simulation);
+			}
+		}
 	}
 
 	private void insertSimulationsVideosAndComments() throws ParseException {
@@ -282,264 +553,5 @@ public class DBInitializer implements CommandLineRunner {
 		simulation.setVideo(videoRepository.findById(1L).get());
 
 		simulationRepository.save(simulation);
-	}
-
-	private void insertCoursesClassesAndStudents() {
-		List<Course> courses = List.of(
-				Course.builder()
-						.name("Semiología Clínica")
-						.javerianaId(100001L)
-						.coordinator(userRepository.findById(3L).get())
-						.faculty("medicina")
-						.department("medicina interna")
-						.program("pregrado")
-						.semester(1)
-						.build(),
-
-				Course.builder()
-						.name("Farmacología General")
-						.javerianaId(100002L)
-						.coordinator(userRepository.findById(5L).get())
-						.faculty("medicina")
-						.department("farmacología")
-						.program("pregrado")
-						.semester(2)
-						.build(),
-
-				Course.builder()
-						.name("Cuidados de Enfermería en el Adulto")
-						.javerianaId(100003L)
-						.coordinator(userRepository.findById(4L).get())
-						.faculty("enfermeria")
-						.department("cuidados intensivos")
-						.program("pregrado")
-						.semester(3)
-						.build(),
-
-				Course.builder()
-						.name("Fisiopatología Clínica")
-						.javerianaId(100004L)
-						.coordinator(userRepository.findById(5L).get())
-						.faculty("medicina")
-						.department("medicina interna")
-						.program("maestria")
-						.semester(4)
-						.build(),
-
-				Course.builder()
-						.name("Terapia Intravenosa y Manejo de Vía Aérea")
-						.javerianaId(100005L)
-						.coordinator(userRepository.findById(6L).get())
-						.faculty("enfermeria")
-						.department("emergencias")
-						.program("especialización")
-						.semester(5)
-						.build(),
-
-				Course.builder()
-						.name("Simulación Clínica Avanzada")
-						.javerianaId(100006L)
-						.coordinator(userRepository.findById(6L).get())
-						.faculty("medicina")
-						.department("medicina crítica")
-						.program("doctorado")
-						.semester(6)
-						.build(),
-
-				Course.builder()
-						.name("Atención Primaria en Salud")
-						.javerianaId(100007L)
-						.coordinator(userRepository.findById(4L).get())
-						.faculty("medicina")
-						.department("medicina familiar")
-						.program("pregrado")
-						.semester(7)
-						.build(),
-
-				Course.builder()
-						.name("Ética y Humanismo Médico")
-						.javerianaId(100008L)
-						.coordinator(userRepository.findById(3L).get())
-						.faculty("medicina")
-						.department("ética médica")
-						.program("pregrado")
-						.semester(8)
-						.build());
-
-		courseRepository.saveAll(courses);
-
-		List<User> allProfessors = userRepository.findAllProfessors();
-		List<User> allStudents = userRepository.findAllStudents();
-
-		List<ClassModel> classes = List.of(
-				ClassModel.builder()
-						.period("2025-10")
-						.professors(allProfessors)
-						.course(courses.get(1))
-						.javerianaId(20001L)
-						.numberOfParticipants(9)
-						.build(),
-				ClassModel.builder()
-						.period("2025-10")
-						.professors(allProfessors)
-						.course(courses.get(1))
-						.javerianaId(20002L)
-						.numberOfParticipants(6)
-						.build(),
-				ClassModel.builder()
-						.period("2025-10")
-						.professors(allProfessors)
-						.course(courses.get(2))
-						.javerianaId(20003L)
-						.numberOfParticipants(15)
-						.build(),
-				ClassModel.builder()
-						.period("2025-10")
-						.professors(allProfessors)
-						.course(courses.get(3))
-						.javerianaId(20004L)
-						.numberOfParticipants(15)
-						.build(),
-				ClassModel.builder()
-						.period("2025-10")
-						.professors(allProfessors)
-						.course(courses.get(4))
-						.javerianaId(20005L)
-						.numberOfParticipants(15)
-						.build(),
-				ClassModel.builder()
-						.period("2025-10")
-						.professors(allProfessors)
-						.course(courses.get(5))
-						.javerianaId(20006L)
-						.numberOfParticipants(15)
-						.build(),
-				ClassModel.builder()
-						.period("2025-10")
-						.professors(allProfessors)
-						.course(courses.get(6))
-						.javerianaId(20007L)
-						.numberOfParticipants(15)
-						.build(),
-				ClassModel.builder()
-						.period("2025-30")
-						.professors(allProfessors)
-						.course(courses.get(7))
-						.javerianaId(20008L)
-						.numberOfParticipants(15)
-						.build());
-
-		classes.forEach(c -> c.setStudents(allStudents));
-
-		classRepository.saveAll(classes);
-	}
-
-	private void insertPractices() {
-		List<Practice> practices = Arrays.asList(
-				Practice.builder().name("Practica 1").description(
-						"Descripcion de la practica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(30).build(),
-				Practice.builder().name("Practica 2").description(
-						"Descripcion de la practica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(9).maxStudentsGroup(1)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build(),
-				Practice.builder().name("Practica 3").description(
-						"Descripcion de la practica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build(),
-				Practice.builder().name("Practica 4").description(
-						"Descripcion de la practica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(false).numberOfGroups(5).maxStudentsGroup(5)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build());
-		practiceRepository.saveAll(practices);
-	}
-
-	/* 
-	private void insertSimulations() {
-
-		LocalDateTime startDateTime = LocalDateTime.now().plusDays(1).withHour(11).withMinute(0).withSecond(0)
-				.withNano(0);
-
-		Simulation simulation1 = Simulation.builder()
-				.practice(practiceRepository.findById(1L).get())
-				.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
-				.startDateTime(Date.from(startDateTime.atZone(ZoneId.systemDefault()).toInstant()))
-				.endDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
-				.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
-				.gradeStatus(GradeStatus.PENDING)
-				.grade(5.0f)
-				.groupNumber(1)
-				.users(userRepository.findAllStudents())
-				.build();
-
-		Simulation simulation2 = Simulation.builder()
-				.practice(practiceRepository.findById(1L).get())
-				.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
-				.startDateTime(Date.from(startDateTime.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
-				.endDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
-				.gradeDateTime(Date.from(startDateTime.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
-				.gradeStatus(GradeStatus.PENDING)
-				.grade(5.0f)
-				.groupNumber(2)
-				.build();
-
-		Simulation simulation3 = Simulation.builder()
-				.practice(practiceRepository.findById(1L).get())
-				.rooms(Arrays.asList(roomRepository.findById(1L).get(), roomRepository.findById(2L).get()))
-				.startDateTime(Date.from(startDateTime.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
-				.endDateTime(Date.from(startDateTime.plusMinutes(90).atZone(ZoneId.systemDefault()).toInstant()))
-				.gradeDateTime(Date.from(LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
-				.gradeStatus(GradeStatus.PENDING)
-				.grade(5.0f)
-				.groupNumber(3)
-				.build();
-
-		simulationRepository.save(simulation1);
-		simulationRepository.save(simulation2);
-		simulationRepository.save(simulation3);
-	}
-	*/
-
-	private void insertSimulations() {	
-		LocalDateTime baseDate = LocalDateTime.now()
-				.withHour(9).withMinute(0).withSecond(0).withNano(0)
-				.with(java.time.DayOfWeek.MONDAY)
-				.minusWeeks(LocalDateTime.now().getDayOfWeek() == java.time.DayOfWeek.MONDAY ? 1 : 0);
-
-		List<SimulationByTimeSlotDto> simulationsPractice1 = Arrays.asList(
-			
-				SimulationByTimeSlotDto.builder().practiceId(1L)
-						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date.from(baseDate.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
-						.build(),
-
-				SimulationByTimeSlotDto.builder().practiceId(1L)
-						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date.from(baseDate.plusDays(1).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
-						.build(),
-
-				SimulationByTimeSlotDto.builder().practiceId(1L)
-						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.plusDays(2).atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date.from(baseDate.plusDays(2).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
-						.build()
-		);
-
-		simulationService.addSimulations(simulationsPractice1);
-
-		List<SimulationByTimeSlotDto> simulationsPractice2 = Arrays.asList(
-				SimulationByTimeSlotDto.builder().practiceId(2L)
-						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.plusWeeks(1L).atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date.from(baseDate.plusWeeks(1L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
-						.build()
-		);
-		
-		simulationService.addSimulations(simulationsPractice2);
-
-
 	}
 }

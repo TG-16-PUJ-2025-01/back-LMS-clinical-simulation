@@ -136,7 +136,8 @@ public class ClassService {
     }
 
     public ClassModel findById(Long id) {
-        return classRepository.findById(id).get();
+        return classRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
+                "Class with ID " + id + " not found"));
     }
 
     public ClassModel save(ClassDto entity) {
@@ -163,8 +164,6 @@ public class ClassService {
                 professors,
                 courseOpt.get(), entity.getJaverianaId(),
                 entity.getNumberOfParticipants());
-
-        // log.info("unicornio aa2 ");
 
         try {
             classRepository.save(classModel);
@@ -205,9 +204,6 @@ public class ClassService {
                 courseOpt.get(), entity.getJaverianaId(),
                 entity.getNumberOfParticipants());
 
-        // log.info("unicornio aa2 ");
-        // manejar si esta repetido
-
         try {
             classRepository.save(classModel);
         } catch (EntityNotFoundException e) {
@@ -233,7 +229,6 @@ public class ClassService {
     {
         ClassModel currentClassModel = classRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Class with ID " + id + " not found"));
-       
 
         currentClassModel.setJaverianaId(classModeldto.getJaverianaId());
         // Update fields
@@ -306,6 +301,46 @@ public class ClassService {
         classRepository.save(classModel);
 
         return classModel;
+    }
+
+    public List<ClassModel> findByProfessorIdAndFilters(Long userId, Integer year, Integer period, String filter) {
+        String periodFilter = "";
+        if (year != null && period != null) {
+            periodFilter = year + "-" + period;
+        } else if (year != null) {
+            periodFilter = year.toString();
+        } else if (period != null) {
+            periodFilter = "-" + period;
+        }
+
+        List<ClassModel> classes = classRepository.findByProfessors_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
+            userId, filter, periodFilter
+        );
+
+        // Sort by period in descending order
+        classes.sort((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod()));
+
+        return classes;
+    }
+
+    public List<ClassModel> findByStudentIdAndFilters(Long userId, Integer year, Integer period, String filter) {
+        String periodFilter = "";
+        if (year != null && period != null) {
+            periodFilter = year + "-" + period;
+        } else if (year != null) {
+            periodFilter = year.toString();
+        } else if (period != null) {
+            periodFilter = "-" + period;
+        }
+
+        List<ClassModel> classes = classRepository.findByStudents_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(
+            userId, filter, periodFilter
+        );
+
+        // Sort by period in descending order
+        classes.sort((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod()));
+
+        return classes;
     }
 
 }

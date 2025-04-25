@@ -131,7 +131,7 @@ public class ClassController {
             @RequestParam(defaultValue = "true") Boolean asc,
             @RequestParam(defaultValue = "") String filter,
             @PathVariable Long id) {
-        
+
         log.info("Requesting all members out of the class");
 
         Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id, "");
@@ -250,22 +250,21 @@ public class ClassController {
     @Valid
     @PutMapping("/update/{id}/members/professor/{idProfessor}")
     public ResponseEntity<?> updateClassProfessorMember(@PathVariable Long id, @PathVariable Long idProfessor) {
-        log.info("Updating class members with ID: " + id + " "+idProfessor);    
-        
+        log.info("Updating class members with ID: " + id + " " + idProfessor);
+
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
-                    "Class updated successfully.", classService.updateMember(id,idProfessor,Role.PROFESOR), null));
-        
+                "Class updated successfully.", classService.updateMember(id, idProfessor, Role.PROFESOR), null));
+
     }
 
     @Valid
     @PutMapping("/update/{id}/members/student/{idStudent}")
     public ResponseEntity<?> updateClassStudentMember(@PathVariable Long id, @PathVariable Long idStudent) {
-        log.info("Updating class members with ID: " + id + " "+idStudent);    
-        return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
-                    "Class updated successfully.", classService.updateMember(id,idStudent,Role.ESTUDIANTE), null));
-        
-    }
+        log.info("Updating class members with ID: " + id + " " + idStudent);
 
+        return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(),
+                "Class updated successfully.", classService.updateMember(id, idStudent, Role.ESTUDIANTE), null));
+    }
 
     @Valid
     @PostMapping("/add")
@@ -278,8 +277,46 @@ public class ClassController {
     @Valid
     @PostMapping("/add/excel")
     public ResponseEntity<?> addClassByExcel(@Valid @RequestBody ClassDto classModel) {
-       
+
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<ClassModel>(
                 HttpStatus.CREATED.value(), "Class added successfully.", classService.saveByExcel(classModel), null));
+    }
+
+    @GetMapping("/all/professor")
+    public ResponseEntity<?> getClassesByProfesor(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer period,
+            @RequestParam(defaultValue = "") String filter) {
+
+        token = token.substring(7);
+        log.info("Requesting main menu information for professor role");
+
+        Long userId = authService.getUserIdByToken(token);
+        log.info("User ID: " + userId);
+
+        List<ClassModel> classes = classService.findByProfessorIdAndFilters(userId, year, period, filter);
+
+        return ResponseEntity
+                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Classes retrieved successfully", classes, null));
+    }
+
+    @GetMapping("/all/student")
+    public ResponseEntity<?> getClassesByStudent(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer period,
+            @RequestParam(defaultValue = "") String filter) {
+
+        token = token.substring(7);
+        log.info("Requesting main menu information for student role");
+
+        Long userId = authService.getUserIdByToken(token);
+        log.info("User ID: " + userId);
+
+        List<ClassModel> classes = classService.findByStudentIdAndFilters(userId, year, period, filter);
+
+        return ResponseEntity
+                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Classes retrieved successfully", classes, null));
     }
 }

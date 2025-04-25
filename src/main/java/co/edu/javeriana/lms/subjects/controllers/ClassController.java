@@ -131,6 +131,7 @@ public class ClassController {
             @RequestParam(defaultValue = "true") Boolean asc,
             @RequestParam(defaultValue = "") String filter,
             @PathVariable Long id) {
+        
         log.info("Requesting all members out of the class");
 
         Page<User> classModelPage = classService.findAllNonMembers(filter, page, size, sort, asc, id, "");
@@ -198,7 +199,6 @@ public class ClassController {
         }
 
         return ResponseEntity.ok(new ApiResponseDto<ClassModel>(HttpStatus.OK.value(), "ok", classModel, null));
-
     }
 
     @DeleteMapping("/delete/{id}")
@@ -275,41 +275,11 @@ public class ClassController {
                 HttpStatus.CREATED.value(), "Class added successfully.", classService.save(classModel), null));
     }
 
-    @GetMapping("/all/professor")
-    public ResponseEntity<?> getClassesByProfesor(
-            @RequestHeader("Authorization") String token,
-            @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) Integer period,
-            @RequestParam(defaultValue = "") String filter) {
-
-        token = token.substring(7);
-        log.info("Requesting main menu information for professor role");
-
-        Long userId = authService.getUserIdByToken(token);
-        log.info("User ID: " + userId);
-
-        List<ClassModel> classes = classService.findByProfessorIdAndFilters(userId, year, period, filter);
-
-        return ResponseEntity
-                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Classes retrieved successfully", classes, null));
-    }
-
-    @GetMapping("/all/student")
-    public ResponseEntity<?> getClassesByStudent(
-            @RequestHeader("Authorization") String token,
-            @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) Integer period,
-            @RequestParam(defaultValue = "") String filter) {
-
-        token = token.substring(7);
-        log.info("Requesting main menu information for student role");
-
-        Long userId = authService.getUserIdByToken(token);
-        log.info("User ID: " + userId);
-
-        List<ClassModel> classes = classService.findByStudentIdAndFilters(userId, year, period, filter);
-
-        return ResponseEntity
-                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Classes retrieved successfully", classes, null));
+    @Valid
+    @PostMapping("/add/excel")
+    public ResponseEntity<?> addClassByExcel(@Valid @RequestBody ClassDto classModel) {
+       
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<ClassModel>(
+                HttpStatus.CREATED.value(), "Class added successfully.", classService.saveByExcel(classModel), null));
     }
 }

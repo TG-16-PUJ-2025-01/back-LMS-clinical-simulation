@@ -30,6 +30,8 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
 
         Page<Simulation> findByPracticeId(Long practiceId, Pageable pageable);
 
+        List<Simulation> findByPracticeId(Long practiceId);
+
         List<Simulation> findByStartDateTimeAfter(Date startDateTime);
 
         List<Simulation> findByStartDateTimeBetween(Date startDateTime, Date endDateTime);

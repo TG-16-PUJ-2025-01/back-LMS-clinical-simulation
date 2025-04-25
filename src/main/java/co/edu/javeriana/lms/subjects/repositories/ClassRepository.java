@@ -65,6 +65,18 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
             """)
     Page<User> findStudentsMembers(@Param("classId") Long classId, @Param("filter") String filter, Pageable pageable);
 
+
+    @Query("""
+        SELECT u FROM User u
+        WHERE (
+            u.id IN (
+                SELECT s.id FROM ClassModel c JOIN c.students s WHERE c.classId = :classId
+            )
+
+        )
+    """)
+    List<User> findStudentsMembers(@Param("classId") Long classId);
+
     @Query("""
                 SELECT u FROM User u
                 WHERE (

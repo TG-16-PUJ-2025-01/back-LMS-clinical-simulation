@@ -58,7 +58,7 @@ public class GradeController {
                 null));
     }
 
-    @PutMapping("/class/{classId}/percentages")
+    @PutMapping("/percentages")
     public ResponseEntity<?> updateClassGradePercentages(
             @RequestBody PracticesPercentagesDto classGradePercentagesDto) {
         log.info("Requesting to update grade percentages");

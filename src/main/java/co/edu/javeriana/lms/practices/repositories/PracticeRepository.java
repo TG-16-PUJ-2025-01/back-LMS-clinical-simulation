@@ -19,5 +19,7 @@ public interface PracticeRepository extends JpaRepository<Practice, Long> {
     
     List<Practice> findByClassModel_ClassId(Long classId, Sort sort);
 
+    List<Practice> findByClassModel_ClassId(Long classId);
+
     List<Practice> findByClassModelIn(List<ClassModel> classModels);
 }

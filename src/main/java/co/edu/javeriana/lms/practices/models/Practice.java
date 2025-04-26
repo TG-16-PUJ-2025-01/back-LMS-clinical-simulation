@@ -61,7 +61,7 @@ public class Practice {
 
     @Nullable
     @Column(nullable = true)
-    private Integer numberOfGroups;
+    private Integer numberOfGroups; 
 
     @Nullable
     @Column(nullable = true)
@@ -83,5 +83,4 @@ public class Practice {
     @OneToMany(mappedBy = "practice")
     @JsonIgnore
     private List<Simulation> simulations;
-
 }

@@ -73,12 +73,10 @@ public class Practice {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    @JsonIgnore
     private ClassModel classModel;
 
     @OneToOne
     @JoinColumn(nullable = true)
-    @JsonIgnore
     private RubricTemplate rubricTemplate;
     
     

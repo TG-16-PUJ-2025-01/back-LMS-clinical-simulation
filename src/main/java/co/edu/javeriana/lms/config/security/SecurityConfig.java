@@ -99,9 +99,12 @@ public class SecurityConfig {
                         .requestMatchers("/practice/{id}/enrolled")
                         .hasAnyAuthority(Role.ESTUDIANTE.name(), Role.ADMIN.name(), Role.COORDINADOR.name(),
                                 Role.PROFESOR.name()) // Ensure ESTUDIANTE role is included
-                        .requestMatchers("/practice/**")
-                        .hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name(), Role.PROFESOR.name())
-                        .anyRequest().permitAll())
+                        .requestMatchers("/practice/**").access((authentication, context) -> 
+                            context.getRequest().getMethod().equalsIgnoreCase("GET") ? 
+                            new AuthorizationDecision(true) : 
+                            new AuthorizationDecision(false))
+                        .requestMatchers("/practice/**").hasAnyAuthority(Role.ADMIN.name(), Role.COORDINADOR.name(), Role.PROFESOR.name())
+                        .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

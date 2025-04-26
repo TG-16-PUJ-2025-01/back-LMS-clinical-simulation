@@ -65,7 +65,7 @@ public class RubricTemplate {
     @JsonIgnore
     private List<Course> courses;
 
-    // no se deberian borrar las practicas si se borra la rubrica
+    // no se deberían borrar las practicas si se borra la rubrica
     // revisar que poner
     @OneToOne
     @JsonIgnore

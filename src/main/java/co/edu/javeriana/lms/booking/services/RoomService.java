@@ -69,6 +69,7 @@ public class RoomService {
 
         existingRoom.setName(formattedName);
         existingRoom.setCapacity(room.getCapacity());
+        existingRoom.setIp(room.getIp());
         existingRoom.setType(type);
 
         return roomRepository.save(existingRoom);

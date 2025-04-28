@@ -20,6 +20,9 @@ public class RoomDto {
     @NotNull(message = "Room capacity is mandatory")
     private Integer capacity;
 
+    @NotNull(message = "Room IP is mandatory")
+    private String ip;
+
     @NotNull(message = "Room type ID is mandatory")
     private Long typeId;
 
@@ -28,6 +31,7 @@ public class RoomDto {
         room.setId(null);
         room.setName(this.name);
         room.setCapacity(this.capacity);
+        room.setIp(this.ip);
         room.setType(RoomType.builder().id(this.typeId).build());
 
         return room;

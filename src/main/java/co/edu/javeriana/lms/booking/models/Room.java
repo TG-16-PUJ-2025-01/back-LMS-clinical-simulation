@@ -44,6 +44,10 @@ public class Room {
     @Column(nullable = false)
     private Integer capacity;
 
+    @NonNull
+    @Column(nullable = false)
+    private String ip;
+
     @ManyToOne
     @NonNull
     private RoomType type;

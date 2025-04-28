@@ -27,7 +27,6 @@ public class ArecService {
     private String AREC_PASSWORD;
     private static final String AREC_LOGIN_PATH = "/api/login";
     private static final String AREC_RECORDINGS_PATH = "/api/recording";
-    private String accessToken;
 
     private ArecLoginResponseDto loginToArec() throws URISyntaxException, IOException, InterruptedException {
         log.info("Logging in to Arec with username: {}", AREC_USERNAME);
@@ -51,13 +50,11 @@ public class ArecService {
         // ArecLoginResponseDto res = gson.fromJson(response.body(), ArecLoginResponseDto.class);
         ArecLoginResponseDto res = new ArecLoginResponseDto("accessToken", "refreshToken");
 
-        accessToken = res.getAccessToken();
-
         return res;
     }
 
     public void syncVideos() throws URISyntaxException, IOException, InterruptedException {
         log.info("Syncing videos with Arec");
-        loginToArec();
+        ArecLoginResponseDto res = loginToArec();
     }
 }

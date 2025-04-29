@@ -89,47 +89,49 @@ public class DBInitializer implements CommandLineRunner {
 
 	private void insertRoomsAndTypes() {
 		List<RoomType> roomTypes = Arrays.asList(
+				RoomType.builder().name("Consultorio").build(),
 				RoomType.builder().name("Cuidado crítico intensivo").build(),
 				RoomType.builder().name("Cuidado crítico urgencias").build(),
 				RoomType.builder().name("Cuidado crítico ginecobstetricia").build(),
-				RoomType.builder().name("Consultorios").build(),
-				RoomType.builder().name("Salas debriefing").build(),
-				RoomType.builder().name("Observación").build(),
 				RoomType.builder().name("Hospitalización").build(),
-				RoomType.builder().name("Microcirugía").build(),
+				RoomType.builder().name("Observación").build(),
 				RoomType.builder().name("Cirugía").build(),
-				RoomType.builder().name("Procedimiento y habilidades quirúrgicas").build(),
-				RoomType.builder().name("Farmacia").build(),
-				RoomType.builder().name("Salones").build());
-
+				RoomType.builder().name("Laparoscopia").build()
+		);
+	
 		roomTypeRepository.saveAll(roomTypes);
-
+	
 		List<Room> rooms = Arrays.asList(
-				Room.builder().name("Sala1").type(roomTypes.get(0)).capacity(11).build(),
-				Room.builder().name("Sala2").type(roomTypes.get(1)).capacity(14).build(),
-				Room.builder().name("Sala3").type(roomTypes.get(2)).capacity(13).build(),
-				Room.builder().name("Sala4").type(roomTypes.get(3)).capacity(11).build(),
-				Room.builder().name("Sala5").type(roomTypes.get(3)).capacity(1).build(),
-				Room.builder().name("Sala6").type(roomTypes.get(3)).capacity(11).build(),
-				Room.builder().name("Sala7").type(roomTypes.get(4)).capacity(15).build(),
-				Room.builder().name("Sala8").type(roomTypes.get(4)).capacity(11).build(),
-				Room.builder().name("Sala9").type(roomTypes.get(4)).capacity(11).build(),
-				Room.builder().name("Sala10").type(roomTypes.get(5)).capacity(11).build(),
-				Room.builder().name("Sala11").type(roomTypes.get(5)).capacity(11).build(),
-				Room.builder().name("Sala12").type(roomTypes.get(5)).capacity(14).build(),
-				Room.builder().name("Sala13").type(roomTypes.get(6)).capacity(11).build(),
-				Room.builder().name("Sala14").type(roomTypes.get(6)).capacity(11).build(),
-				Room.builder().name("Sala15").type(roomTypes.get(6)).capacity(21).build(),
-				Room.builder().name("Sala16").type(roomTypes.get(7)).capacity(11).build(),
-				Room.builder().name("Sala17").type(roomTypes.get(8)).capacity(13).build(),
-				Room.builder().name("Sala18").type(roomTypes.get(9)).capacity(11).build(),
-				Room.builder().name("Sala19").type(roomTypes.get(10)).capacity(51).build(),
-				Room.builder().name("Sala20").type(roomTypes.get(11)).capacity(11).build(),
-				Room.builder().name("Sala21").type(roomTypes.get(11)).capacity(11).build(),
-				Room.builder().name("Sala22").type(roomTypes.get(11)).capacity(11).build());
-
+				Room.builder().name("Consultorio 1").type(roomTypes.get(0)).capacity(11).ip("10.197.140.234").build(),
+				Room.builder().name("Consultorio 2").type(roomTypes.get(0)).capacity(11).ip("10.197.140.235").build(),
+				Room.builder().name("Consultorio 3").type(roomTypes.get(0)).capacity(11).ip("10.197.140.236").build(),
+	
+				Room.builder().name("Cuidado crítico 1A").type(roomTypes.get(1)).capacity(11).ip("10.197.140.239").build(),
+				Room.builder().name("Cuidado crítico 1B").type(roomTypes.get(1)).capacity(11).ip("10.197.140.237").build(),
+	
+				Room.builder().name("Cuidado crítico 2A").type(roomTypes.get(2)).capacity(11).ip("10.197.140.240").build(),
+				Room.builder().name("Cuidado crítico 2B").type(roomTypes.get(2)).capacity(11).ip("10.197.140.238").build(),
+	
+				Room.builder().name("Cuidado crítico 3A").type(roomTypes.get(3)).capacity(11).ip("10.197.140.242").build(),
+				Room.builder().name("Cuidado crítico 3B").type(roomTypes.get(3)).capacity(11).ip("10.197.140.238").build(),
+	
+				Room.builder().name("Hospitalización 1").type(roomTypes.get(4)).capacity(11).ip("10.197.140.128").build(),
+				Room.builder().name("Hospitalización 2").type(roomTypes.get(4)).capacity(11).ip("10.197.140.133").build(),
+				Room.builder().name("Hospitalización 3").type(roomTypes.get(4)).capacity(11).ip("10.197.140.132").build(),
+	
+				Room.builder().name("Observación 1").type(roomTypes.get(5)).capacity(11).ip("10.197.140.211").build(),
+				Room.builder().name("Observación 2").type(roomTypes.get(5)).capacity(11).ip("10.197.140.206").build(),
+				Room.builder().name("Observación 3").type(roomTypes.get(5)).capacity(11).ip("10.197.140.209").build(),
+	
+				Room.builder().name("Cirugía 1").type(roomTypes.get(6)).capacity(11).ip("10.197.140.207").build(),
+				Room.builder().name("Cirugía 2").type(roomTypes.get(6)).capacity(11).ip("10.197.140.210").build(),
+	
+				Room.builder().name("Laparoscopia").type(roomTypes.get(7)).capacity(11).ip("10.197.140.208").build()
+		);
+	
 		roomRepository.saveAll(rooms);
 	}
+	
 
 	private void createUsers() {
 

@@ -415,20 +415,20 @@ public class DBInitializer implements CommandLineRunner {
 
 	private void insertPractices() {
 		List<Practice> practices = Arrays.asList(
-				Practice.builder().name("Practica 1").description(
-						"Descripcion de la practica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+				Practice.builder().name("Práctica 1").description(
+						"Descripción de la práctica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(30).gradePercentage(30f).build(),
-				Practice.builder().name("Practica 2").description(
-						"Descripcion de la practica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+				Practice.builder().name("Práctica 2").description(
+						"Descripción de la práctica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(9).maxStudentsGroup(1)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(40f).build(),
-				Practice.builder().name("Practica 3").description(
-						"Descripcion de la practica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+				Practice.builder().name("Práctica 3").description(
+						"Descripción de la práctica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(30f).build(),
-				Practice.builder().name("Practica 4").description(
-						"Descripcion de la practica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+				Practice.builder().name("Práctica 4").description(
+						"Descripción de la práctica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.GRUPAL).gradeable(false).numberOfGroups(5).maxStudentsGroup(5)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build());
 		practiceRepository.saveAll(practices);
@@ -559,7 +559,7 @@ public class DBInitializer implements CommandLineRunner {
 		videoRepository.saveAll(videos);
 
 		Simulation simulation = simulationRepository.findById(1L).get();
-		simulation.setVideo(videoRepository.findById(1L).get());
+		simulation.setVideos(List.of(videoRepository.findById(1L).get(), videoRepository.findById(2L).get()));
 
 		simulationRepository.save(simulation);
 	}

@@ -517,6 +517,13 @@ public class DBInitializer implements CommandLineRunner {
 				simulationRepository.save(simulation);
 			}
 		}
+
+		// For e2e testing purposes, so that a teacher can grade a pending simulation
+		Simulation simulation = simulationRepository.findById(1L).get();
+		simulation.setGrade(null);
+		simulation.setGradeStatus(GradeStatus.PENDING);
+		simulation.setGradeDateTime(null);
+		simulationRepository.save(simulation);
 	}
 
 	private void insertSimulationsVideosAndComments() throws ParseException {

@@ -1,4 +1,4 @@
-package co.edu.javeriana.lms.shared.dtos;
+package co.edu.javeriana.lms.videos.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

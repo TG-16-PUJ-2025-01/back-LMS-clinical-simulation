@@ -552,7 +552,7 @@ public class DBInitializer implements CommandLineRunner {
 		videoRepository.saveAll(videos);
 
 		Simulation simulation = simulationRepository.findById(1L).get();
-		simulation.setVideo(videoRepository.findById(1L).get());
+		simulation.setVideos(List.of(videoRepository.findById(1L).get(), videoRepository.findById(2L).get()));
 
 		simulationRepository.save(simulation);
 	}

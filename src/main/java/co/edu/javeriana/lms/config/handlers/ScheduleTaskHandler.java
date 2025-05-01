@@ -21,6 +21,6 @@ public class ScheduleTaskHandler {
     @Scheduled(cron = "0 * * * * *") // Cron expression for running every minute
     public void syncArecVideos() throws URISyntaxException, IOException, InterruptedException {
         log.info("Scheduled task to sync videos with Arec started");
-        arecService.syncVideos();
+        // arecService.syncVideos("");
     }
 }

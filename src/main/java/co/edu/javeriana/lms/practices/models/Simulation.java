@@ -22,6 +22,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -62,9 +63,9 @@ public class Simulation {
     @ManyToOne
     private Practice practice;
 
-    @OneToOne
-    @JoinColumn(name = "video_id")
-    private Video video;
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "simulation_id")
+    private List<Video> videos;
 
     @OneToOne
     @JoinColumn(nullable = true)

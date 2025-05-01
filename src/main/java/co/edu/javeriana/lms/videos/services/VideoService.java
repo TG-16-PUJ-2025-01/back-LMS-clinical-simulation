@@ -41,6 +41,16 @@ public class VideoService {
         return videoRepository.save(videoToEdit);
     }
 
+    public Video setVideoAsUnavailable(Long id) {
+        Video video = videoRepository.findById(id).orElse(null);
+        if (video == null) {
+            return null;
+        }
+
+        video.setAvailable(false);
+        return videoRepository.save(video);
+    }
+
     public Video deleteVideo(Long id) {
         Video video = videoRepository.findById(id).orElse(null);
         if (video == null) {

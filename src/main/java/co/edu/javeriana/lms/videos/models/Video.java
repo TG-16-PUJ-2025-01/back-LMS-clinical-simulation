@@ -62,6 +62,10 @@ public class Video {
     @Column(nullable = false)
     private Double size; // in MB
 
+    @NonNull
+    @Column(nullable = false)
+    private String videoUrl;
+
     @ManyToOne
     @JoinColumn(name = "simulation_id")
     @JsonIgnore

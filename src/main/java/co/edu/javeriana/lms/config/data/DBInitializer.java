@@ -523,30 +523,29 @@ public class DBInitializer implements CommandLineRunner {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		List<Video> videos = Arrays.asList(
-				Video.builder().name("javatechie.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("javatechie").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/javatechie.mp4")
 						.expirationDate(new Date()).duration(62L).size(8.3).build(),
-				Video.builder().name("10350-224234500_small.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("10350-224234500_small").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/10350-224234500_small.mp4")
 						.expirationDate(new Date()).duration(600L).size(31.2).build(),
-				Video.builder().name("CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
-						.recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("CCrit1-1__2025_03_03_18_25_12_Movie").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.expirationDate(new Date()).duration(600L).size(31.2).build(),
-				Video.builder().name("unavailable1.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("unavailable1").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable1.mp4")
 						.expirationDate(new Date()).duration(210L).size(300.0).available(false).build(),
-				Video.builder().name("unavailable2.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("unavailable2").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable2.mp4")
 						.expirationDate(new Date()).duration(450L).size(420.0).available(false).build(),
-				Video.builder().name("unavailable3.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("unavailable3").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable3.mp4")
 						.expirationDate(new Date()).duration(600L).size(500.0).available(false).build(),
-				Video.builder().name("unavailable4.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("unavailable4").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable4.mp4")
 						.expirationDate(new Date()).duration(780L).size(780.0).available(false).build(),
-				Video.builder().name("unavailable5.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("unavailable5").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable5.mp4")
 						.expirationDate(new Date()).duration(6000L).size(6000.0).available(false).build(),
-				Video.builder().name("unavailable6.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("unavailable6").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable6.mp4")
 						.expirationDate(new Date()).duration(620L).size(500.0).available(false).build(),
-				Video.builder().name("unavailable7.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("unavailable7").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable7.mp4")
 						.expirationDate(new Date()).duration(620L).size(500.0).available(false).build(),
-				Video.builder().name("unavailable8.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("unavailable8").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable8.mp4")
 						.expirationDate(new Date()).duration(620L).size(500.0).available(false).build(),
-				Video.builder().name("unavailable9.mp4").recordingDate(dateFormat.parse("2023-01-31"))
+				Video.builder().name("unavailable9").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable9.mp4")
 						.expirationDate(new Date()).duration(620L).size(500.0).available(false).build());
 
 		videoRepository.saveAll(videos);

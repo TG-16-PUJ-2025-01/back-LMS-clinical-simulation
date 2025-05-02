@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -53,13 +52,13 @@ public class VideoControllerTest {
     @BeforeAll
     public static void setUpAll() throws ParseException {
         Video video1 = Video.builder().name("Video 1").recordingDate(dateFormat.parse("2025-02-22"))
-                .expirationDate(new Date()).duration(62L).size(8.3).build();
+                .duration(62L).size(8.3).build();
 
         Video video2 = Video.builder().name("Video 2").recordingDate(dateFormat.parse("2024-12-24"))
-                .expirationDate(new Date()).duration(3600L).size(10.3).build();
+                .duration(3600L).size(10.3).build();
 
         mockVideo = Video.builder().name("Video 1").recordingDate(dateFormat.parse("2025-02-22"))
-                .expirationDate(new Date()).duration(62L).size(8.3).build();
+                .duration(62L).size(8.3).build();
 
         List<Video> mockVideos = Arrays.asList(video1, video2);
 
@@ -102,9 +101,9 @@ public class VideoControllerTest {
     @Test
     public void testEditVideoSuccess() {
         Long id = 1L;
-        when(videoService.editVideo(id, new EditVideoDto(mockVideo.getName(), mockVideo.getExpirationDate()))).thenReturn(mockVideo);
+        when(videoService.editVideo(id, new EditVideoDto(mockVideo.getName()))).thenReturn(mockVideo);
 
-        ResponseEntity<ApiResponseDto<Video>> editedVideo = videoController.editVideo(id, new EditVideoDto(mockVideo.getName(), mockVideo.getExpirationDate()));
+        ResponseEntity<ApiResponseDto<Video>> editedVideo = videoController.editVideo(id, new EditVideoDto(mockVideo.getName()));
 
         assert (editedVideo.getBody().getData().equals(mockVideo));
         assert (editedVideo.getBody().getMetadata() == null);
@@ -113,9 +112,9 @@ public class VideoControllerTest {
     @Test
     public void testEditVideoFailure() {
         Long id = 1L;
-        when(videoService.editVideo(id, new EditVideoDto(mockVideo.getName(), mockVideo.getExpirationDate()))).thenReturn(null);
+        when(videoService.editVideo(id, new EditVideoDto(mockVideo.getName()))).thenReturn(null);
 
-        ResponseEntity<ApiResponseDto<Video>> editedVideo = videoController.editVideo(id, new EditVideoDto(mockVideo.getName(), mockVideo.getExpirationDate()));
+        ResponseEntity<ApiResponseDto<Video>> editedVideo = videoController.editVideo(id, new EditVideoDto(mockVideo.getName()));
 
         assert (editedVideo.getBody().getData() == null);
         assert (editedVideo.getStatusCode() == HttpStatusCode.valueOf(404));

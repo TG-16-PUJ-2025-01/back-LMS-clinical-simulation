@@ -332,6 +332,8 @@ public class SimulationService {
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
 
         simulation.setGradeStatus(GradeStatus.REGISTERED);
+        simulation.setGradeDateTime(new Date());
+        simulation.setGrade(simulation.getRubric().getTotal().getScore());
         return simulationRepository.save(simulation);
     }
 

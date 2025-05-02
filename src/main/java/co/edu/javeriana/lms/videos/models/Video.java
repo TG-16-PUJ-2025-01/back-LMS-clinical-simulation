@@ -52,10 +52,6 @@ public class Video {
 
     @NonNull
     @Column(nullable = false)
-    private Date expirationDate;
-
-    @NonNull
-    @Column(nullable = false)
     private Long duration; // in seconds
 
     @NonNull

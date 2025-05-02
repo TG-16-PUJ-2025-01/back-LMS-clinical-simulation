@@ -1,5 +1,6 @@
 package co.edu.javeriana.lms.videos.dtos;
 
+import java.util.Date;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
@@ -25,11 +26,14 @@ public class ArecVideosResponseDto {
     @Data
     public static class Video {
         private String name;
-        private String length;
+        private Long length;
         @SerializedName("recorded_at")
-        private String recordedAt;
+        private Date recordedAt;
         @SerializedName("finished_at")
-        private String finishedAt;
+        private Date finishedAt;
+        private String status;
+        @SerializedName("videos")
+        private List<VideoMetadata> metadata;
     }
 
     @Data
@@ -42,7 +46,7 @@ public class ArecVideosResponseDto {
         private String downloadUrl;
         @SerializedName("finished_at")
         private String finishedAt;
-        private String size;
+        private Double size;
         private String thumbnail;
     }
 }

@@ -36,7 +36,6 @@ public class VideoService {
         }
 
         videoToEdit.setName(video.getName());
-        videoToEdit.setExpirationDate(video.getExpirationDate());
     
         return videoRepository.save(videoToEdit);
     }

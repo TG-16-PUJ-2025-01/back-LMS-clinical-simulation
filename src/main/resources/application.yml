@@ -45,3 +45,4 @@ jwt:
 arec:
   username: "${AREC_USERNAME}"
   password: "${AREC_PASSWORD}"
+  sync: "${AREC_SYNC:false}"

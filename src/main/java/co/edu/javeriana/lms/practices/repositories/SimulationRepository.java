@@ -57,4 +57,7 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
                         Date endDate);
 
         List<Simulation> findAllByPractice_ClassModel(ClassModel classModel);
+
+        List<Simulation> findAllByRooms_IdAndStartDateTimeAfterAndEndDateTimeBefore(Long roomId, Date startDateTime,
+                        Date endDateTime);
 }

@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,13 +50,13 @@ public class VideoServiceTest {
     @BeforeAll
     public static void setUpAll() throws ParseException {
         Video video1 = Video.builder().name("Video 1").recordingDate(dateFormat.parse("2025-02-22"))
-                .expirationDate(new Date()).duration(62L).size(8.3).build();
+                .duration(62L).size(8.3).build();
 
         Video video2 = Video.builder().name("Video 2").recordingDate(dateFormat.parse("2024-12-24"))
-                .expirationDate(new Date()).duration(3600L).size(10.3).build();
+                .duration(3600L).size(10.3).build();
 
         mockVideo = Video.builder().name("Video 1").recordingDate(dateFormat.parse("2025-02-22"))
-                .expirationDate(new Date()).duration(62L).size(8.3).build();
+                .duration(62L).size(8.3).build();
 
         List<Video> mockVideos = Arrays.asList(video1, video2);
 
@@ -110,7 +109,7 @@ public class VideoServiceTest {
         when(videoRepository.save(mockVideo)).thenReturn(mockVideo);
 
         Video editedVideo = videoService.editVideo(id,
-                new EditVideoDto(mockVideo.getName(), mockVideo.getExpirationDate()));
+                new EditVideoDto(mockVideo.getName()));
 
         assert (editedVideo.equals(mockVideo));
     }
@@ -121,7 +120,7 @@ public class VideoServiceTest {
         when(videoRepository.findById(id)).thenReturn(Optional.empty());
 
         Video editedVideo = videoService.editVideo(id,
-                new EditVideoDto(mockVideo.getName(), mockVideo.getExpirationDate()));
+                new EditVideoDto(mockVideo.getName()));
 
         assert (editedVideo == null);
     }

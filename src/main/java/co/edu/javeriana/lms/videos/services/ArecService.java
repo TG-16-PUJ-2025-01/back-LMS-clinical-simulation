@@ -9,15 +9,21 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 
+import co.edu.javeriana.lms.practices.models.Simulation;
+import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
 import co.edu.javeriana.lms.videos.dtos.ArecLoginRequestDto;
 import co.edu.javeriana.lms.videos.dtos.ArecLoginResponseDto;
 import co.edu.javeriana.lms.videos.dtos.ArecVideosResponseDto;
+import co.edu.javeriana.lms.videos.models.Video;
+import co.edu.javeriana.lms.videos.repositories.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -29,6 +35,12 @@ public class ArecService {
     private String AREC_PASSWORD;
     private static final String AREC_LOGIN_PATH = "/api/login";
     private static final String AREC_RECORDINGS_PATH = "/api/recording";
+
+    @Autowired
+    private VideoRepository videoRepository;
+
+    @Autowired
+    private SimulationRepository simulationRepository;
 
     private ArecLoginResponseDto loginToArec(String ipAddress)
             throws URISyntaxException, IOException, InterruptedException {
@@ -107,12 +119,53 @@ public class ArecService {
         return res;
     }
 
-    private void associateVideoWithSimulation(ArecVideosResponseDto.Video video)
+    private void associateVideoWithSimulation(Long roomId, ArecVideosResponseDto.Video video)
             throws URISyntaxException, IOException, InterruptedException {
+        log.info("Associating video with simulation " + video.getName());
+
+        Optional<Video> videoData = videoRepository.findByName(video.getName());
+
+        if (videoData.isPresent()) {
+            log.info("Video already exists in the database");
+            return;
+        }
+        ArecVideosResponseDto.VideoMetadata videoMetadata = video.getMetadata().stream()
+            .filter(metadata -> metadata.getChannelName().equals("Movie"))
+            .findFirst()
+            .orElse(null);
+
+        if (videoMetadata == null) {
+            log.error("No metadata found with channelName 'movie' for video: {}", video.getName());
+            return;
+        }
+
+        Video newVideo = Video.builder()
+                .name(video.getName())
+                .duration(video.getLength())
+                .recordingDate(video.getRecordedAt())
+                .available(video.getStatus().equals("ready"))
+                .videoUrl(videoMetadata.getPlaybackUrl())
+                .size(videoMetadata.getSize() / 1000000)
+                .build();
         
+        List<Simulation> simulations = simulationRepository.findAllByRooms_IdAndStartDateTimeAfterAndEndDateTimeBefore(
+                roomId, video.getRecordedAt(), video.getFinishedAt());
+
+        if (simulations.isEmpty()) {
+            log.error("No simulation found for video: {}", video.getName());
+            return;
+        } if (simulations.size() > 1) {
+            log.error("Multiple simulations found for video: {}", video.getName());
+            return;
+        }
+        Simulation simulation = simulations.get(0);
+        log.info("Simulation found: {}", simulation.getSimulationId());
+        newVideo.setSimulation(simulation);
+        videoRepository.save(newVideo);
+        log.info("Video saved: {}", newVideo.getName());
     }
 
-    public void syncVideos(String ipAddress) throws URISyntaxException, IOException, InterruptedException {
+    public void syncVideos(Long roomId, String ipAddress) throws URISyntaxException, IOException, InterruptedException {
         log.info("Syncing videos with Arec");
 
         ArecVideosResponseDto res = fetchVideos(ipAddress);
@@ -123,7 +176,7 @@ public class ArecService {
             log.info("Video recorded at: {}", video.getRecordedAt());
             log.info("Video finished at: {}", video.getFinishedAt());
 
-            associateVideoWithSimulation(video);
+            associateVideoWithSimulation(roomId, video);
         }
     }
 }

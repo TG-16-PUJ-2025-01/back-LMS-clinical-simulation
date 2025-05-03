@@ -95,4 +95,18 @@ public class VideoController {
         return ResponseEntity.ok(new ApiResponseDto<Video>(HttpStatus.OK.value(), "ok", video, null));
     }
 
+    @PutMapping("/unavailable/{id}")
+    public ResponseEntity<ApiResponseDto<Video>> setVideoAsUnavailable(@PathVariable Long id) {
+        log.info("Setting video with id: {} as unavailable", id);
+
+        Video video = videoService.setVideoAsUnavailable(id);
+
+        if (video == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseDto<>(HttpStatus.NOT_FOUND.value(), "Video not found", null, null));
+        }
+
+        return ResponseEntity.ok(new ApiResponseDto<Video>(HttpStatus.OK.value(), "ok", video, null));
+    }
+
 }

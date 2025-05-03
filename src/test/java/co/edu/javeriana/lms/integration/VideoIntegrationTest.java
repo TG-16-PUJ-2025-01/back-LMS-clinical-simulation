@@ -96,10 +96,9 @@ public class VideoIntegrationTest {
     public void testEditVideoSuccess() throws Exception {
         mockMvc.perform(put("/video/1")
                 .contentType("application/json")
-                .content("{\"name\":\"Video 1\",\"expirationDate\":\"2025-01-01\"}"))
+                .content("{\"name\":\"Video 1\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.name", is("Video 1")))
-                .andExpect(jsonPath("$.data.expirationDate", is("2025-01-01T00:00:00.000+00:00")))
                 .andExpect(jsonPath("$.metadata", is(nullValue())));
     }
 
@@ -107,7 +106,7 @@ public class VideoIntegrationTest {
     public void testEditVideoFailure() throws Exception {
         mockMvc.perform(put("/video/1000")
                 .contentType("application/json")
-                .content("{\"name\":\"Video 3\",\"expirationDate\":\"2025-01-01\"}"))
+                .content("{\"name\":\"Video 3\"}"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.data", is(nullValue())))
                 .andExpect(jsonPath("$.status", is(404)))

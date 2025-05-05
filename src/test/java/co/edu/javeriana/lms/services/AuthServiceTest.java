@@ -4,6 +4,7 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -88,7 +89,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void testLoginInvalidPassword() {
+    public void testLoginInvalidCredentials() {
         when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(mockPassword, mockUser.getPassword())).thenReturn(false);
 
@@ -97,7 +98,6 @@ public class AuthServiceTest {
 
     @Test
     public void testChangePassword() {
-
         String mockSubject = "Cambio de contraseña LMS";
         String mockBody = "Hola " + mockUser.getEmail() + ",\n\nTu contraseña ha sido cambiada con éxito.\n" +
                 "Si no fuiste tú, por favor, contacta al administrador.";
@@ -118,17 +118,59 @@ public class AuthServiceTest {
         verify(userRepository).save(mockUser);
         verify(jwtService).generateToken(mockUser);
         verify(emailService).sendEmail(mockEmail, mockSubject, mockBody);
+    }
 
+    @Test
+    public void testChangePasswordUserNotFound() {
+        when(jwtService.extractUserName(mockToken)).thenReturn(mockEmail);
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> authService.changePassword(mockToken, mockPassword, mockNewPassword));
+    }
+
+    @Test
+    public void testChangePasswordInvalidCredentials() {
+        when(jwtService.extractUserName(mockToken)).thenReturn(mockEmail);
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser));
+        when(passwordEncoder.matches(mockPassword, mockUser.getPassword())).thenReturn(false);
+
+        assertThrows(RuntimeException.class, () -> authService.changePassword(mockToken, mockPassword, mockNewPassword));
     }
 
     @Test
     public void testGetRolesByToken() {
+        when(jwtService.extractUserName(mockToken)).thenReturn(mockEmail);
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser));
 
+        List<String> roles = List.of(authService.getRolesByToken(mockToken));
+
+        assert roles.size() == 2;
+        assert roles.contains(Role.ADMIN.name());
+        assert roles.contains(Role.COORDINADOR.name());
+        verify(jwtService).extractUserName(mockToken);
+        verify(userRepository).findByEmail(mockEmail);
     }
 
     @Test
     public void testGetEmailByToken() {
+        when(jwtService.extractUserName(mockToken)).thenReturn(mockEmail);
+        
+        String email = authService.getEmailByToken(mockToken);
 
+        assert email.equals(mockEmail);
+        verify(jwtService).extractUserName(mockToken);
+    }
+
+    @Test
+    public void testGetNameByToken() {
+        when(jwtService.extractUserName(mockToken)).thenReturn(mockEmail);
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser));
+
+        String name = authService.getNameByToken(mockToken);
+
+        assert name.equals(mockUser.getName() + " " + mockUser.getLastName());
+        verify(jwtService).extractUserName(mockToken);
+        verify(userRepository).findByEmail(mockEmail);
     }
 
 }

@@ -36,9 +36,18 @@ public class VideoService {
         }
 
         videoToEdit.setName(video.getName());
-        videoToEdit.setExpirationDate(video.getExpirationDate());
     
         return videoRepository.save(videoToEdit);
+    }
+
+    public Video setVideoAsUnavailable(Long id) {
+        Video video = videoRepository.findById(id).orElse(null);
+        if (video == null) {
+            return null;
+        }
+
+        video.setAvailable(false);
+        return videoRepository.save(video);
     }
 
     public Video deleteVideo(Long id) {

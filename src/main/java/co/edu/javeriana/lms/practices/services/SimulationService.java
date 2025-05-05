@@ -1,7 +1,9 @@
 package co.edu.javeriana.lms.practices.services;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -82,6 +84,15 @@ public class SimulationService {
         }
     }
 
+    private Date convertToCorrectTimeZone(Date date) {
+        if (date == null) return null;
+        
+        Instant instant = date.toInstant();
+        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC"))
+                            .withZoneSameLocal(ZoneId.systemDefault());
+        return Date.from(zonedDateTime.toInstant());
+    }
+
     @Transactional
     public List<Simulation> addSimulations(List<SimulationByTimeSlotDto> simulationsDto) {
 
@@ -89,6 +100,12 @@ public class SimulationService {
             throw new IllegalArgumentException(
                     "The number of groups does not match the number of available time slots");
         }
+
+        simulationsDto.forEach(dto -> {
+            dto.setStartDateTime(convertToCorrectTimeZone(dto.getStartDateTime()));
+            dto.setEndDateTime(convertToCorrectTimeZone(dto.getEndDateTime()));
+        });
+
         List<Simulation> createdSimulations = new ArrayList<>();
         for (SimulationByTimeSlotDto simulation : simulationsDto) {
             createdSimulations.addAll(addSimulationsPerTimeSlot(simulation));

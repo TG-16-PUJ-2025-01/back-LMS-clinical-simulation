@@ -30,7 +30,7 @@ public class AuthService {
     public LoginResponseDto login(String email, String password) {
         log.info("Logging in user: " + email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found")); 
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
@@ -53,7 +53,7 @@ public class AuthService {
         userRepository.save(user);
         String subject = "Cambio de contraseña LMS";
         String body = "Hola " + user.getEmail() + ",\n\nTu contraseña ha sido cambiada con éxito.\n" +
-                    "Si no fuiste tú, por favor, contacta al administrador.";
+                "Si no fuiste tú, por favor, contacta al administrador.";
         emailService.sendEmail(user.getEmail(), subject, body);
         String newToken = jwtService.generateToken(user);
         return newToken;
@@ -67,12 +67,12 @@ public class AuthService {
         return user.getRoles().stream().map(role -> role.name()).toArray(String[]::new);
     }
 
-    public String getEmailByToken (String token) {
+    public String getEmailByToken(String token) {
         log.info("Getting email for token: " + token);
         return jwtService.extractUserName(token);
     }
 
-    public String getNameByToken (String token) {
+    public String getNameByToken(String token) {
         log.info("Getting name for token: " + token);
         String email = jwtService.extractUserName(token);
         User user = userRepository.findByEmail(email)

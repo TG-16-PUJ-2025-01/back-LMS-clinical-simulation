@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import co.edu.javeriana.lms.accounts.dtos.LoginResponseDto;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.shared.services.JwtService;
@@ -26,17 +27,18 @@ public class AuthService {
     @Autowired
     private JwtService jwtService;
 
-    public String login(String email, String password) {
+    public LoginResponseDto login(String email, String password) {
         log.info("Logging in user: " + email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found")); 
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
         String token = jwtService.generateToken(user);
-        return token;
+
+        return new LoginResponseDto(token, user.getRoles(), user.getPreferredRole());
     }
 
     public String changePassword(String token, String password, String newPassword) {
@@ -51,7 +53,7 @@ public class AuthService {
         userRepository.save(user);
         String subject = "Cambio de contraseña LMS";
         String body = "Hola " + user.getEmail() + ",\n\nTu contraseña ha sido cambiada con éxito.\n" +
-                    "Si no fuiste tú, por favor, contacta al administrador.";
+                "Si no fuiste tú, por favor, contacta al administrador.";
         emailService.sendEmail(user.getEmail(), subject, body);
         String newToken = jwtService.generateToken(user);
         return newToken;
@@ -65,12 +67,12 @@ public class AuthService {
         return user.getRoles().stream().map(role -> role.name()).toArray(String[]::new);
     }
 
-    public String getEmailByToken (String token) {
+    public String getEmailByToken(String token) {
         log.info("Getting email for token: " + token);
         return jwtService.extractUserName(token);
     }
 
-    public String getNameByToken (String token) {
+    public String getNameByToken(String token) {
         log.info("Getting name for token: " + token);
         String email = jwtService.extractUserName(token);
         User user = userRepository.findByEmail(email)
@@ -78,5 +80,13 @@ public class AuthService {
         String firstName = user.getName();
         String lastName = user.getLastName();
         return firstName + " " + lastName;
+    }
+
+    public Long getUserIdByToken(String token) {
+        log.info("Getting user ID for token: " + token);
+        String email = jwtService.extractUserName(token);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getId();
     }
 }

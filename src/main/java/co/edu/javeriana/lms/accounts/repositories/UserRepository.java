@@ -32,4 +32,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Buscar todos los profesores
     @Query("SELECT u FROM User u JOIN u.roles r WHERE r = 'PROFESOR'")
     List<User> findAllProfessors();
+
+    // Buscar todos los estudiantes
+    @Query("SELECT u FROM User u JOIN u.roles r WHERE r = 'ESTUDIANTE'")
+    List<User> findAllStudents();
+
+    @Query("SELECT u FROM User u WHERE u.institutionalId = :idMember")
+    Optional<User> findByInstitutionalId(@Param("idMember") Long idMember);
 }

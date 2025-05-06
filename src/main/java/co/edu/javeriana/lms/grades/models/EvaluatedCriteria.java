@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class EvaluatedCriteria {
     private UUID id;
     private String comment;
-    private Integer score;
+    private Float score;
 }

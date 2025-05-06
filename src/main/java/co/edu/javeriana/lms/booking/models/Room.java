@@ -5,14 +5,15 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import co.edu.javeriana.lms.practices.models.Simulation;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.NonNull;
@@ -43,11 +44,16 @@ public class Room {
     @Column(nullable = false)
     private Integer capacity;
 
+    @NonNull
+    @Column(nullable = false)
+    private String ip;
+
     @ManyToOne
     @NonNull
     private RoomType type;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    @ManyToMany
+    @JoinTable(name = "simulation_rooms", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
     @JsonIgnore
     private List<Simulation> simulations;
 

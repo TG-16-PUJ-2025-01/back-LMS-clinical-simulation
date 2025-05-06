@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.javeriana.lms.accounts.services.AuthService;
 import co.edu.javeriana.lms.practices.dtos.PracticeDto;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.services.PracticeService;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @Slf4j
 @RestController
@@ -33,6 +35,9 @@ public class PracticeController {
 
     @Autowired
     private PracticeService practiceService;
+
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponseDto<?>> getAllPractices(
@@ -58,34 +63,40 @@ public class PracticeController {
 
         Practice practice = practiceService.findById(id);
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice retrieved successfully", practice, null));
+        return ResponseEntity
+                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice retrieved successfully", practice, null));
     }
 
     @GetMapping("/class/{classId}")
-    public ResponseEntity<ApiResponseDto<?>> getPracticesByClass(@PathVariable Long classId) {
+    public ResponseEntity<ApiResponseDto<?>> getPracticesByClassId(@PathVariable Long classId) {
         log.info("Requesting practices by class with id: {}", classId);
 
         List<Practice> practices = practiceService.findByClassId(classId);
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practices retrieved successfully", practices, null));
+        return ResponseEntity
+                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practices retrieved successfully", practices, null));
     }
 
     @PostMapping("/add/{classId}")
-    public ResponseEntity<ApiResponseDto<?>> addPractice(@PathVariable Long classId, @Valid @RequestBody PracticeDto practiceDto) {
-        log.info("Adding practice to class with id: {}", classId);        
+    public ResponseEntity<ApiResponseDto<?>> addPractice(@PathVariable Long classId,
+            @Valid @RequestBody PracticeDto practiceDto) {
+        log.info("Adding practice to class with id: {}", classId);
 
         Practice newPractice = practiceService.save(classId, practiceDto.toEntity());
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.CREATED.value(), "Practice created successfully", newPractice, null));
+        return ResponseEntity.ok(
+                new ApiResponseDto<>(HttpStatus.CREATED.value(), "Practice created successfully", newPractice, null));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<?>> updatePractice(@PathVariable Long id, @Valid @RequestBody PracticeDto practiceDto) {
+    public ResponseEntity<ApiResponseDto<?>> updatePractice(@PathVariable Long id,
+            @Valid @RequestBody PracticeDto practiceDto) {
         log.info("Updating practice with id: {}", id);
 
         Practice updatedPractice = practiceService.update(id, practiceDto.toEntity());
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice updated successfully", updatedPractice, null));
+        return ResponseEntity.ok(
+                new ApiResponseDto<>(HttpStatus.OK.value(), "Practice updated successfully", updatedPractice, null));
     }
 
     @DeleteMapping("/{id}")
@@ -94,7 +105,32 @@ public class PracticeController {
 
         practiceService.deleteById(id);
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice deleted successfully", null, null));
+        return ResponseEntity
+                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice deleted successfully", null, null));
+    }
+
+    @PutMapping("/{id}/rubric/{rubricId}")
+    public ResponseEntity<ApiResponseDto<?>> updatePracticeRubric(@PathVariable Long id, @PathVariable Long rubricId) {
+        log.info("Updating rubric for practice with id: {}", id);
+
+        Practice updatedPractice = practiceService.updateRubric(id, rubricId);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Practice rubric updated successfully",
+                updatedPractice, null));
+    }
+
+    @GetMapping("/{id}/enrolled")
+    public ResponseEntity<ApiResponseDto<?>> getEnroledSimulation(@RequestHeader("Authorization") String token,
+            @PathVariable Long id) {
+        log.info("Requesting enroled simulation with id: {}", id);
+
+        token = token.substring(7);
+
+        Long userId = authService.getUserIdByToken(token);
+
+        Long simulationId = practiceService.getEnroledSimulation(id, userId);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationId, null));
     }
 
 }

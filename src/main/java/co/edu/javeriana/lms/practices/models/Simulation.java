@@ -1,6 +1,6 @@
 package co.edu.javeriana.lms.practices.models;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -14,11 +14,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -37,11 +41,11 @@ public class Simulation {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long simulationId;
 
-    @Column(nullable = false)
-    private LocalDateTime startDateTime;
+    @Column(nullable = true)
+    private Date startDateTime;
 
-    @Column(nullable = false)
-    private LocalDateTime endDateTime;
+    @Column(nullable = true)
+    private Date endDateTime;
 
     @Column(nullable = true)
     private Float grade;
@@ -51,32 +55,28 @@ public class Simulation {
     private GradeStatus gradeStatus;
 
     @Column(nullable = true)
-    private LocalDateTime gradeDateTime;
+    private Date gradeDateTime;
+
+    @Column(nullable = false)
+    private Integer groupNumber;
 
     @ManyToOne
-    @JsonIgnore
     private Practice practice;
 
-    @OneToOne
-    @JoinColumn(name = "video_id")
-    @JsonIgnore
-    private Video video;
-
-    /*@ManyToMany
-    @JoinTable(name = "simulation_users", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
-    @JsonIgnore
-
-    private List<GroupPerSimulation> groups;*/
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "simulation_id")
+    private List<Video> videos;
 
     @OneToOne
     @JoinColumn(nullable = true)
     private Rubric rubric;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "simulation_users", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
+    @JsonIgnore
     private List<User> users;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    @JsonIgnore
-    private Room room;
-
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "simulation_rooms", joinColumns = @JoinColumn(name = "simulationId"), inverseJoinColumns = @JoinColumn(name = "id"))
+    private List<Room> rooms;
 }

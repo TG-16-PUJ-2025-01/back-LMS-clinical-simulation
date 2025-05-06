@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.config.security.PasswordGenerator;
@@ -60,6 +61,23 @@ public class UserService implements UserDetailsService {
         return savedUser;
     }
 
+    public User addUserExcel(User user) {
+        log.info("Creating user: " + user.getEmail());
+        if (userRepository.existsByEmail(user.getEmail())) {
+            return userRepository.findByEmail(user.getEmail()).orElseThrow();
+        }
+        String password = PasswordGenerator.generatePassword();
+        user.setPassword(passwordEncoder.encode(password));
+        User savedUser =  userRepository.save(user);
+
+        String subject = "Bienvenido a LMS - Tus credenciales de acceso";
+        String body = "Hola " + user.getEmail() + ",\n\nTu cuenta ha sido creada exitosamente.\n" +
+                  "Tu contraseña temporal es: " + password + "\n\nPor favor, cambia tu contraseña después de iniciar sesión.";
+        emailService.sendEmail(user.getEmail(), subject, body);
+
+        return savedUser;
+    }
+
     public User findById(Long id) {
         log.info("Getting user by id: " + id);
         return userRepository.findById(id)
@@ -69,12 +87,19 @@ public class UserService implements UserDetailsService {
     public User updateUserById(Long id, User user) {
         log.info("Updating user by id: " + id);
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found wirth id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
         existingUser.setName(user.getName());
         existingUser.setLastName(user.getLastName());
         existingUser.setEmail(user.getEmail());
         existingUser.setInstitutionalId(user.getInstitutionalId());
         existingUser.setRoles(user.getRoles());
+        return userRepository.save(existingUser);
+    }
+
+    public User setPreferredRoleToUser(String email, Role role) {
+        log.info("Setting default role to user by name: " + email);
+        User existingUser = userRepository.findByEmail(email).orElseThrow();
+        existingUser.setPreferredRole(role);
         return userRepository.save(existingUser);
     }
 

@@ -41,3 +41,8 @@ spring:
 jwt:
   signing:
     key: "${JWT_SIGNING_KEY}"
+
+arec:
+  username: "${AREC_USERNAME}"
+  password: "${AREC_PASSWORD}"
+  sync: "${AREC_SYNC:false}"

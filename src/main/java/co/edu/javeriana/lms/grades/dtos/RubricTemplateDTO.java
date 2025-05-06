@@ -1,10 +1,9 @@
 package co.edu.javeriana.lms.grades.dtos;
 
-import java.sql.Date;
 import java.util.List;
 
 import co.edu.javeriana.lms.grades.models.Criteria;
-import io.micrometer.common.lang.Nullable;
+import co.edu.javeriana.lms.grades.models.RubricColumn;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,11 +18,9 @@ public class RubricTemplateDTO {
     String title;
     @NotNull(message = "criteria is required")
     private List<Criteria> criteria;
-    @Nullable
+    @NotNull(message = "columns is required")
+    private List<RubricColumn> columns;
     private List<Long> courses;
-    @NotNull(message = "creation date is required")
-    private Date creationDate;
-    @Nullable
     private Long practiceId;
     @NotNull(message = "archived is required")
     Boolean archived;

@@ -10,11 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Criteria {
-    
     private UUID id;
     private String name;
-    private Integer points;
-    private List<ScoringPair> scoringScale;  // 👈 Aquí se reemplaza Pair<Long, Long>
+    private Double weight;
     private List<String> scoringScaleDescription;
-    private Integer score;
 }

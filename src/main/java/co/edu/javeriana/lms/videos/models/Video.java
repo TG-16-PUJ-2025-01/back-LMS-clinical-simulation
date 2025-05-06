@@ -13,8 +13,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -52,17 +52,17 @@ public class Video {
 
     @NonNull
     @Column(nullable = false)
-    private Date expirationDate;
-
-    @NonNull
-    @Column(nullable = false)
     private Long duration; // in seconds
 
     @NonNull
     @Column(nullable = false)
     private Double size; // in MB
 
-    @OneToOne
+    @NonNull
+    @Column(nullable = false)
+    private String videoUrl;
+
+    @ManyToOne
     @JoinColumn(name = "simulation_id")
     @JsonIgnore
     private Simulation simulation;

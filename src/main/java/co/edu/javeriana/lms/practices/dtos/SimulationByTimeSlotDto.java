@@ -26,10 +26,8 @@ public class SimulationByTimeSlotDto {
     private List<Long> roomIds;
     
     @NotNull(message = "Start date and time is required")
-    @Future(message = "Start date and time must be in the future")
     private Date startDateTime;
     
-    @Future(message = "Start date and time must be in the future")
     @NotNull(message = "End date and time is required")
     private Date endDateTime;
 }

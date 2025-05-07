@@ -3,7 +3,6 @@ package co.edu.javeriana.lms.practices.dtos;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -510,9 +510,15 @@ public class DBInitializer implements CommandLineRunner {
 	private void insertRubricTemplates() {
 		Course course1 = courseRepository.findById(1L).get();
 		Course course2 = courseRepository.findById(2L).get();
+		Course course3 = courseRepository.findById(3L).get();
+		User user1 = userRepository.findById(1L).get();
+		User user2 = userRepository.findById(2L).get();
+		User user3 = userRepository.findById(3L).get();
 
 		List<RubricTemplate> rubricTemplates = List.of(
 				RubricTemplate.builder().title("Rubrica 1").archived(false).courses(List.of(course1, course2))
+						.creationDate(new Date())
+						.creator(user1)
 						.criteria(List
 								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(0.2).build(),
 										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(0.3).build(),
@@ -527,7 +533,9 @@ public class DBInitializer implements CommandLineRunner {
 										.scoringScale(ScoringPair.builder().lowerValue(4L).upperValue(5L).build())
 										.build()))
 						.build(),
-				RubricTemplate.builder().title("Rubrica 2").archived(false).courses(List.of(course1, course2))
+				RubricTemplate.builder().title("Rubrica 2").archived(false).courses(List.of(course3))
+						.creationDate(new Date())
+						.creator(user2)
 						.criteria(List
 								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(0.4).build(),
 										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(0.6)
@@ -541,7 +549,9 @@ public class DBInitializer implements CommandLineRunner {
 										.scoringScale(ScoringPair.builder().lowerValue(4L).upperValue(5L).build())
 										.build()))
 						.build(),
-				RubricTemplate.builder().title("Rubrica 3").archived(true).courses(List.of(course1, course2))
+				RubricTemplate.builder().title("Rubrica 3").archived(true).courses(List.of(course1, course2, course3))
+						.creationDate(new Date())
+						.creator(user3)
 						.criteria(List
 								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(0.7).build(),
 										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(0.3)

@@ -24,7 +24,7 @@ public class ScheduleTaskHandler {
     @Autowired
     private RoomRepository roomRepository;
 
-    @Value("${AREC_SYNC}")
+    @Value("${AREC_SYNC:false}")
     private Boolean arecSync;
 
     // @Scheduled(cron = "0 0 6 * * *") // Cron expression for running 6AM every day

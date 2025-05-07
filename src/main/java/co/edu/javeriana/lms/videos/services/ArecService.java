@@ -1,6 +1,7 @@
 package co.edu.javeriana.lms.videos.services;
 
 import java.io.IOException;
+import java.net.HttpCookie;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -42,13 +43,23 @@ public class ArecService {
     @Autowired
     private SimulationRepository simulationRepository;
 
-    private ArecLoginResponseDto loginToArec(String ipAddress)
+    private final HttpClient httpClient;
+
+    public ArecService(HttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
+    public String encodeCredentials(String username, String password) {
+        return Base64.getEncoder()
+                .encodeToString(String.format("%s:%s", username, password).getBytes(StandardCharsets.UTF_8));
+    }
+
+    public ArecLoginResponseDto loginToArec(String ipAddress)
             throws URISyntaxException, IOException, InterruptedException {
         log.info("Logging in to Arec with username: {}", AREC_USERNAME);
         Gson gson = new Gson();
 
-        String base64Auth = Base64.getEncoder()
-                .encodeToString(String.format("%s:%s", AREC_USERNAME, AREC_PASSWORD).getBytes(StandardCharsets.UTF_8));
+        String base64Auth = encodeCredentials(AREC_USERNAME, AREC_PASSWORD);
 
         String req = gson.toJson(new ArecLoginRequestDto(AREC_USERNAME, base64Auth, "javeriana", "0"));
         log.info("Request to Arec: {}", req);
@@ -59,8 +70,7 @@ public class ArecService {
                 .POST(HttpRequest.BodyPublishers.ofString(req))
                 .build();
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         log.info("Response from Arec: {}", response.body());
         log.info("Response status code: {}", response.statusCode());
@@ -74,24 +84,26 @@ public class ArecService {
 
         log.info("Set-Cookie: {}", setCookieHeader);
 
-        List<String> cookieParts = List.of(setCookieHeader.split(";"));
-        for (String part : cookieParts) {
-            log.info("Cookie part: {}", part);
-            if (part.startsWith("session=")) {
-                cookies.setSession(part.split("=", 2)[1]);
-                log.info("Session cookie: {}", cookies.getSession());
-            } else if (part.startsWith("path=")) {
-                cookies.setPath(part.split("=", 2)[1]);
-                log.info("Path cookie: {}", cookies.getPath());
-            } else {
-                log.warn("Ignored cookie part: {}", part);
+        List<HttpCookie> setCookies = HttpCookie.parse(setCookieHeader);
+        for (HttpCookie setCookie : setCookies) {
+            log.info("Name: " + setCookie.getName());
+            log.info("Value: " + setCookie.getValue());
+            log.info("Domain: " + setCookie.getDomain());
+            log.info("Path: " + setCookie.getPath());
+            log.info("Max Age: " + setCookie.getMaxAge());
+            log.info("Secure: " + setCookie.getSecure());
+            log.info("HttpOnly: " + setCookie.isHttpOnly());
+            log.info("Version: " + setCookie.getVersion());
+            log.info("Comment: " + setCookie.getComment());
+            if (setCookie.getName().equals("session")) {
+                cookies.setSession(setCookie.getValue());
             }
         }
 
         return cookies;
     }
 
-    private ArecVideosResponseDto fetchVideos(String ipAddress)
+    public ArecVideosResponseDto fetchVideos(String ipAddress)
             throws URISyntaxException, IOException, InterruptedException {
         log.info("Getting videos from Arec");
         Gson gson = new Gson();
@@ -101,11 +113,10 @@ public class ArecService {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI("http://" + ipAddress + AREC_RECORDINGS_PATH))
                 .header("Content-Type", "application/json")
-                .header("Cookie", "session=" + cookies.getSession() + "; " + cookies.getPath() + "; HttpOnly")
+                .header("Cookie", "session=" + cookies.getSession())
                 .GET()
                 .build();
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         ArecVideosResponseDto res = gson.fromJson(response.body(), ArecVideosResponseDto.class);
 
@@ -117,14 +128,14 @@ public class ArecService {
                     .uri(new URI(
                             "http://" + ipAddress + AREC_RECORDINGS_PATH + "?per_page=" + res.getPageInfo().getTotal()))
                     .header("Content-Type", "application/json")
-                    .header("Cookie", "session=" + cookies.getSession() + "; " + cookies.getPath() + "; HttpOnly")
+                    .header("Cookie", "session=" + cookies.getSession())
                     .GET()
                     .build();
         }
         return res;
     }
 
-    private void associateVideoWithSimulation(Long roomId, ArecVideosResponseDto.Video video)
+    public void associateVideoWithSimulation(Long roomId, ArecVideosResponseDto.Video video)
             throws URISyntaxException, IOException, InterruptedException {
         log.info("Associating video with simulation " + video.getName());
 

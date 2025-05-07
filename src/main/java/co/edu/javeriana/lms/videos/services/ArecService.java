@@ -62,25 +62,30 @@ public class ArecService {
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        List<String> setCookieHeaders = response.headers().allValues("Set-Cookie");
+        log.info("Response from Arec: {}", response.body());
+        log.info("Response status code: {}", response.statusCode());
+        log.info("Response headers: {}", response.headers().map());
+
+        String setCookieHeader = response.headers().firstValue("Set-Cookie")
+                .orElseThrow(() -> new RuntimeException("No Set-Cookie header found"));
+        log.info("Set-Cookie headers: {}", setCookieHeader);
 
         ArecLoginResponseDto cookies = new ArecLoginResponseDto();
 
-        if (!setCookieHeaders.isEmpty()) {
-            log.info("Set-Cookie headers received:");
-            for (String setCookieHeader : setCookieHeaders) {
-                if (setCookieHeader.startsWith("session=")) {
-                    cookies.setSession(setCookieHeader.split(";")[0].split("=")[1]);
-                    log.info("Session cookie: {}", cookies.getSession());
-                } else if (setCookieHeader.startsWith("path=")) {
-                    cookies.setPath(setCookieHeader.split(";")[0].split("=")[1]);
-                    log.info("Path cookie: {}", cookies.getPath());
-                } else {
-                    log.warn("Unexpected Set-Cookie header: {}", setCookieHeader);
-                }
+        log.info("Set-Cookie: {}", setCookieHeader);
+
+        List<String> cookieParts = List.of(setCookieHeader.split(";"));
+        for (String part : cookieParts) {
+            log.info("Cookie part: {}", part);
+            if (part.startsWith("session=")) {
+                cookies.setSession(part.split("=", 2)[1]);
+                log.info("Session cookie: {}", cookies.getSession());
+            } else if (part.startsWith("path=")) {
+                cookies.setPath(part.split("=", 2)[1]);
+                log.info("Path cookie: {}", cookies.getPath());
+            } else {
+                log.warn("Ignored cookie part: {}", part);
             }
-        } else {
-            log.error("No Set-Cookie header received in the response.");
         }
 
         return cookies;
@@ -130,9 +135,9 @@ public class ArecService {
             return;
         }
         ArecVideosResponseDto.VideoMetadata videoMetadata = video.getMetadata().stream()
-            .filter(metadata -> metadata.getChannelName().equals("Movie"))
-            .findFirst()
-            .orElse(null);
+                .filter(metadata -> metadata.getChannelName().equals("Movie"))
+                .findFirst()
+                .orElse(null);
 
         if (videoMetadata == null) {
             log.error("No metadata found with channelName 'movie' for video: {}", video.getName());
@@ -147,14 +152,15 @@ public class ArecService {
                 .videoUrl(videoMetadata.getPlaybackUrl())
                 .size(videoMetadata.getSize() / 1000000)
                 .build();
-        
+
         List<Simulation> simulations = simulationRepository.findAllByRooms_IdAndStartDateTimeAfterAndEndDateTimeBefore(
                 roomId, video.getRecordedAt(), video.getFinishedAt());
 
         if (simulations.isEmpty()) {
             log.error("No simulation found for video: {}", video.getName());
             return;
-        } if (simulations.size() > 1) {
+        }
+        if (simulations.size() > 1) {
             log.error("Multiple simulations found for video: {}", video.getName());
             return;
         }

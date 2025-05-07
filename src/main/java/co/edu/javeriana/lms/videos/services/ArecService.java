@@ -43,12 +43,6 @@ public class ArecService {
     @Autowired
     private SimulationRepository simulationRepository;
 
-    private final HttpClient httpClient;
-
-    public ArecService(HttpClient httpClient) {
-        this.httpClient = httpClient;
-    }
-
     public String encodeCredentials(String username, String password) {
         return Base64.getEncoder()
                 .encodeToString(String.format("%s:%s", username, password).getBytes(StandardCharsets.UTF_8));
@@ -70,7 +64,8 @@ public class ArecService {
                 .POST(HttpRequest.BodyPublishers.ofString(req))
                 .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                HttpClient client = HttpClient.newHttpClient();
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         log.info("Response from Arec: {}", response.body());
         log.info("Response status code: {}", response.statusCode());
@@ -116,7 +111,9 @@ public class ArecService {
                 .header("Cookie", "session=" + cookies.getSession())
                 .GET()
                 .build();
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         ArecVideosResponseDto res = gson.fromJson(response.body(), ArecVideosResponseDto.class);
 

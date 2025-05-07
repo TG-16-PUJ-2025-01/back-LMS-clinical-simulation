@@ -252,6 +252,8 @@ public class SimulationService {
         Date startDate = parseDate(date);
         Date endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
 
+        log.info("Finding simulations schedule between {} and {}", startDate, endDate);
+
         List<Simulation> simulations = simulationRepository.findByStartDateTimeBetween(startDate, endDate);
 
         List<TimeSlotDto> timeSlots = new ArrayList<>();

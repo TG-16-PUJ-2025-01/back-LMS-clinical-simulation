@@ -112,7 +112,7 @@ public class RubricTemplateService {
         Practice practice = new Practice();
         if (rubricTemplate.getPracticeId() != null) {
             practice = practiceRepository.findById(rubricTemplate.getPracticeId()).get();
-            rubricTemplateModel.setPractice(practice);
+            rubricTemplateModel.getPractices().add(practice);
             isForPractice = true;
         }
         rubricTemplateModel.setArchived(rubricTemplate.getArchived());

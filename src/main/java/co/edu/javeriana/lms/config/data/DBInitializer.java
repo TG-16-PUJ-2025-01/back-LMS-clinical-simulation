@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -26,7 +27,13 @@ import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
+import co.edu.javeriana.lms.grades.models.Criteria;
 import co.edu.javeriana.lms.grades.models.GradeStatus;
+import co.edu.javeriana.lms.grades.models.RubricColumn;
+import co.edu.javeriana.lms.grades.models.RubricTemplate;
+import co.edu.javeriana.lms.grades.models.ScoringPair;
+import co.edu.javeriana.lms.grades.repositories.RubricRepository;
+import co.edu.javeriana.lms.grades.repositories.RubricTemplateRepository;
 import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.PracticeType;
@@ -72,8 +79,14 @@ public class DBInitializer implements CommandLineRunner {
 	@Autowired
 	private SimulationRepository simulationRepository;
 
-	@Autowired 
+	@Autowired
 	private SimulationService simulationService;
+
+	@Autowired
+	private RubricTemplateRepository rubricTemplateRepository;
+
+	@Autowired
+	private RubricRepository rubricRepository;
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -83,8 +96,9 @@ public class DBInitializer implements CommandLineRunner {
 		insertClasses();
 		insertPractices();
 		insertSimulations();
-		asignStudentsAndGradesToSimulations();
+		assignStudentsAndGradesToSimulations();
 		insertSimulationsVideosAndComments();
+		insertRubricTemplates();
 	}
 
 	private void insertRoomsAndTypes() {
@@ -96,42 +110,48 @@ public class DBInitializer implements CommandLineRunner {
 				RoomType.builder().name("Hospitalización").build(),
 				RoomType.builder().name("Observación").build(),
 				RoomType.builder().name("Cirugía").build(),
-				RoomType.builder().name("Laparoscopia").build()
-		);
-	
+				RoomType.builder().name("Laparoscopia").build());
+
 		roomTypeRepository.saveAll(roomTypes);
-	
+
 		List<Room> rooms = Arrays.asList(
 				Room.builder().name("Consultorio 1").type(roomTypes.get(0)).capacity(11).ip("10.197.140.234").build(),
 				Room.builder().name("Consultorio 2").type(roomTypes.get(0)).capacity(11).ip("10.197.140.235").build(),
 				Room.builder().name("Consultorio 3").type(roomTypes.get(0)).capacity(11).ip("10.197.140.236").build(),
-	
-				Room.builder().name("Cuidado crítico 1A").type(roomTypes.get(1)).capacity(11).ip("10.197.140.239").build(),
-				Room.builder().name("Cuidado crítico 1B").type(roomTypes.get(1)).capacity(11).ip("10.197.140.237").build(),
-	
-				Room.builder().name("Cuidado crítico 2A").type(roomTypes.get(2)).capacity(11).ip("10.197.140.240").build(),
-				Room.builder().name("Cuidado crítico 2B").type(roomTypes.get(2)).capacity(11).ip("10.197.140.238").build(),
-	
-				Room.builder().name("Cuidado crítico 3A").type(roomTypes.get(3)).capacity(11).ip("10.197.140.242").build(),
-				Room.builder().name("Cuidado crítico 3B").type(roomTypes.get(3)).capacity(11).ip("10.197.140.238").build(),
-	
-				Room.builder().name("Hospitalización 1").type(roomTypes.get(4)).capacity(11).ip("10.197.140.128").build(),
-				Room.builder().name("Hospitalización 2").type(roomTypes.get(4)).capacity(11).ip("10.197.140.133").build(),
-				Room.builder().name("Hospitalización 3").type(roomTypes.get(4)).capacity(11).ip("10.197.140.132").build(),
-	
+
+				Room.builder().name("Cuidado crítico 1A").type(roomTypes.get(1)).capacity(11).ip("10.197.140.239")
+						.build(),
+				Room.builder().name("Cuidado crítico 1B").type(roomTypes.get(1)).capacity(11).ip("10.197.140.237")
+						.build(),
+
+				Room.builder().name("Cuidado crítico 2A").type(roomTypes.get(2)).capacity(11).ip("10.197.140.240")
+						.build(),
+				Room.builder().name("Cuidado crítico 2B").type(roomTypes.get(2)).capacity(11).ip("10.197.140.238")
+						.build(),
+
+				Room.builder().name("Cuidado crítico 3A").type(roomTypes.get(3)).capacity(11).ip("10.197.140.242")
+						.build(),
+				Room.builder().name("Cuidado crítico 3B").type(roomTypes.get(3)).capacity(11).ip("10.197.140.238")
+						.build(),
+
+				Room.builder().name("Hospitalización 1").type(roomTypes.get(4)).capacity(11).ip("10.197.140.128")
+						.build(),
+				Room.builder().name("Hospitalización 2").type(roomTypes.get(4)).capacity(11).ip("10.197.140.133")
+						.build(),
+				Room.builder().name("Hospitalización 3").type(roomTypes.get(4)).capacity(11).ip("10.197.140.132")
+						.build(),
+
 				Room.builder().name("Observación 1").type(roomTypes.get(5)).capacity(11).ip("10.197.140.211").build(),
 				Room.builder().name("Observación 2").type(roomTypes.get(5)).capacity(11).ip("10.197.140.206").build(),
 				Room.builder().name("Observación 3").type(roomTypes.get(5)).capacity(11).ip("10.197.140.209").build(),
-	
+
 				Room.builder().name("Cirugía 1").type(roomTypes.get(6)).capacity(11).ip("10.197.140.207").build(),
 				Room.builder().name("Cirugía 2").type(roomTypes.get(6)).capacity(11).ip("10.197.140.210").build(),
-	
-				Room.builder().name("Laparoscopia").type(roomTypes.get(7)).capacity(11).ip("10.197.140.208").build()
-		);
-	
+
+				Room.builder().name("Laparoscopia").type(roomTypes.get(7)).capacity(11).ip("10.197.140.208").build());
+
 		roomRepository.saveAll(rooms);
 	}
-	
 
 	private void createUsers() {
 
@@ -245,8 +265,7 @@ public class DBInitializer implements CommandLineRunner {
 
 				User.builder().email("juliana.perez@javeriana.edu.co").password(passwordEncoder.encode("est012"))
 						.name("Juliana").lastName("Pérez").institutionalId("00000050015")
-						.roles(Set.of(Role.ESTUDIANTE)).build()
-		);
+						.roles(Set.of(Role.ESTUDIANTE)).build());
 
 		// Guardar todos los usuarios
 		userRepository.saveAll(users);
@@ -352,7 +371,7 @@ public class DBInitializer implements CommandLineRunner {
 						.course(courseRepository.findById(1L).get())
 						.javerianaId(20001L)
 						.numberOfParticipants(9)
-						.students(allStudents.subList(0,9))
+						.students(allStudents.subList(0, 9))
 						.build(),
 				ClassModel.builder()
 						.period("2025-10")
@@ -360,7 +379,7 @@ public class DBInitializer implements CommandLineRunner {
 						.course(courseRepository.findById(1L).get())
 						.javerianaId(20002L)
 						.numberOfParticipants(6)
-						.students(allStudents.subList(9,15))
+						.students(allStudents.subList(9, 15))
 						.build(),
 				ClassModel.builder()
 						.period("2025-10")
@@ -418,15 +437,18 @@ public class DBInitializer implements CommandLineRunner {
 				Practice.builder().name("Práctica 1").description(
 						"Descripción de la práctica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(30).gradePercentage(30f).build(),
+						.classModel(classRepository.findById(1L).get()).simulationDuration(30).gradePercentage(30f)
+						.build(),
 				Practice.builder().name("Práctica 2").description(
 						"Descripción de la práctica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(9).maxStudentsGroup(1)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(40f).build(),
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(40f)
+						.build(),
 				Practice.builder().name("Práctica 3").description(
 						"Descripción de la práctica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(30f).build(),
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(30f)
+						.build(),
 				Practice.builder().name("Práctica 4").description(
 						"Descripción de la práctica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.GRUPAL).gradeable(false).numberOfGroups(5).maxStudentsGroup(5)
@@ -434,14 +456,14 @@ public class DBInitializer implements CommandLineRunner {
 		practiceRepository.saveAll(practices);
 	}
 
-	private void insertSimulations() {	
+	private void insertSimulations() {
 		LocalDateTime baseDate = LocalDateTime.now()
 				.withHour(9).withMinute(0).withSecond(0).withNano(0)
 				.with(java.time.DayOfWeek.MONDAY)
 				.minusWeeks(2L);
 
 		List<SimulationByTimeSlotDto> simulationsPractice1 = Arrays.asList(
-			
+
 				SimulationByTimeSlotDto.builder().practiceId(1L)
 						.roomIds(Arrays.asList(1L, 2L))
 						.startDateTime(Date.from(baseDate.atZone(ZoneId.systemDefault()).toInstant()))
@@ -451,15 +473,16 @@ public class DBInitializer implements CommandLineRunner {
 				SimulationByTimeSlotDto.builder().practiceId(1L)
 						.roomIds(Arrays.asList(1L, 2L))
 						.startDateTime(Date.from(baseDate.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date.from(baseDate.plusDays(1).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date
+								.from(baseDate.plusDays(1).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
 						.build(),
 
 				SimulationByTimeSlotDto.builder().practiceId(1L)
 						.roomIds(Arrays.asList(1L, 2L))
 						.startDateTime(Date.from(baseDate.plusDays(2).atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date.from(baseDate.plusDays(2).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
-						.build()
-		);
+						.endDateTime(Date
+								.from(baseDate.plusDays(2).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+						.build());
 
 		simulationService.addSimulations(simulationsPractice1);
 
@@ -467,34 +490,93 @@ public class DBInitializer implements CommandLineRunner {
 				SimulationByTimeSlotDto.builder().practiceId(2L)
 						.roomIds(Arrays.asList(1L, 2L))
 						.startDateTime(Date.from(baseDate.plusWeeks(1L).atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date.from(baseDate.plusWeeks(1L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
-						.build()
-		);
-		
+						.endDateTime(Date.from(
+								baseDate.plusWeeks(1L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
+						.build());
+
 		simulationService.addSimulations(simulationsPractice2);
 
 		List<SimulationByTimeSlotDto> simulationsPractice3 = Arrays.asList(
 				SimulationByTimeSlotDto.builder().practiceId(3L)
 						.roomIds(Arrays.asList(1L, 2L))
 						.startDateTime(Date.from(baseDate.plusWeeks(2L).atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date.from(baseDate.plusWeeks(2L).plusMinutes(45).atZone(ZoneId.systemDefault()).toInstant()))
-						.build()
-		);
+						.endDateTime(Date.from(
+								baseDate.plusWeeks(2L).plusMinutes(45).atZone(ZoneId.systemDefault()).toInstant()))
+						.build());
 
 		simulationService.addSimulations(simulationsPractice3);
 	}
 
+	private void insertRubricTemplates() {
+		Course course1 = courseRepository.findById(1L).get();
+		Course course2 = courseRepository.findById(2L).get();
+		Course course3 = courseRepository.findById(3L).get();
+		User user1 = userRepository.findById(1L).get();
+		User user2 = userRepository.findById(2L).get();
+		User user3 = userRepository.findById(3L).get();
+
+		List<RubricTemplate> rubricTemplates = List.of(
+				RubricTemplate.builder().title("Rubrica 1").archived(false).courses(List.of(course1, course2))
+						.creationDate(new Date())
+						.creator(user1)
+						.criteria(List
+								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(0.2).build(),
+										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(0.3).build(),
+										Criteria.builder().id(UUID.randomUUID()).name("Criterio 3").weight(0.5)
+												.build()))
+						.columns(List.of(RubricColumn.builder().title("No cumple")
+								.scoringScale(ScoringPair.builder().lowerValue(0L).upperValue(3L).build()).build(),
+								RubricColumn.builder().title("Cumple")
+										.scoringScale(ScoringPair.builder().lowerValue(3L).upperValue(4L).build())
+										.build(),
+								RubricColumn.builder().title("Supera")
+										.scoringScale(ScoringPair.builder().lowerValue(4L).upperValue(5L).build())
+										.build()))
+						.build(),
+				RubricTemplate.builder().title("Rubrica 2").archived(false).courses(List.of(course3))
+						.creationDate(new Date())
+						.creator(user2)
+						.criteria(List
+								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(0.4).build(),
+										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(0.6)
+												.build()))
+						.columns(List.of(RubricColumn.builder().title("No cumple")
+								.scoringScale(ScoringPair.builder().lowerValue(0L).upperValue(3L).build()).build(),
+								RubricColumn.builder().title("Cumple")
+										.scoringScale(ScoringPair.builder().lowerValue(3L).upperValue(4L).build())
+										.build(),
+								RubricColumn.builder().title("Supera")
+										.scoringScale(ScoringPair.builder().lowerValue(4L).upperValue(5L).build())
+										.build()))
+						.build(),
+				RubricTemplate.builder().title("Rubrica 3").archived(true).courses(List.of(course1, course2, course3))
+						.creationDate(new Date())
+						.creator(user3)
+						.criteria(List
+								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(0.7).build(),
+										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(0.3)
+												.build()))
+						.columns(List.of(RubricColumn.builder().title("No cumple")
+								.scoringScale(ScoringPair.builder().lowerValue(0L).upperValue(3L).build()).build(),
+								RubricColumn.builder().title("Cumple")
+										.scoringScale(ScoringPair.builder().lowerValue(3L).upperValue(5L).build())
+										.build()))
+						.build());
+
+		rubricTemplateRepository.saveAll(rubricTemplates);
+	}
+
 	@Transactional
-	private void asignStudentsAndGradesToSimulations() {
+	private void assignStudentsAndGradesToSimulations() {
 		ClassModel classModel = classRepository.findById(1L).get();
 		List<User> students = classRepository.findStudentsMembers(1L);
-		List<Practice> practices =  practiceRepository.findByClassModel_ClassId(classModel.getClassId());
+		List<Practice> practices = practiceRepository.findByClassModel_ClassId(classModel.getClassId());
 
-		for (Practice practice: practices){
+		for (Practice practice : practices) {
 			List<User> tempUsers = new ArrayList<>(students);
 			int numberOfGroups = practice.getNumberOfGroups();
 			int maxStudentsGroup = practice.getMaxStudentsGroup();
-			
+
 			// Create groups of students and assign them to simulations
 			List<List<User>> groups = new ArrayList<>();
 			for (int i = 0; i < numberOfGroups; i++) {
@@ -507,11 +589,11 @@ public class DBInitializer implements CommandLineRunner {
 				groups.add(group);
 			}
 
-			for (Simulation simulation: simulationRepository.findByPracticeId(practice.getId())){
+			for (Simulation simulation : simulationRepository.findByPracticeId(practice.getId())) {
 				simulation.setUsers(groups.remove(0));
 				Random random = new Random();
-				float grade = 3.0f + random.nextFloat() * 2.0f; 
-				simulation.setGrade((float) (Math.round(grade * 10.0) / 10.0)); 
+				float grade = 3.0f + random.nextFloat() * 2.0f;
+				simulation.setGrade((float) (Math.round(grade * 10.0) / 10.0));
 				simulation.setGradeStatus(GradeStatus.REGISTERED);
 				simulation.setGradeDateTime(new Date());
 				simulationRepository.save(simulation);
@@ -530,29 +612,42 @@ public class DBInitializer implements CommandLineRunner {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		List<Video> videos = Arrays.asList(
-				Video.builder().name("javatechie").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/javatechie.mp4")
+				Video.builder().name("javatechie").recordingDate(dateFormat.parse("2023-01-31"))
+						.videoUrl("http://localhost:8080/streaming/video/javatechie.mp4")
 						.duration(62L).size(8.3).build(),
-				Video.builder().name("10350-224234500_small").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/10350-224234500_small.mp4")
+				Video.builder().name("10350-224234500_small").recordingDate(dateFormat.parse("2023-01-31"))
+						.videoUrl("http://localhost:8080/streaming/video/10350-224234500_small.mp4")
 						.duration(600L).size(31.2).build(),
-				Video.builder().name("CCrit1-1__2025_03_03_18_25_12_Movie").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+				Video.builder().name("CCrit1-1__2025_03_03_18_25_12_Movie")
+						.recordingDate(dateFormat.parse("2023-01-31"))
+						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(600L).size(31.2).build(),
-				Video.builder().name("unavailable1").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable1.mp4")
+				Video.builder().name("unavailable1").recordingDate(dateFormat.parse("2023-01-31"))
+						.videoUrl("http://localhost:8080/streaming/video/unavailable1.mp4")
 						.duration(210L).size(300.0).available(false).build(),
-				Video.builder().name("unavailable2").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable2.mp4")
+				Video.builder().name("unavailable2").recordingDate(dateFormat.parse("2023-01-31"))
+						.videoUrl("http://localhost:8080/streaming/video/unavailable2.mp4")
 						.duration(450L).size(420.0).available(false).build(),
-				Video.builder().name("unavailable3").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable3.mp4")
+				Video.builder().name("unavailable3").recordingDate(dateFormat.parse("2023-01-31"))
+						.videoUrl("http://localhost:8080/streaming/video/unavailable3.mp4")
 						.duration(600L).size(500.0).available(false).build(),
-				Video.builder().name("unavailable4").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable4.mp4")
+				Video.builder().name("unavailable4").recordingDate(dateFormat.parse("2023-01-31"))
+						.videoUrl("http://localhost:8080/streaming/video/unavailable4.mp4")
 						.duration(780L).size(780.0).available(false).build(),
-				Video.builder().name("unavailable5").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable5.mp4")
+				Video.builder().name("unavailable5").recordingDate(dateFormat.parse("2023-01-31"))
+						.videoUrl("http://localhost:8080/streaming/video/unavailable5.mp4")
 						.duration(6000L).size(6000.0).available(false).build(),
-				Video.builder().name("unavailable6").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable6.mp4")
+				Video.builder().name("unavailable6").recordingDate(dateFormat.parse("2023-01-31"))
+						.videoUrl("http://localhost:8080/streaming/video/unavailable6.mp4")
 						.duration(620L).size(500.0).available(false).build(),
-				Video.builder().name("unavailable7").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable7.mp4")
+				Video.builder().name("unavailable7").recordingDate(dateFormat.parse("2023-01-31"))
+						.videoUrl("http://localhost:8080/streaming/video/unavailable7.mp4")
 						.duration(620L).size(500.0).available(false).build(),
-				Video.builder().name("unavailable8").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable8.mp4")
+				Video.builder().name("unavailable8").recordingDate(dateFormat.parse("2023-01-31"))
+						.videoUrl("http://localhost:8080/streaming/video/unavailable8.mp4")
 						.duration(620L).size(500.0).available(false).build(),
-				Video.builder().name("unavailable9").recordingDate(dateFormat.parse("2023-01-31")).videoUrl("http://localhost:8080/streaming/video/unavailable9.mp4")
+				Video.builder().name("unavailable9").recordingDate(dateFormat.parse("2023-01-31"))
+						.videoUrl("http://localhost:8080/streaming/video/unavailable9.mp4")
 						.duration(620L).size(500.0).available(false).build());
 
 		videoRepository.saveAll(videos);

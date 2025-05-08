@@ -520,9 +520,19 @@ public class DBInitializer implements CommandLineRunner {
 						.creationDate(new Date())
 						.creator(user1)
 						.criteria(List
-								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(0.2).build(),
-										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(0.3).build(),
-										Criteria.builder().id(UUID.randomUUID()).name("Criterio 3").weight(0.5)
+								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(20.0)
+										.scoringScaleDescription(List.of("Descripción criterio 1 no cumple",
+												"Descripción criterio 1 cumple", "Descripción criterio 1 supera"))
+										.build(),
+										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(30.0)
+												.scoringScaleDescription(List.of("Descripción criterio 2 no cumple",
+														"Descripción criterio 2 cumple",
+														"Descripción criterio 2 supera"))
+												.build(),
+										Criteria.builder().id(UUID.randomUUID()).name("Criterio 3").weight(50.0)
+												.scoringScaleDescription(List.of("Descripción criterio 3 no cumple",
+														"Descripción criterio 3 cumple",
+														"Descripción criterio 3 supera"))
 												.build()))
 						.columns(List.of(RubricColumn.builder().title("No cumple")
 								.scoringScale(ScoringPair.builder().lowerValue(0L).upperValue(3L).build()).build(),
@@ -537,8 +547,14 @@ public class DBInitializer implements CommandLineRunner {
 						.creationDate(new Date())
 						.creator(user2)
 						.criteria(List
-								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(0.4).build(),
-										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(0.6)
+								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(40.0)
+										.scoringScaleDescription(List.of("Descripción criterio 1 no cumple",
+												"Descripción criterio 1 cumple", "Descripción criterio 1 supera"))
+										.build(),
+										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(60.0)
+												.scoringScaleDescription(List.of("Descripción criterio 2 no cumple",
+														"Descripción criterio 2 cumple",
+														"Descripción criterio 2 supera"))
 												.build()))
 						.columns(List.of(RubricColumn.builder().title("No cumple")
 								.scoringScale(ScoringPair.builder().lowerValue(0L).upperValue(3L).build()).build(),
@@ -553,8 +569,14 @@ public class DBInitializer implements CommandLineRunner {
 						.creationDate(new Date())
 						.creator(user3)
 						.criteria(List
-								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(0.7).build(),
-										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(0.3)
+								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(70.0)
+										.scoringScaleDescription(List.of("Descripción criterio 1 no cumple",
+												"Descripción criterio 1 cumple", "Descripción criterio 1 supera"))
+										.build(),
+										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(30.0)
+												.scoringScaleDescription(List.of("Descripción criterio 2 no cumple",
+														"Descripción criterio 2 cumple",
+														"Descripción criterio 2 supera"))
 												.build()))
 						.columns(List.of(RubricColumn.builder().title("No cumple")
 								.scoringScale(ScoringPair.builder().lowerValue(0L).upperValue(3L).build()).build(),

@@ -9,5 +9,4 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 public class ArecLoginResponseDto {
     private String session;
-    private String path;
 }

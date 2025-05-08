@@ -5,12 +5,14 @@ import java.util.List;
 import co.edu.javeriana.lms.grades.models.Rubric;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class RubricDto {
     @Valid
     private List<EvaluatedCriteriaDto> evaluatedCriterias;

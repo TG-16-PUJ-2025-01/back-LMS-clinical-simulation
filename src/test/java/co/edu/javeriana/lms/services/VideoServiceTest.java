@@ -50,13 +50,13 @@ public class VideoServiceTest {
     @BeforeAll
     public static void setUpAll() throws ParseException {
         Video video1 = Video.builder().name("Video 1").recordingDate(dateFormat.parse("2025-02-22"))
-                .duration(62L).size(8.3).build();
+                .duration(62L).size(8.3).videoUrl("/streaming/video/test1.mp4").build();
 
         Video video2 = Video.builder().name("Video 2").recordingDate(dateFormat.parse("2024-12-24"))
-                .duration(3600L).size(10.3).build();
+                .duration(3600L).size(10.3).videoUrl("/streaming/video/test2.mp4").build();
 
         mockVideo = Video.builder().name("Video 1").recordingDate(dateFormat.parse("2025-02-22"))
-                .duration(62L).size(8.3).build();
+                .duration(62L).size(8.3).videoUrl("/streaming/video/test3.mp4").build();
 
         List<Video> mockVideos = Arrays.asList(video1, video2);
 
@@ -66,7 +66,8 @@ public class VideoServiceTest {
 
     @Test
     public void testSearchVideos() {
-        when(videoRepository.findByNameContainingIgnoreCase("", mockVideosPage.getPageable())).thenReturn(mockVideosPage);
+        when(videoRepository.findByNameContainingIgnoreCase("", mockVideosPage.getPageable()))
+                .thenReturn(mockVideosPage);
 
         Page<Video> videosPage = videoService.searchVideos("", 0, 10, "name", true);
 
@@ -84,9 +85,11 @@ public class VideoServiceTest {
 
     @Test
     public void testSearchVideosMultiplePages() {
-        Page<Video> filteredVideosPage = new PageImpl<>(mockVideosPage.getContent(), PageRequest.of(0, 1, Sort.by("name").ascending()), mockVideosPage.getTotalElements());
+        Page<Video> filteredVideosPage = new PageImpl<>(mockVideosPage.getContent(),
+                PageRequest.of(0, 1, Sort.by("name").ascending()), mockVideosPage.getTotalElements());
 
-        when(videoRepository.findByNameContainingIgnoreCase("", PageRequest.of(0, 1, Sort.by("name").ascending()))).thenReturn(filteredVideosPage);
+        when(videoRepository.findByNameContainingIgnoreCase("", PageRequest.of(0, 1, Sort.by("name").ascending())))
+                .thenReturn(filteredVideosPage);
 
         Page<Video> videosPage = videoService.searchVideos("", 0, 1, "name", true);
 

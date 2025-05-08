@@ -18,6 +18,12 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
                 SELECT c FROM Course c
                 WHERE CAST(c.javerianaId AS string) LIKE %:filter%
                 OR LOWER(TRANSLATE(c.name, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
+                OR LOWER(TRANSLATE(c.coordinator.name, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
+                OR LOWER(TRANSLATE(c.coordinator.lastName, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
+                OR LOWER(TRANSLATE(c.faculty, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
+                OR LOWER(TRANSLATE(c.department, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
+                OR LOWER(TRANSLATE(c.program, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
+                OR CAST(c.semester AS string) LIKE %:filter%
             """)
     Page<Course> findByNameOrJaverianaIdContaining(@Param("filter") String filter, Pageable pageable);
 

@@ -85,6 +85,10 @@ public class CourseService {
         currentCourseModel.setName(course.getName());
         currentCourseModel.setJaverianaId(course.getJaverianaId());
         currentCourseModel.setCoordinator(userRepository.findById(course.getCoordinatorId()).get());
+        currentCourseModel.setFaculty(course.getFaculty());
+        currentCourseModel.setDepartment(course.getDepartment());
+        currentCourseModel.setProgram(course.getProgram());
+        currentCourseModel.setSemester(course.getSemester());
 
         courseRepository.save(currentCourseModel);
 

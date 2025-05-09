@@ -96,7 +96,7 @@ public class DBInitializer implements CommandLineRunner {
 		insertClasses();
 		insertPractices();
 		insertSimulations();
-		assignStudentsAndGradesToSimulations();
+		assignStudentsRubricsAndGradesToSimulations();
 		insertSimulationsVideosAndComments();
 		insertRubricTemplates();
 	}
@@ -589,7 +589,7 @@ public class DBInitializer implements CommandLineRunner {
 	}
 
 	@Transactional
-	private void assignStudentsAndGradesToSimulations() {
+	private void assignStudentsRubricsAndGradesToSimulations() {
 		ClassModel classModel = classRepository.findById(1L).get();
 		List<User> students = classRepository.findStudentsMembers(1L);
 		List<Practice> practices = practiceRepository.findByClassModel_ClassId(classModel.getClassId());

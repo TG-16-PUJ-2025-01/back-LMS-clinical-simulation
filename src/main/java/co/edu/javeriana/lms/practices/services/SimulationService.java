@@ -207,34 +207,30 @@ public class SimulationService {
     public Simulation updateSimulation(Long id, SimulationByTimeSlotDto simulationDto) {
         Simulation existingSimulation = simulationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
-
+    
         List<Room> rooms = new ArrayList<>();
-
+    
         for (Long roomId : simulationDto.getRoomIds()) {
             rooms.add(roomRepository.findById(roomId)
                     .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + roomId)));
         }
-
-        existingSimulation.setStartDateTime(null);
-        existingSimulation.setEndDateTime(null);
-
-        simulationRepository.save(existingSimulation);
-
-        for (Room room : existingSimulation.getRooms()) {
+    
+        for (Room room : rooms) {
             if (!simulationRepository.isRoomAvailable(room, simulationDto.getStartDateTime(),
                     simulationDto.getEndDateTime())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Room is not available for the selected dates");
             }
-
+    
             if (existingSimulation.getPractice().getMaxStudentsGroup() > room.getCapacity()) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
                         "Room capacity is not enough for the selected practice");
             }
         }
-
-        existingSimulation.setRooms(rooms);
+    
         existingSimulation.setStartDateTime(simulationDto.getStartDateTime());
         existingSimulation.setEndDateTime(simulationDto.getEndDateTime());
+        existingSimulation.setRooms(rooms);
+    
         return simulationRepository.save(existingSimulation);
     }
 
@@ -257,6 +253,8 @@ public class SimulationService {
     public List<TimeSlotDto> findSimulationsSchedule(String date) {
         Date startDate = parseDate(date);
         Date endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+
+        log.info("Finding simulations schedule between {} and {}", startDate, endDate);
 
         List<Simulation> simulations = simulationRepository.findByStartDateTimeBetween(startDate, endDate);
 

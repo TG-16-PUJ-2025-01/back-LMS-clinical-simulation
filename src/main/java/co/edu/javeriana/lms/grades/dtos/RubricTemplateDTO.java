@@ -6,12 +6,14 @@ import co.edu.javeriana.lms.grades.models.Criteria;
 import co.edu.javeriana.lms.grades.models.RubricColumn;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class RubricTemplateDTO {
 
     @NotNull(message = "title is required")

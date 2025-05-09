@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -28,7 +30,9 @@ import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
 import co.edu.javeriana.lms.grades.models.Criteria;
+import co.edu.javeriana.lms.grades.models.EvaluatedCriteria;
 import co.edu.javeriana.lms.grades.models.GradeStatus;
+import co.edu.javeriana.lms.grades.models.Rubric;
 import co.edu.javeriana.lms.grades.models.RubricColumn;
 import co.edu.javeriana.lms.grades.models.RubricTemplate;
 import co.edu.javeriana.lms.grades.models.ScoringPair;
@@ -94,11 +98,11 @@ public class DBInitializer implements CommandLineRunner {
 		createUsers();
 		insertCourses();
 		insertClasses();
+		insertRubricTemplates();
 		insertPractices();
 		insertSimulations();
-		assignStudentsAndGradesToSimulations();
+		assignStudentsRubricsAndGradesToSimulations();
 		insertSimulationsVideosAndComments();
-		insertRubricTemplates();
 	}
 
 	private void insertRoomsAndTypes() {
@@ -432,12 +436,94 @@ public class DBInitializer implements CommandLineRunner {
 		classRepository.saveAll(classes);
 	}
 
+	private void insertRubricTemplates() {
+		Course course1 = courseRepository.findById(1L).get();
+		Course course2 = courseRepository.findById(2L).get();
+		Course course3 = courseRepository.findById(3L).get();
+		User user1 = userRepository.findById(1L).get();
+		User user2 = userRepository.findById(2L).get();
+		User user3 = userRepository.findById(3L).get();
+
+		List<RubricTemplate> rubricTemplates = List.of(
+				RubricTemplate.builder().title("Rubrica 1").archived(false).courses(List.of(course1, course2))
+						.creationDate(new Date())
+						.creator(user1)
+						.criteria(List
+								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(20.0)
+										.scoringScaleDescription(List.of("Descripción criterio 1 no cumple",
+												"Descripción criterio 1 cumple", "Descripción criterio 1 supera"))
+										.build(),
+										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(30.0)
+												.scoringScaleDescription(List.of("Descripción criterio 2 no cumple",
+														"Descripción criterio 2 cumple",
+														"Descripción criterio 2 supera"))
+												.build(),
+										Criteria.builder().id(UUID.randomUUID()).name("Criterio 3").weight(50.0)
+												.scoringScaleDescription(List.of("Descripción criterio 3 no cumple",
+														"Descripción criterio 3 cumple",
+														"Descripción criterio 3 supera"))
+												.build()))
+						.columns(List.of(RubricColumn.builder().title("No cumple")
+								.scoringScale(ScoringPair.builder().lowerValue(0L).upperValue(3L).build()).build(),
+								RubricColumn.builder().title("Cumple")
+										.scoringScale(ScoringPair.builder().lowerValue(3L).upperValue(4L).build())
+										.build(),
+								RubricColumn.builder().title("Supera")
+										.scoringScale(ScoringPair.builder().lowerValue(4L).upperValue(5L).build())
+										.build()))
+						.build(),
+				RubricTemplate.builder().title("Rubrica 2").archived(false).courses(List.of(course3))
+						.creationDate(new Date())
+						.creator(user2)
+						.criteria(List
+								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(40.0)
+										.scoringScaleDescription(List.of("Descripción criterio 1 no cumple",
+												"Descripción criterio 1 cumple", "Descripción criterio 1 supera"))
+										.build(),
+										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(60.0)
+												.scoringScaleDescription(List.of("Descripción criterio 2 no cumple",
+														"Descripción criterio 2 cumple",
+														"Descripción criterio 2 supera"))
+												.build()))
+						.columns(List.of(RubricColumn.builder().title("No cumple")
+								.scoringScale(ScoringPair.builder().lowerValue(0L).upperValue(3L).build()).build(),
+								RubricColumn.builder().title("Cumple")
+										.scoringScale(ScoringPair.builder().lowerValue(3L).upperValue(4L).build())
+										.build(),
+								RubricColumn.builder().title("Supera")
+										.scoringScale(ScoringPair.builder().lowerValue(4L).upperValue(5L).build())
+										.build()))
+						.build(),
+				RubricTemplate.builder().title("Rubrica 3").archived(true).courses(List.of(course1, course2, course3))
+						.creationDate(new Date())
+						.creator(user3)
+						.criteria(List
+								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(70.0)
+										.scoringScaleDescription(List.of("Descripción criterio 1 no cumple",
+												"Descripción criterio 1 cumple", "Descripción criterio 1 supera"))
+										.build(),
+										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(30.0)
+												.scoringScaleDescription(List.of("Descripción criterio 2 no cumple",
+														"Descripción criterio 2 cumple",
+														"Descripción criterio 2 supera"))
+												.build()))
+						.columns(List.of(RubricColumn.builder().title("No cumple")
+								.scoringScale(ScoringPair.builder().lowerValue(0L).upperValue(3L).build()).build(),
+								RubricColumn.builder().title("Cumple")
+										.scoringScale(ScoringPair.builder().lowerValue(3L).upperValue(5L).build())
+										.build()))
+						.build());
+
+		rubricTemplateRepository.saveAll(rubricTemplates);
+	}
+
 	private void insertPractices() {
 		List<Practice> practices = Arrays.asList(
 				Practice.builder().name("Práctica 1").description(
 						"Descripción de la práctica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(30).gradePercentage(30f)
+						.rubricTemplate(rubricTemplateRepository.findById(1L).get())
 						.build(),
 				Practice.builder().name("Práctica 2").description(
 						"Descripción de la práctica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
@@ -448,6 +534,7 @@ public class DBInitializer implements CommandLineRunner {
 						"Descripción de la práctica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(30f)
+						.rubricTemplate(rubricTemplateRepository.findById(1L).get())
 						.build(),
 				Practice.builder().name("Práctica 4").description(
 						"Descripción de la práctica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
@@ -507,67 +594,8 @@ public class DBInitializer implements CommandLineRunner {
 		simulationService.addSimulations(simulationsPractice3);
 	}
 
-	private void insertRubricTemplates() {
-		Course course1 = courseRepository.findById(1L).get();
-		Course course2 = courseRepository.findById(2L).get();
-		Course course3 = courseRepository.findById(3L).get();
-		User user1 = userRepository.findById(1L).get();
-		User user2 = userRepository.findById(2L).get();
-		User user3 = userRepository.findById(3L).get();
-
-		List<RubricTemplate> rubricTemplates = List.of(
-				RubricTemplate.builder().title("Rubrica 1").archived(false).courses(List.of(course1, course2))
-						.creationDate(new Date())
-						.creator(user1)
-						.criteria(List
-								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(0.2).build(),
-										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(0.3).build(),
-										Criteria.builder().id(UUID.randomUUID()).name("Criterio 3").weight(0.5)
-												.build()))
-						.columns(List.of(RubricColumn.builder().title("No cumple")
-								.scoringScale(ScoringPair.builder().lowerValue(0L).upperValue(3L).build()).build(),
-								RubricColumn.builder().title("Cumple")
-										.scoringScale(ScoringPair.builder().lowerValue(3L).upperValue(4L).build())
-										.build(),
-								RubricColumn.builder().title("Supera")
-										.scoringScale(ScoringPair.builder().lowerValue(4L).upperValue(5L).build())
-										.build()))
-						.build(),
-				RubricTemplate.builder().title("Rubrica 2").archived(false).courses(List.of(course3))
-						.creationDate(new Date())
-						.creator(user2)
-						.criteria(List
-								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(0.4).build(),
-										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(0.6)
-												.build()))
-						.columns(List.of(RubricColumn.builder().title("No cumple")
-								.scoringScale(ScoringPair.builder().lowerValue(0L).upperValue(3L).build()).build(),
-								RubricColumn.builder().title("Cumple")
-										.scoringScale(ScoringPair.builder().lowerValue(3L).upperValue(4L).build())
-										.build(),
-								RubricColumn.builder().title("Supera")
-										.scoringScale(ScoringPair.builder().lowerValue(4L).upperValue(5L).build())
-										.build()))
-						.build(),
-				RubricTemplate.builder().title("Rubrica 3").archived(true).courses(List.of(course1, course2, course3))
-						.creationDate(new Date())
-						.creator(user3)
-						.criteria(List
-								.of(Criteria.builder().id(UUID.randomUUID()).name("Criterio 1").weight(0.7).build(),
-										Criteria.builder().id(UUID.randomUUID()).name("Criterio 2").weight(0.3)
-												.build()))
-						.columns(List.of(RubricColumn.builder().title("No cumple")
-								.scoringScale(ScoringPair.builder().lowerValue(0L).upperValue(3L).build()).build(),
-								RubricColumn.builder().title("Cumple")
-										.scoringScale(ScoringPair.builder().lowerValue(3L).upperValue(5L).build())
-										.build()))
-						.build());
-
-		rubricTemplateRepository.saveAll(rubricTemplates);
-	}
-
 	@Transactional
-	private void assignStudentsAndGradesToSimulations() {
+	private void assignStudentsRubricsAndGradesToSimulations() {
 		ClassModel classModel = classRepository.findById(1L).get();
 		List<User> students = classRepository.findStudentsMembers(1L);
 		List<Practice> practices = practiceRepository.findByClassModel_ClassId(classModel.getClassId());
@@ -591,12 +619,53 @@ public class DBInitializer implements CommandLineRunner {
 
 			for (Simulation simulation : simulationRepository.findByPracticeId(practice.getId())) {
 				simulation.setUsers(groups.remove(0));
+				if (practice.getRubricTemplate() == null) {
+					simulation.setRubric(null);
+					simulation.setGrade(null);
+					simulation.setGradeStatus(GradeStatus.PENDING);
+				}
+				simulation = simulationRepository.save(simulation);
 				Random random = new Random();
-				float grade = 3.0f + random.nextFloat() * 2.0f;
-				simulation.setGrade((float) (Math.round(grade * 10.0) / 10.0));
-				simulation.setGradeStatus(GradeStatus.REGISTERED);
-				simulation.setGradeDateTime(new Date());
-				simulationRepository.save(simulation);
+				if (practice.getRubricTemplate() != null) {
+					AtomicInteger index = new AtomicInteger(0);
+					Rubric rubric = Rubric.builder()
+							.simulation(simulation)
+							.rubricTemplate(practice.getRubricTemplate())
+							.evaluatedCriterias(practice.getRubricTemplate().getCriteria().stream()
+									.map(criteria -> {
+										int currentIndex = index.incrementAndGet();
+										float score = 2.5f + random.nextFloat() * 2.5f;
+										return EvaluatedCriteria.builder()
+												.id(UUID.randomUUID())
+												.comment("Comentario " + currentIndex)
+												.score((float) (Math.round(score * 10.0) / 10.0))
+												.build();
+									})
+									.collect(Collectors.toList()))
+							.total(
+									EvaluatedCriteria.builder()
+											.id(UUID.randomUUID())
+											.comment("Comentario final")
+											.score(0.0f)
+											.build())
+							.build();
+					index.set(0);
+					Float totalScore = (float) rubric.getEvaluatedCriterias().stream()
+							.mapToDouble(evaluatedCriteria -> {
+								int currentIndex = index.getAndIncrement();
+								Criteria criteria = practice.getRubricTemplate().getCriteria().get(currentIndex);
+								return evaluatedCriteria.getScore() * (criteria.getWeight() / 100.0);
+							})
+							.sum();
+					totalScore = (float) (Math.round(totalScore * 10.0) / 10.0);
+					rubric.getTotal().setScore(totalScore);
+					rubricRepository.save(rubric);
+					simulation.setGrade(totalScore);
+					simulation.setGradeStatus(GradeStatus.REGISTERED);
+					simulation.setGradeDateTime(new Date());
+					simulation.setRubric(rubric);
+					simulationRepository.save(simulation);
+				}
 			}
 		}
 

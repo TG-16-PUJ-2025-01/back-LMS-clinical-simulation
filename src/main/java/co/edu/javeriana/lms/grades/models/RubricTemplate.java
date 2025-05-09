@@ -23,7 +23,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -67,9 +66,9 @@ public class RubricTemplate {
 
     // no se deberían borrar las practicas si se borra la rubrica
     // revisar que poner
-    @OneToOne
+    @OneToMany(mappedBy = "rubricTemplate", cascade = CascadeType.DETACH, orphanRemoval = false)
     @JsonIgnore
-    private Practice practice;
+    private List<Practice> practices;
 
     @OneToMany(mappedBy = "rubricTemplate", cascade = CascadeType.DETACH, orphanRemoval = false)
     @JsonIgnore

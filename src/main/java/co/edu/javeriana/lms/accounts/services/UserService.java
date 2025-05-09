@@ -51,7 +51,7 @@ public class UserService implements UserDetailsService {
         }
         String password = PasswordGenerator.generatePassword();
         user.setPassword(passwordEncoder.encode(password));
-        User savedUser =  userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         String subject = "Bienvenido a LMS - Tus credenciales de acceso";
         String body = "Hola " + user.getEmail() + ",\n\nTu cuenta ha sido creada exitosamente.\n" +

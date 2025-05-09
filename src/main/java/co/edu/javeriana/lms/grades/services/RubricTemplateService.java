@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -111,7 +112,7 @@ public class RubricTemplateService {
         Practice practice = new Practice();
         if (rubricTemplate.getPracticeId() != null) {
             practice = practiceRepository.findById(rubricTemplate.getPracticeId()).get();
-            rubricTemplateModel.setPractice(practice);
+            rubricTemplateModel.getPractices().add(practice);
             isForPractice = true;
         }
         rubricTemplateModel.setArchived(rubricTemplate.getArchived());
@@ -148,7 +149,7 @@ public class RubricTemplateService {
 
     private List<Criteria> addCriteriaUUID(List<Criteria> criteria) {
         for (Criteria criteria2 : criteria) {
-            criteria2.setId(java.util.UUID.randomUUID());
+            criteria2.setId(UUID.randomUUID());
         }
         return criteria;
     }

@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -28,7 +30,9 @@ import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
 import co.edu.javeriana.lms.grades.models.Criteria;
+import co.edu.javeriana.lms.grades.models.EvaluatedCriteria;
 import co.edu.javeriana.lms.grades.models.GradeStatus;
+import co.edu.javeriana.lms.grades.models.Rubric;
 import co.edu.javeriana.lms.grades.models.RubricColumn;
 import co.edu.javeriana.lms.grades.models.RubricTemplate;
 import co.edu.javeriana.lms.grades.models.ScoringPair;
@@ -94,11 +98,11 @@ public class DBInitializer implements CommandLineRunner {
 		createUsers();
 		insertCourses();
 		insertClasses();
+		insertRubricTemplates();
 		insertPractices();
 		insertSimulations();
-		assignStudentsAndGradesToSimulations();
+		assignStudentsRubricsAndGradesToSimulations();
 		insertSimulationsVideosAndComments();
-		insertRubricTemplates();
 	}
 
 	private void insertRoomsAndTypes() {
@@ -432,81 +436,6 @@ public class DBInitializer implements CommandLineRunner {
 		classRepository.saveAll(classes);
 	}
 
-	private void insertPractices() {
-		List<Practice> practices = Arrays.asList(
-				Practice.builder().name("Práctica 1").description(
-						"Descripción de la práctica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(30).gradePercentage(30f)
-						.build(),
-				Practice.builder().name("Práctica 2").description(
-						"Descripción de la práctica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(9).maxStudentsGroup(1)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(40f)
-						.build(),
-				Practice.builder().name("Práctica 3").description(
-						"Descripción de la práctica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(30f)
-						.build(),
-				Practice.builder().name("Práctica 4").description(
-						"Descripción de la práctica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
-						.type(PracticeType.GRUPAL).gradeable(false).numberOfGroups(5).maxStudentsGroup(5)
-						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build());
-		practiceRepository.saveAll(practices);
-	}
-
-	private void insertSimulations() {
-		LocalDateTime baseDate = LocalDateTime.now()
-				.withHour(9).withMinute(0).withSecond(0).withNano(0)
-				.with(java.time.DayOfWeek.MONDAY)
-				.minusWeeks(2L);
-
-		List<SimulationByTimeSlotDto> simulationsPractice1 = Arrays.asList(
-
-				SimulationByTimeSlotDto.builder().practiceId(1L)
-						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date.from(baseDate.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
-						.build(),
-
-				SimulationByTimeSlotDto.builder().practiceId(1L)
-						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date
-								.from(baseDate.plusDays(1).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
-						.build(),
-
-				SimulationByTimeSlotDto.builder().practiceId(1L)
-						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.plusDays(2).atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date
-								.from(baseDate.plusDays(2).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
-						.build());
-
-		simulationService.addSimulations(simulationsPractice1);
-
-		List<SimulationByTimeSlotDto> simulationsPractice2 = Arrays.asList(
-				SimulationByTimeSlotDto.builder().practiceId(2L)
-						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.plusWeeks(1L).atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date.from(
-								baseDate.plusWeeks(1L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
-						.build());
-
-		simulationService.addSimulations(simulationsPractice2);
-
-		List<SimulationByTimeSlotDto> simulationsPractice3 = Arrays.asList(
-				SimulationByTimeSlotDto.builder().practiceId(3L)
-						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.plusWeeks(2L).atZone(ZoneId.systemDefault()).toInstant()))
-						.endDateTime(Date.from(
-								baseDate.plusWeeks(2L).plusMinutes(45).atZone(ZoneId.systemDefault()).toInstant()))
-						.build());
-
-		simulationService.addSimulations(simulationsPractice3);
-	}
-
 	private void insertRubricTemplates() {
 		Course course1 = courseRepository.findById(1L).get();
 		Course course2 = courseRepository.findById(2L).get();
@@ -588,8 +517,85 @@ public class DBInitializer implements CommandLineRunner {
 		rubricTemplateRepository.saveAll(rubricTemplates);
 	}
 
+	private void insertPractices() {
+		List<Practice> practices = Arrays.asList(
+				Practice.builder().name("Práctica 1").description(
+						"Descripción de la práctica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(30).gradePercentage(30f)
+						.rubricTemplate(rubricTemplateRepository.findById(1L).get())
+						.build(),
+				Practice.builder().name("Práctica 2").description(
+						"Descripción de la práctica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(9).maxStudentsGroup(1)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(40f)
+						.build(),
+				Practice.builder().name("Práctica 3").description(
+						"Descripción de la práctica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(30f)
+						.rubricTemplate(rubricTemplateRepository.findById(1L).get())
+						.build(),
+				Practice.builder().name("Práctica 4").description(
+						"Descripción de la práctica 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
+						.type(PracticeType.GRUPAL).gradeable(false).numberOfGroups(5).maxStudentsGroup(5)
+						.classModel(classRepository.findById(1L).get()).simulationDuration(15).build());
+		practiceRepository.saveAll(practices);
+	}
+
+	private void insertSimulations() {
+		LocalDateTime baseDate = LocalDateTime.now()
+				.withHour(9).withMinute(0).withSecond(0).withNano(0)
+				.with(java.time.DayOfWeek.MONDAY)
+				.minusWeeks(2L);
+
+		List<SimulationByTimeSlotDto> simulationsPractice1 = Arrays.asList(
+
+				SimulationByTimeSlotDto.builder().practiceId(1L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date.from(baseDate.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+						.build(),
+
+				SimulationByTimeSlotDto.builder().practiceId(1L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date
+								.from(baseDate.plusDays(1).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+						.build(),
+
+				SimulationByTimeSlotDto.builder().practiceId(1L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.plusDays(2).atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date
+								.from(baseDate.plusDays(2).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+						.build());
+
+		simulationService.addSimulations(simulationsPractice1);
+
+		List<SimulationByTimeSlotDto> simulationsPractice2 = Arrays.asList(
+				SimulationByTimeSlotDto.builder().practiceId(2L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.plusWeeks(1L).atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date.from(
+								baseDate.plusWeeks(1L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
+						.build());
+
+		simulationService.addSimulations(simulationsPractice2);
+
+		List<SimulationByTimeSlotDto> simulationsPractice3 = Arrays.asList(
+				SimulationByTimeSlotDto.builder().practiceId(3L)
+						.roomIds(Arrays.asList(1L, 2L))
+						.startDateTime(Date.from(baseDate.plusWeeks(2L).atZone(ZoneId.systemDefault()).toInstant()))
+						.endDateTime(Date.from(
+								baseDate.plusWeeks(2L).plusMinutes(45).atZone(ZoneId.systemDefault()).toInstant()))
+						.build());
+
+		simulationService.addSimulations(simulationsPractice3);
+	}
+
 	@Transactional
-	private void assignStudentsAndGradesToSimulations() {
+	private void assignStudentsRubricsAndGradesToSimulations() {
 		ClassModel classModel = classRepository.findById(1L).get();
 		List<User> students = classRepository.findStudentsMembers(1L);
 		List<Practice> practices = practiceRepository.findByClassModel_ClassId(classModel.getClassId());
@@ -613,12 +619,53 @@ public class DBInitializer implements CommandLineRunner {
 
 			for (Simulation simulation : simulationRepository.findByPracticeId(practice.getId())) {
 				simulation.setUsers(groups.remove(0));
+				if (practice.getRubricTemplate() == null) {
+					simulation.setRubric(null);
+					simulation.setGrade(null);
+					simulation.setGradeStatus(GradeStatus.PENDING);
+				}
+				simulation = simulationRepository.save(simulation);
 				Random random = new Random();
-				float grade = 3.0f + random.nextFloat() * 2.0f;
-				simulation.setGrade((float) (Math.round(grade * 10.0) / 10.0));
-				simulation.setGradeStatus(GradeStatus.REGISTERED);
-				simulation.setGradeDateTime(new Date());
-				simulationRepository.save(simulation);
+				if (practice.getRubricTemplate() != null) {
+					AtomicInteger index = new AtomicInteger(0);
+					Rubric rubric = Rubric.builder()
+							.simulation(simulation)
+							.rubricTemplate(practice.getRubricTemplate())
+							.evaluatedCriterias(practice.getRubricTemplate().getCriteria().stream()
+									.map(criteria -> {
+										int currentIndex = index.incrementAndGet();
+										float score = 2.5f + random.nextFloat() * 2.5f;
+										return EvaluatedCriteria.builder()
+												.id(UUID.randomUUID())
+												.comment("Comentario " + currentIndex)
+												.score((float) (Math.round(score * 10.0) / 10.0))
+												.build();
+									})
+									.collect(Collectors.toList()))
+							.total(
+									EvaluatedCriteria.builder()
+											.id(UUID.randomUUID())
+											.comment("Comentario final")
+											.score(0.0f)
+											.build())
+							.build();
+					index.set(0);
+					Float totalScore = (float) rubric.getEvaluatedCriterias().stream()
+							.mapToDouble(evaluatedCriteria -> {
+								int currentIndex = index.getAndIncrement();
+								Criteria criteria = practice.getRubricTemplate().getCriteria().get(currentIndex);
+								return evaluatedCriteria.getScore() * (criteria.getWeight() / 100.0);
+							})
+							.sum();
+					totalScore = (float) (Math.round(totalScore * 10.0) / 10.0);
+					rubric.getTotal().setScore(totalScore);
+					rubricRepository.save(rubric);
+					simulation.setGrade(totalScore);
+					simulation.setGradeStatus(GradeStatus.REGISTERED);
+					simulation.setGradeDateTime(new Date());
+					simulation.setRubric(rubric);
+					simulationRepository.save(simulation);
+				}
 			}
 		}
 

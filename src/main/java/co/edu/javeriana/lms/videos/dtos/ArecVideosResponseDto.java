@@ -26,7 +26,7 @@ public class ArecVideosResponseDto {
     @Data
     public static class Video {
         private String name;
-        private Long length;
+        private Double length;
         @SerializedName("recorded_at")
         private Date recordedAt;
         @SerializedName("finished_at")
@@ -44,8 +44,6 @@ public class ArecVideosResponseDto {
         private String playbackUrl;
         @SerializedName("download_url")
         private String downloadUrl;
-        @SerializedName("finished_at")
-        private String finishedAt;
         private Double size;
         private String thumbnail;
     }

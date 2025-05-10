@@ -141,7 +141,7 @@ public class ArecService {
 
         Video newVideo = Video.builder()
                 .name(video.getName())
-                .duration(video.getLength())
+                .duration(video.getLength().longValue())
                 .recordingDate(video.getRecordedAt())
                 .available(video.getStatus().equals("ready"))
                 .videoUrl(videoMetadata.getPlaybackUrl())

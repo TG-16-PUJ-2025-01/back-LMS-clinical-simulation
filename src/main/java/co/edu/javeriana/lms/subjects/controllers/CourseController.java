@@ -92,11 +92,10 @@ public class CourseController {
 	public ResponseEntity<?> deleteCourseById(@PathVariable Long id) {
 		log.info("Deleting course with ID: " + id);
 
-		Course course = courseService.findById(id);
 		courseService.deleteById(id);
 
 		return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(),
-				"Course deleted successfully.", course, null));
+				"Course deleted successfully.", null, null));
 	}
 
 	@Valid

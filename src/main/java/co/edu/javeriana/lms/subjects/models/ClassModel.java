@@ -32,7 +32,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ClassModel {
 
-    public ClassModel(String period, List<User> professor, Course course, Long javerianaId, Integer numberOfParticipants) {
+    public ClassModel(String period, List<User> professor, Course course, Long javerianaId,
+            Integer numberOfParticipants) {
         this.period = period;
         this.professors = professor;
         this.course = course;
@@ -53,7 +54,7 @@ public class ClassModel {
     private Integer numberOfParticipants;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "professor_classes", joinColumns = @JoinColumn(name = "classId"), inverseJoinColumns = @JoinColumn(name = "id"))  
+    @JoinTable(name = "professor_classes", joinColumns = @JoinColumn(name = "classId"), inverseJoinColumns = @JoinColumn(name = "id"))
     private List<User> professors;
 
     @ManyToOne

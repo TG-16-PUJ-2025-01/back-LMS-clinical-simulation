@@ -9,18 +9,24 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.grades.models.RubricTemplate;
+import co.edu.javeriana.lms.practices.models.Practice;
+import co.edu.javeriana.lms.practices.models.Simulation;
+import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
+import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
 import co.edu.javeriana.lms.subjects.dtos.CourseDto;
 import co.edu.javeriana.lms.subjects.models.ClassModel;
 import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
 import co.edu.javeriana.lms.subjects.repositories.CourseRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -35,6 +41,12 @@ public class CourseService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private SimulationRepository simulationRepository;
+
+    @Autowired
+    private PracticeRepository practiceRepository;
 
     public Page<Course> findAll(String filter, Integer page, Integer size, String sort, Boolean asc) {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
@@ -71,7 +83,10 @@ public class CourseService {
         return newCourse;
     }
 
+
+    @Transactional
     public void deleteById(Long id) {
+        // Ahora eliminar el curso
         courseRepository.deleteById(id);
     }
 

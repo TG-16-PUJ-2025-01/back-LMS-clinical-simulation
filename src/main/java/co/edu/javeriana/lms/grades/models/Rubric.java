@@ -18,6 +18,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -26,6 +27,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Rubric {
 
     @Id
@@ -45,7 +47,7 @@ public class Rubric {
     private RubricTemplate rubricTemplate;
 
     @OneToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "simulationId")
     @JsonIgnore
     private Simulation simulation;
 

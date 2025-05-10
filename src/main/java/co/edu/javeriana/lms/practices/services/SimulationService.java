@@ -1,7 +1,9 @@
 package co.edu.javeriana.lms.practices.services;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -71,15 +73,30 @@ public class SimulationService {
             Boolean asc, Integer groupNumber) {
         practiceRepository.findById(practiceId)
                 .orElseThrow(() -> new EntityNotFoundException("Practice not found with id: " + practiceId));
-
-        Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
-        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        Pageable pageable;
+        if (sort != null) {
+            boolean ascendingOrder = asc == null || asc;
+            Sort sortOrder = ascendingOrder ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+            pageable = PageRequest.of(page, size, sortOrder);
+        } else {
+            pageable = PageRequest.of(page, size);
+        }
 
         if (groupNumber == null) {
             return simulationRepository.findByPracticeId(practiceId, pageable);
         } else {
             return simulationRepository.findByPracticeIdAndGroupNumber(practiceId, groupNumber, pageable);
         }
+    }
+
+    private Date convertToCorrectTimeZone(Date date) {
+        if (date == null)
+            return null;
+
+        Instant instant = date.toInstant();
+        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC"))
+                .withZoneSameLocal(ZoneId.systemDefault());
+        return Date.from(zonedDateTime.toInstant());
     }
 
     @Transactional
@@ -89,6 +106,12 @@ public class SimulationService {
             throw new IllegalArgumentException(
                     "The number of groups does not match the number of available time slots");
         }
+
+        simulationsDto.forEach(dto -> {
+            dto.setStartDateTime(convertToCorrectTimeZone(dto.getStartDateTime()));
+            dto.setEndDateTime(convertToCorrectTimeZone(dto.getEndDateTime()));
+        });
+
         List<Simulation> createdSimulations = new ArrayList<>();
         for (SimulationByTimeSlotDto simulation : simulationsDto) {
             createdSimulations.addAll(addSimulationsPerTimeSlot(simulation));
@@ -184,34 +207,30 @@ public class SimulationService {
     public Simulation updateSimulation(Long id, SimulationByTimeSlotDto simulationDto) {
         Simulation existingSimulation = simulationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
-
+    
         List<Room> rooms = new ArrayList<>();
-
+    
         for (Long roomId : simulationDto.getRoomIds()) {
             rooms.add(roomRepository.findById(roomId)
                     .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + roomId)));
         }
-
-        existingSimulation.setStartDateTime(null);
-        existingSimulation.setEndDateTime(null);
-
-        simulationRepository.save(existingSimulation);
-
-        for (Room room : existingSimulation.getRooms()) {
+    
+        for (Room room : rooms) {
             if (!simulationRepository.isRoomAvailable(room, simulationDto.getStartDateTime(),
                     simulationDto.getEndDateTime())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Room is not available for the selected dates");
             }
-
+    
             if (existingSimulation.getPractice().getMaxStudentsGroup() > room.getCapacity()) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
                         "Room capacity is not enough for the selected practice");
             }
         }
-
-        existingSimulation.setRooms(rooms);
+    
         existingSimulation.setStartDateTime(simulationDto.getStartDateTime());
         existingSimulation.setEndDateTime(simulationDto.getEndDateTime());
+        existingSimulation.setRooms(rooms);
+    
         return simulationRepository.save(existingSimulation);
     }
 
@@ -234,6 +253,8 @@ public class SimulationService {
     public List<TimeSlotDto> findSimulationsSchedule(String date) {
         Date startDate = parseDate(date);
         Date endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+
+        log.info("Finding simulations schedule between {} and {}", startDate, endDate);
 
         List<Simulation> simulations = simulationRepository.findByStartDateTimeBetween(startDate, endDate);
 
@@ -307,29 +328,39 @@ public class SimulationService {
         return simulation.getUsers();
     }
 
+    @Transactional
     public Rubric updateSimulationRubric(Long id, RubricDto rubricDto) {
         Simulation simulation = simulationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
 
-        Rubric rubric = rubricDto.toRubric();
-        Rubric existingRubric = simulation.getRubric();
-        if (existingRubric != null) {
-            existingRubric.setEvaluatedCriterias(rubric.getEvaluatedCriterias());
-            existingRubric.setTotal(rubric.getTotal());
-            rubricRepository.save(existingRubric);
-        } else {
-            rubric.setSimulation(simulation);
-            rubric = rubricRepository.save(rubric);
-            simulation.setRubric(rubric);
-            simulationRepository.save(simulation);
-        }
+        // Convertir DTO a entidad Rubric
+        Rubric newRubric = rubricDto.toRubric();
 
-        return rubric;
+        // Si ya existe una rúbrica, actualizarla
+        if (simulation.getRubric() != null) {
+            Rubric existingRubric = simulation.getRubric();
+            existingRubric.setEvaluatedCriterias(newRubric.getEvaluatedCriterias());
+            existingRubric.setTotal(newRubric.getTotal());
+            return rubricRepository.save(existingRubric);
+        }
+        // Si no existe, crear nueva
+        else {
+            newRubric.setSimulation(simulation);
+            Rubric savedRubric = rubricRepository.save(newRubric);
+            simulation.setRubric(savedRubric);
+            simulationRepository.save(simulation);
+
+            return savedRubric;
+        }
     }
 
     public Simulation publishGrade(Long id) {
         Simulation simulation = simulationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
+
+        if (simulation.getRubric() == null) {
+            throw new IllegalStateException("Cannot publish grade without a rubric");
+        }
 
         simulation.setGradeStatus(GradeStatus.REGISTERED);
         simulation.setGradeDateTime(new Date());
@@ -428,7 +459,8 @@ public class SimulationService {
     private List<SimulationAvailabilityDto> mapSimulationsToAvailabilityDtos(List<Simulation> simulations) {
         return simulations.stream().map(simulation -> {
             boolean isFull = simulation.getUsers().size() >= simulation.getPractice().getMaxStudentsGroup();
-            boolean hasStarted = simulation.getStartDateTime() != null && new Date().after(simulation.getStartDateTime());
+            boolean hasStarted = simulation.getStartDateTime() != null
+                    && new Date().after(simulation.getStartDateTime());
             boolean isGraded = simulation.getGradeStatus() == GradeStatus.REGISTERED;
 
             boolean available = !isFull && !hasStarted && !isGraded;

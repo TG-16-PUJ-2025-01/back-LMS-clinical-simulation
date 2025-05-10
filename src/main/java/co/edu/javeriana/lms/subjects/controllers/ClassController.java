@@ -289,6 +289,8 @@ public class ClassController {
             @RequestParam(required = false) Integer period,
             @RequestParam(defaultValue = "") String filter) {
 
+        // TODO: Check if the user is admin, and return all classes
+
         token = token.substring(7);
         log.info("Requesting main menu information for professor role");
 
@@ -307,6 +309,8 @@ public class ClassController {
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) Integer period,
             @RequestParam(defaultValue = "") String filter) {
+
+        // TODO: Check if the user is admin, and return all classes
 
         token = token.substring(7);
         log.info("Requesting main menu information for student role");

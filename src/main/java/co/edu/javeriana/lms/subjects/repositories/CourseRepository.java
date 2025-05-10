@@ -29,12 +29,12 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("SELECT c FROM Course c WHERE c.coordinator = :coordinator AND (CAST(c.javerianaId AS string) LIKE %:filter% OR LOWER(TRANSLATE(c.name, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%')))")
     List<Course> findCoursesByCoordinatorAndNameContaining(User coordinator, @Param("filter") String filter);
 
-    @Query("SELECT rt FROM Course c JOIN c.rubricTemplates rt WHERE c.courseId = :courseId AND LOWER(rt.title) LIKE LOWER(CONCAT('%', :title, '%')) ORDER BY rt.creationDate ASC")
+    @Query("SELECT rt FROM Course c JOIN c.rubricTemplates rt WHERE c.courseId = :courseId AND LOWER(rt.title) LIKE LOWER(CONCAT('%', :title, '%')) AND rt.archived = false ORDER BY rt.creationDate ASC")
     Page<RubricTemplate> findByCourseIdAndTitleContainingIgnoreCase(
             @Param("courseId") Long courseId,
             @Param("title") String title,
             Pageable pageable);
 
-    @Query("SELECT c FROM Course c WHERE  c.javerianaId = :courseId")
+    @Query("SELECT c FROM Course c WHERE c.javerianaId = :courseId")
     Optional<Course> findByJaverianaId( @Param("courseId") Long courseId);
 }

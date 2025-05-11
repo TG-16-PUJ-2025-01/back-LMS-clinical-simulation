@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -68,8 +67,11 @@ public class CourseServiceTest {
     private static List<ClassModel> mockClassModels;
     private static CourseDto mockCourseDto;
 
-    @BeforeAll
-    public static void setUpAll() {
+    @BeforeEach
+    public void setUpAll() {
+        // Initialize mocks
+        MockitoAnnotations.openMocks(this);
+
         // Mock Coordinator
         mockCoordinator = User.builder()
                 .id(1L)
@@ -156,11 +158,6 @@ public class CourseServiceTest {
 
         mockCoursesPage = new PageImpl<>(Arrays.asList(mockCourse1, mockCourse2),
                 PageRequest.of(0, 10, Sort.by("courseId").ascending()), mockClassModels.size());
-    }
-
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -292,11 +289,12 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void testUpdateCourse(){
+    public void testUpdateCourse() {
         // Arrange
         Long courseId = 1L;
         when(courseRepository.findById(courseId)).thenReturn(java.util.Optional.of(mockCourse1));
-        when(userRepository.findById(mockCourseDto.getCoordinatorId())).thenReturn(java.util.Optional.of(mockCoordinator));
+        when(userRepository.findById(mockCourseDto.getCoordinatorId()))
+                .thenReturn(java.util.Optional.of(mockCoordinator));
         when(courseRepository.save(mockCourse1)).thenReturn(mockCourse1);
 
         // Act
@@ -310,6 +308,223 @@ public class CourseServiceTest {
         assert (result.getDepartment().equals("Cirugia"));
         assert (result.getProgram().equals("Medicina"));
         assert (result.getSemester() == 7);
+    }
+
+    @Test
+    public void testUpdateCourseNotFound() {
+        // Arrange
+        Long courseId = 1L;
+        when(courseRepository.findById(courseId)).thenReturn(java.util.Optional.empty());
+        when(userRepository.findById(mockCourseDto.getCoordinatorId()))
+                .thenReturn(java.util.Optional.of(mockCoordinator));
+        when(courseRepository.save(mockCourse1)).thenReturn(mockCourse1);
+
+        // Act & Assert
+        try {
+            courseService.update(mockCourseDto, courseId);
+        } catch (Exception e) {
+            assert (e instanceof EntityNotFoundException);
+            assert (e.getMessage().equals("Course with ID " + courseId + " not found"));
+        }
+
+        verify(courseRepository, times(1)).findById(courseId);
+        verify(courseRepository, times(0)).save(mockCourse1);
+        verifyNoMoreInteractions(courseRepository);
+    }
+
+    @Test
+    public void testFindAllCoordinatorCoursesWithCourses() {
+        // Arrange
+        String filter = "";
+        String sort = "name";
+        Boolean asc = true;
+        String email = "alice.johnson@example.com";
+        String searchByKey = "";
+        String period = "2025";
+
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(mockCoordinator));
+        when(courseRepository.findCoursesByCoordinator(mockCoordinator)).thenReturn(List.of(mockCourse1, mockCourse2));
+        when(classRepository.findClassesByCourseId(mockCourse1, period)).thenReturn(List.of(mockClass1));
+        when(classRepository.findClassesByCourseId(mockCourse2, period)).thenReturn(List.of(mockClass2));
+
+        // Act
+        List<CourseDto> result = courseService.findAllCoordinatorCourses(filter, sort, asc, email, searchByKey, period);
+
+        // Assert
+        assert (result.size() == 2);
+        assert (result.get(0).getName().equals("Cirugia General"));
+        assert (result.get(1).getName().equals("Cirugia Plastica"));
+        assert (result.get(0).getClasses().size() == 1);
+        assert (result.get(1).getClasses().size() == 1);
+    }
+
+    @Test
+    public void testFindAllCoordinatorCoursesWithoutCourses() {
+        // Arrange
+        String filter = "";
+        String sort = "name";
+        Boolean asc = true;
+        String email = "alice.johnson@example.com";
+        String searchByKey = "";
+        String period = "2025";
+
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(mockCoordinator));
+        when(courseRepository.findCoursesByCoordinator(mockCoordinator)).thenReturn(List.of());
+
+        // Act
+        List<CourseDto> result = courseService.findAllCoordinatorCourses(filter, sort, asc, email, searchByKey, period);
+
+        // Assert
+        assert (result.isEmpty());
+    }
+
+    @Test
+    public void testFindAllCoordinatorCoursesWithFilterByName() {
+        // Arrange
+        String filter = "Cirugia";
+        String sort = "name";
+        Boolean asc = true;
+        String email = "alice.johnson@example.com";
+        String searchByKey = "Asignaturas";
+        String period = "2025";
+
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(mockCoordinator));
+        when(courseRepository.findCoursesByCoordinatorAndNameContaining(mockCoordinator, filter))
+                .thenReturn(List.of(mockCourse1));
+        when(classRepository.findClassesByCourseId(mockCourse1, period)).thenReturn(List.of(mockClass1));
+
+        // Act
+        List<CourseDto> result = courseService.findAllCoordinatorCourses(filter, sort, asc, email, searchByKey, period);
+
+        // Assert
+        assert (result.size() == 1);
+        assert (result.get(0).getName().equals("Cirugia General"));
+        assert (result.get(0).getClasses().size() == 1);
+    }
+
+    @Test
+    public void testFindAllCoordinatorCoursesWithFilterByClasses() {
+        // Arrange
+        String filter = "Clase";
+        String sort = "name";
+        Boolean asc = true;
+        String email = "alice.johnson@example.com";
+        String searchByKey = "Clases";
+        String period = "2025";
+
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(mockCoordinator));
+        when(courseRepository.findCoursesByCoordinator(mockCoordinator)).thenReturn(List.of(mockCourse1));
+        when(classRepository.findClassesByCourseIdAndNameContaining(mockCourse1, filter, period))
+                .thenReturn(List.of(mockClass1));
+
+        // Act
+        List<CourseDto> result = courseService.findAllCoordinatorCourses(filter, sort, asc, email, searchByKey, period);
+
+        // Assert
+        assert (result.size() == 1);
+        assert (result.get(0).getName().equals("Cirugia General"));
+        assert (result.get(0).getClasses().size() == 1);
+    }
+
+    @Test
+    public void testFindAllCoordinatorCoursesWithFilterByProfessors() {
+        // Arrange
+        String filter = "Profesor";
+        String sort = "name";
+        Boolean asc = true;
+        String email = "alice.johnson@example.com";
+        String searchByKey = "Profesores";
+        String period = "2025";
+
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(mockCoordinator));
+        when(courseRepository.findCoursesByCoordinator(mockCoordinator)).thenReturn(List.of(mockCourse1));
+        when(classRepository.findClassesByCourseByProfessorContaining(mockCourse1, filter, period))
+                .thenReturn(List.of(mockClass1));
+
+        // Act
+        List<CourseDto> result = courseService.findAllCoordinatorCourses(filter, sort, asc, email, searchByKey, period);
+
+        // Assert
+        assert (result.size() == 1);
+        assert (result.get(0).getName().equals("Cirugia General"));
+        assert (result.get(0).getClasses().size() == 1);
+    }
+
+    @Test
+    public void testFindRecommendedRubricsByCourseIdWithResults() {
+        // Arrange
+        Long courseId = 1L;
+        String filter = "Evaluación";
+        int page = 0;
+        int size = 10;
+        String sort = "title";
+        boolean asc = true;
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<RubricTemplate> mockRubricsPage = new PageImpl<>(List.of(mockRubricTemplate));
+
+        when(courseRepository.findById(courseId)).thenReturn(java.util.Optional.of(mockCourse1));
+        when(courseRepository.findByCourseIdAndTitleContainingIgnoreCase(courseId, filter, pageable))
+                .thenReturn(mockRubricsPage);
+
+        // Act
+        Page<RubricTemplate> result = courseService.findRecommendedRubricsByCourseId(courseId, filter, page, size, sort,
+                asc);
+
+        // Assert
+        assert (result.getContent().size() == 1);
+        assert (result.getContent().get(0).getTitle().equals("Rubrica de Evaluación de Cirugía"));
+        assert (result.getTotalElements() == 1);
+    }
+
+    @Test
+    public void testFindRecommendedRubricsByCourseIdCourseNotFound() {
+        // Arrange
+        Long courseId = 1L;
+        String filter = "Evaluación";
+        int page = 0;
+        int size = 10;
+        String sort = "title";
+        boolean asc = true;
+
+        when(courseRepository.findById(courseId)).thenReturn(java.util.Optional.empty());
+
+        // Act & Assert
+        try {
+            courseService.findRecommendedRubricsByCourseId(courseId, filter, page, size, sort, asc);
+        } catch (Exception e) {
+            assert (e instanceof EntityNotFoundException);
+            assert (e.getMessage().equals("Course with ID " + courseId + " not found"));
+        }
+
+        verify(courseRepository, times(1)).findById(courseId);
+        verifyNoMoreInteractions(courseRepository);
+    }
+
+    @Test
+    public void testFindRecommendedRubricsByCourseIdNoResults() {
+        // Arrange
+        Long courseId = 1L;
+        String filter = "NoMatch";
+        int page = 0;
+        int size = 10;
+        String sort = "title";
+        boolean asc = true;
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<RubricTemplate> emptyRubricsPage = new PageImpl<>(List.of());
+
+        when(courseRepository.findById(courseId)).thenReturn(java.util.Optional.of(mockCourse1));
+        when(courseRepository.findByCourseIdAndTitleContainingIgnoreCase(courseId, filter, pageable))
+                .thenReturn(emptyRubricsPage);
+
+        // Act
+        Page<RubricTemplate> result = courseService.findRecommendedRubricsByCourseId(courseId, filter, page, size, sort,
+                asc);
+
+        // Assert
+        assert (result.getContent().isEmpty());
+        assert (result.getTotalElements() == 0);
     }
 
 }

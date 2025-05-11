@@ -72,7 +72,7 @@ public class CourseService {
     }
 
     public void deleteById(Long id) {
-        if(!courseRepository.existsById(id)) {
+        if (!courseRepository.existsById(id)) {
             throw new EntityNotFoundException("Course not found with id: " + id);
         }
 
@@ -103,8 +103,6 @@ public class CourseService {
             String searsearchByKey, String period) {
         User coordinator = userRepository.findByEmail(email).get();
 
-        // Obtener los cursos del coordinador
-
         List<Course> coordinatorCourses = new ArrayList<>();
 
         log.info("Searching by key: " + searsearchByKey + " and filter: " + filter + " and period: " + period);
@@ -120,37 +118,26 @@ public class CourseService {
         for (Course course : coordinatorCourses) {
 
             List<ClassModel> sortedClasses = new ArrayList<>();
-            // Buscar las clases del curs o y ordenarlas por periodo de mayor a menor
             if (searsearchByKey.isEmpty() || searsearchByKey.equals("Asignaturas")) {
-                sortedClasses = classRepository.findClassesByCourseId(course, period); // Convertir el stream en lista
+                sortedClasses = classRepository.findClassesByCourseId(course, period);
 
             } else if (searsearchByKey.equals("Clases")) {
-                sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter, period); // Convertir
-                                                                                                                // el //
-                                                                                                                // lista
+                sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter, period);
             } else {
-                sortedClasses = classRepository.findClassesByCourseByProfessorContaining(course, filter, period); // Convertir
-                // el stream // en lista
+                sortedClasses = classRepository.findClassesByCourseByProfessorContaining(course, filter, period);
             }
 
-            // Crear un CourseDto con las clases ordenadas
             courses.add(new CourseDto(course.getCourseId(), course.getJaverianaId(), course.getName(),
                     course.getCoordinator().getId(), sortedClasses.stream()
-                            .sorted((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod())) // Ordenar por periodo (mayor
-                                                                                          // // a menor)
+                            .sorted((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod()))
                             .toList(),
                     course.getFaculty(), course.getDepartment(), course.getProgram(),
                     course.getSemester()));
 
         }
 
-        // log.info("Courses found: " + courses.toString());
-
-        // enviar el resultado de mayor a menos numero de clases encontradas
         return courses.stream()
-                .sorted((c1, c2) -> Integer.compare(c2.getClasses().size(), c1.getClasses().size())) // Ordenar por
-                                                                                                     // periodo (mayor a
-                                                                                                     // menor)
+                .sorted((c1, c2) -> Integer.compare(c2.getClasses().size(), c1.getClasses().size()))
                 .toList();
     }
 

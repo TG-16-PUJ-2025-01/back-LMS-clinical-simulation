@@ -68,7 +68,7 @@ public class Video {
     private Simulation simulation;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @OrderBy("timestamp ASC") 
+    @OrderBy("timestamp ASC")
     private List<Comment> comments;
 
 }

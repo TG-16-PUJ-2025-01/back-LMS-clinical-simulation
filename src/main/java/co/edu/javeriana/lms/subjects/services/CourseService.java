@@ -72,6 +72,10 @@ public class CourseService {
     }
 
     public void deleteById(Long id) {
+        if(!courseRepository.existsById(id)) {
+            throw new EntityNotFoundException("Course not found with id: " + id);
+        }
+
         courseRepository.deleteById(id);
     }
 
@@ -85,10 +89,13 @@ public class CourseService {
         currentCourseModel.setName(course.getName());
         currentCourseModel.setJaverianaId(course.getJaverianaId());
         currentCourseModel.setCoordinator(userRepository.findById(course.getCoordinatorId()).get());
+        currentCourseModel.setFaculty(course.getFaculty());
+        currentCourseModel.setDepartment(course.getDepartment());
+        currentCourseModel.setProgram(course.getProgram());
+        currentCourseModel.setSemester(course.getSemester());
 
         courseRepository.save(currentCourseModel);
 
-        // log.info("Updating course with ID: " + currentCourseModel);
         return currentCourseModel;
     }
 

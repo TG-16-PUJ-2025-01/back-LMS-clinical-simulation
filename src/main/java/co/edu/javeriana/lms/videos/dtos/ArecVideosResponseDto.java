@@ -18,12 +18,16 @@ public class ArecVideosResponseDto {
     private List<Video> result;
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PageInfo {
         private Integer total;
         private Integer count;
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Video {
         private String name;
         private Double length;
@@ -37,6 +41,8 @@ public class ArecVideosResponseDto {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class VideoMetadata {
         @SerializedName("channel_name")
         private String channelName;

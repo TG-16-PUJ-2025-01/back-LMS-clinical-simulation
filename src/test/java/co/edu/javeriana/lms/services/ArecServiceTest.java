@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,7 @@ import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
 import co.edu.javeriana.lms.videos.dtos.ArecLoginRequestDto;
 import co.edu.javeriana.lms.videos.dtos.ArecLoginResponseDto;
 import co.edu.javeriana.lms.videos.dtos.ArecVideosResponseDto;
+import co.edu.javeriana.lms.videos.models.Video;
 import co.edu.javeriana.lms.videos.repositories.VideoRepository;
 import co.edu.javeriana.lms.videos.services.ArecService;
 import reactor.core.publisher.Mono;
@@ -33,154 +36,182 @@ import reactor.core.publisher.Mono;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class ArecServiceTest {
 
-    private ArecService arecService;
+        private ArecService arecService;
 
-    @Mock
-    WebClient webClient;
+        @Mock
+        WebClient webClient;
 
-    @Mock
-    private WebClient.RequestBodyUriSpec requestBodyUriSpec;
+        @Mock
+        private WebClient.RequestBodyUriSpec requestBodyUriSpec;
 
-    @Mock
-    private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
+        @Mock
+        private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
 
-    @Mock
-    private WebClient.RequestBodySpec requestBodySpec;
+        @Mock
+        private WebClient.RequestBodySpec requestBodySpec;
 
-    @Mock
-    private WebClient.RequestHeadersSpec requestHeadersSpec;
-    
-    @Mock
-    private WebClient.RequestHeadersSpec requestHeadersSpec2;
+        @Mock
+        private WebClient.RequestHeadersSpec requestHeadersSpec;
 
-    @Mock
-    private WebClient.ResponseSpec responseSpec;
+        @Mock
+        private WebClient.RequestHeadersSpec requestHeadersSpec2;
 
-    @Mock
-    private WebClient.ResponseSpec responseSpec2;
+        @Mock
+        private WebClient.ResponseSpec responseSpec;
 
-    @Mock
-    private VideoRepository videoRepository;
+        @Mock
+        private WebClient.ResponseSpec responseSpec2;
 
-    @Mock
-    private SimulationRepository simulationRepository;
+        @Mock
+        private VideoRepository videoRepository;
 
-    private static final String mockIp = "mockIp";
-    private Gson gson;
+        @Mock
+        private SimulationRepository simulationRepository;
 
-    @BeforeEach
-    public void setUp() {
-        gson = new Gson();
-        arecService = new ArecService(webClient);
-    }
+        private static final String mockIp = "mockIp";
+        private Gson gson;
 
-    @Test
-    public void testLogin() throws URISyntaxException, IOException, InterruptedException {
-        ArecLoginResponseDto login = new ArecLoginResponseDto("abc123");
+        @BeforeEach
+        public void setUp() {
+                gson = new Gson();
+                arecService = new ArecService(webClient);
+        }
 
-        when(webClient.post())
-                .thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("http://mockIp/api/login"))
-                .thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON))
-                .thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(any(ArecLoginRequestDto.class)))
-                .thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.exchangeToMono(any()))
-                .thenReturn(Mono.just(login));
+        @Test
+        public void testLogin() throws URISyntaxException, IOException, InterruptedException {
+                ArecLoginResponseDto login = new ArecLoginResponseDto("abc123");
 
-        ArecLoginResponseDto response = arecService.loginToArec(mockIp);
+                when(webClient.post())
+                                .thenReturn(requestBodyUriSpec);
+                when(requestBodyUriSpec.uri("http://mockIp/api/login"))
+                                .thenReturn(requestBodySpec);
+                when(requestBodySpec.contentType(MediaType.APPLICATION_JSON))
+                                .thenReturn(requestBodySpec);
+                when(requestBodySpec.bodyValue(any(ArecLoginRequestDto.class)))
+                                .thenReturn(requestHeadersSpec);
+                when(requestHeadersSpec.exchangeToMono(any()))
+                                .thenReturn(Mono.just(login));
 
-        assert response != null;
-        assert response.getSession().equals(login.getSession());
-    }
+                ArecLoginResponseDto response = arecService.loginToArec(mockIp);
 
-    @Test
-    public void testFetchVideos() throws URISyntaxException, IOException, InterruptedException {
-        ArecLoginResponseDto login = new ArecLoginResponseDto("abc123");
-        
-        when(webClient.post())
-                .thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("http://mockIp/api/login"))
-                .thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON))
-                .thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(any(ArecLoginRequestDto.class)))
-                .thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.exchangeToMono(any()))
-                .thenReturn(Mono.just(login));
+                assert response != null;
+                assert response.getSession().equals(login.getSession());
+        }
 
-        String jsonResponse = new String(Files.readAllBytes(Paths.get("./src/test/resources/arecVideosResponse.json")));
-        ArecVideosResponseDto response = gson.fromJson(jsonResponse, ArecVideosResponseDto.class);
+        @Test
+        public void testFetchVideos() throws URISyntaxException, IOException, InterruptedException {
+                ArecLoginResponseDto login = new ArecLoginResponseDto("abc123");
 
-        when(webClient.get())
-                .thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri("http://mockIp/api/recording"))
-                .thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.header(HttpHeaders.COOKIE, "session=" + login.getSession()))
-                .thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve())
-                .thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(ArecVideosResponseDto.class))
-                .thenReturn(Mono.just(response));
+                when(webClient.post())
+                                .thenReturn(requestBodyUriSpec);
+                when(requestBodyUriSpec.uri("http://mockIp/api/login"))
+                                .thenReturn(requestBodySpec);
+                when(requestBodySpec.contentType(MediaType.APPLICATION_JSON))
+                                .thenReturn(requestBodySpec);
+                when(requestBodySpec.bodyValue(any(ArecLoginRequestDto.class)))
+                                .thenReturn(requestHeadersSpec);
+                when(requestHeadersSpec.exchangeToMono(any()))
+                                .thenReturn(Mono.just(login));
 
-        ArecVideosResponseDto result = arecService.fetchVideos(mockIp);
+                String jsonResponse = new String(
+                                Files.readAllBytes(Paths.get("./src/test/resources/arecVideosResponse.json")));
+                ArecVideosResponseDto response = gson.fromJson(jsonResponse, ArecVideosResponseDto.class);
 
-        assert result != null;
-        assert result.equals(response);
-    }
+                when(webClient.get())
+                                .thenReturn(requestHeadersUriSpec);
+                when(requestHeadersUriSpec.uri("http://mockIp/api/recording"))
+                                .thenReturn(requestHeadersSpec);
+                when(requestHeadersSpec.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                                .thenReturn(requestHeadersSpec);
+                when(requestHeadersSpec.header(HttpHeaders.COOKIE, "session=" + login.getSession()))
+                                .thenReturn(requestHeadersSpec);
+                when(requestHeadersSpec.retrieve())
+                                .thenReturn(responseSpec);
+                when(responseSpec.bodyToMono(ArecVideosResponseDto.class))
+                                .thenReturn(Mono.just(response));
 
-    @Test
-    public void testFetchVideosDifferentCount() throws URISyntaxException, IOException, InterruptedException {
-        ArecLoginResponseDto login = new ArecLoginResponseDto("abc123");
-        
-        when(webClient.post())
-                .thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("http://mockIp/api/login"))
-                .thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON))
-                .thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(any(ArecLoginRequestDto.class)))
-                .thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.exchangeToMono(any()))
-                .thenReturn(Mono.just(login));
+                ArecVideosResponseDto result = arecService.fetchVideos(mockIp);
 
-        String jsonResponse = new String(Files.readAllBytes(Paths.get("./src/test/resources/arecVideosResponse.json")));
-        ArecVideosResponseDto response = gson.fromJson(jsonResponse, ArecVideosResponseDto.class);
-        String jsonResponse2 = new String(Files.readAllBytes(Paths.get("./src/test/resources/arecVideosResponse2.json")));
-        ArecVideosResponseDto response2 = gson.fromJson(jsonResponse2, ArecVideosResponseDto.class);
+                assert result != null;
+                assert result.equals(response);
+        }
 
-        when(webClient.get())
-                .thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri("http://mockIp/api/recording"))
-                .thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.header(HttpHeaders.COOKIE, "session=" + login.getSession()))
-                .thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve())
-                .thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(ArecVideosResponseDto.class))
-                .thenReturn(Mono.just(response));
+        @Test
+        public void testFetchVideosDifferentCount() throws URISyntaxException, IOException, InterruptedException {
+                ArecLoginResponseDto login = new ArecLoginResponseDto("abc123");
 
-        when(webClient.get())
-                .thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri("http://mockIp/api/recording?per_page=" + response2.getPageInfo().getTotal()))
-                .thenReturn(requestHeadersSpec2);
-        when(requestHeadersSpec2.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .thenReturn(requestHeadersSpec2);
-        when(requestHeadersSpec2.header(HttpHeaders.COOKIE, "session=" + login.getSession()))
-                .thenReturn(requestHeadersSpec2);
-        when(requestHeadersSpec2.retrieve())
-                .thenReturn(responseSpec2);
-        when(responseSpec2.bodyToMono(ArecVideosResponseDto.class))
-                .thenReturn(Mono.just(response2));
+                when(webClient.post())
+                                .thenReturn(requestBodyUriSpec);
+                when(requestBodyUriSpec.uri("http://mockIp/api/login"))
+                                .thenReturn(requestBodySpec);
+                when(requestBodySpec.contentType(MediaType.APPLICATION_JSON))
+                                .thenReturn(requestBodySpec);
+                when(requestBodySpec.bodyValue(any(ArecLoginRequestDto.class)))
+                                .thenReturn(requestHeadersSpec);
+                when(requestHeadersSpec.exchangeToMono(any()))
+                                .thenReturn(Mono.just(login));
 
-        ArecVideosResponseDto result = arecService.fetchVideos(mockIp);
+                String jsonResponse = new String(
+                                Files.readAllBytes(Paths.get("./src/test/resources/arecVideosResponse.json")));
+                ArecVideosResponseDto response = gson.fromJson(jsonResponse, ArecVideosResponseDto.class);
+                String jsonResponse2 = new String(
+                                Files.readAllBytes(Paths.get("./src/test/resources/arecVideosResponse2.json")));
+                ArecVideosResponseDto response2 = gson.fromJson(jsonResponse2, ArecVideosResponseDto.class);
 
-        assert result != null;
-        assert result.equals(response);
-    }
+                when(webClient.get())
+                                .thenReturn(requestHeadersUriSpec);
+                when(requestHeadersUriSpec.uri("http://mockIp/api/recording"))
+                                .thenReturn(requestHeadersSpec);
+                when(requestHeadersSpec.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                                .thenReturn(requestHeadersSpec);
+                when(requestHeadersSpec.header(HttpHeaders.COOKIE, "session=" + login.getSession()))
+                                .thenReturn(requestHeadersSpec);
+                when(requestHeadersSpec.retrieve())
+                                .thenReturn(responseSpec);
+                when(responseSpec.bodyToMono(ArecVideosResponseDto.class))
+                                .thenReturn(Mono.just(response));
+
+                when(webClient.get())
+                                .thenReturn(requestHeadersUriSpec);
+                when(requestHeadersUriSpec
+                                .uri("http://mockIp/api/recording?per_page=" + response2.getPageInfo().getTotal()))
+                                .thenReturn(requestHeadersSpec2);
+                when(requestHeadersSpec2.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                                .thenReturn(requestHeadersSpec2);
+                when(requestHeadersSpec2.header(HttpHeaders.COOKIE, "session=" + login.getSession()))
+                                .thenReturn(requestHeadersSpec2);
+                when(requestHeadersSpec2.retrieve())
+                                .thenReturn(responseSpec2);
+                when(responseSpec2.bodyToMono(ArecVideosResponseDto.class))
+                                .thenReturn(Mono.just(response2));
+
+                ArecVideosResponseDto result = arecService.fetchVideos(mockIp);
+
+                assert result != null;
+                assert result.equals(response);
+        }
+
+        @Test
+        public void testAssociateVideoWithSimulation() throws URISyntaxException, IOException, InterruptedException {
+                Long roomId = 1L;
+                String videoName = "videoName";
+                String simulationId = "simulationId";
+                Video video = Video.builder()
+                                .name("Test Video")
+                                .build();
+
+                ArecVideosResponseDto.Video arecVideo = new ArecVideosResponseDto.Video("Test Video", 10.0, null, null,
+                                "finished", List.of(new ArecVideosResponseDto.VideoMetadata("channel", "playbackUrl",
+                                                "downloadUrl", 10.0, "thumbnail")));
+
+                when(videoRepository.findByName(videoName)).thenReturn(Optional.empty());
+                when(simulationRepository.findAllByRooms_IdAndStartDateTimeAfterAndEndDateTimeBefore(roomId, any(), any()))
+                                .thenReturn(List.of());
+                when(videoRepository.save(any(Video.class))).thenReturn(video);
+
+                arecService.associateVideoWithSimulation(roomId, arecVideo);
+
+                // Verify that the video and simulation were associated correctly
+                // Add your assertions here if needed
+        }
 }

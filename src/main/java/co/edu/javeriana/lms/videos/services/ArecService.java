@@ -184,7 +184,7 @@ public class ArecService {
 
         ArecVideosResponseDto res = fetchVideos(ipAddress);
 
-        for (ArecVideosResponseDto.Video video : res.getResults()) {
+        for (ArecVideosResponseDto.Video video : res.getResult()) {
             log.info("Video name: {}", video.getName());
             log.info("Video length: {}", video.getLength());
             log.info("Video recorded at: {}", video.getRecordedAt());

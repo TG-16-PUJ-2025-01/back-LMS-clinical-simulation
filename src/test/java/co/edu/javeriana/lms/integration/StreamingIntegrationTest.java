@@ -44,5 +44,4 @@ public class StreamingIntegrationTest {
         mockMvc.perform(get("/streaming/video/notexists.mp4"))
                 .andExpect(status().isNotFound());
     }
-
 }

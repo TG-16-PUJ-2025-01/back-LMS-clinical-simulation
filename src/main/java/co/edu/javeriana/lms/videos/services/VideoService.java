@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.videos.dtos.EditVideoDto;
 import co.edu.javeriana.lms.videos.models.Video;
 import co.edu.javeriana.lms.videos.repositories.VideoRepository;
@@ -54,6 +55,11 @@ public class VideoService {
         Video video = videoRepository.findById(id).orElse(null);
         if (video == null) {
             return null;
+        }
+
+        if (video.getSimulation() != null) {
+            Simulation simulation = video.getSimulation();
+            simulation.getVideos().remove(video);
         }
 
         videoRepository.delete(video);

@@ -102,7 +102,7 @@ public class CourseController {
 	@Valid
 	@PutMapping("/update/{id}")
 	public ResponseEntity<?> updateCourse(@RequestBody CourseDto courseModel, @PathVariable Long id) {
-		log.info("Updating course with ID: " + id);
+		log.info("Updating course with ID: " + id + " with data: " + courseModel.toString());
 
 		Course course = courseService.update(courseModel, id);
 

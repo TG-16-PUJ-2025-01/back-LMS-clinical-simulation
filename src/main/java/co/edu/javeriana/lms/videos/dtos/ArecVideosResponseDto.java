@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class ArecVideosResponseDto {
     @SerializedName("page_info")
     private PageInfo pageInfo;
-    private List<Video> results;
+    private List<Video> result;
 
     @Data
     public static class PageInfo {

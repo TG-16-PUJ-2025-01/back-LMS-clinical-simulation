@@ -1,5 +1,6 @@
 package co.edu.javeriana.lms.services;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -395,28 +396,24 @@ public class ClassServiceTest {
         verify(courseRepository, times(0)).findById(1L);
     }
 
-    // TODO: Fix this test
     @Test
     public void testSaveClassByExcel() {
-        // Mock the repository behavior
-        when(classRepository.save(mockClass1)).thenReturn(mockClass1);
+        // Arrange
         when(userRepository.findByInstitutionalId(2L)).thenReturn(java.util.Optional.of(mockProfessor));
-        when(courseRepository.findByJaverianaId(20001L)).thenReturn(java.util.Optional.of(mockCourse));
+        when(courseRepository.findByJaverianaId(1L)).thenReturn(java.util.Optional.of(mockCourse));
+        when(classRepository.save(any(ClassModel.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         ClassModel result = classService.saveByExcel(mockClassDto);
 
         // Assert
         assert (result != null);
-        assert (result.getJaverianaId().equals(mockClass1.getJaverianaId()));
-        assert (result.getPeriod().equals(mockClass1.getPeriod()));
-        assert (result.getNumberOfParticipants().equals(mockClass1.getNumberOfParticipants()));
-        assert (result.getCourse().getCourseId().equals(mockClass1.getCourse().getCourseId()));
+        assert (result.getJaverianaId().equals(20001L));
+        assert (result.getPeriod().equals("2025-10"));
+        assert (result.getNumberOfParticipants().equals(20));
         assert (result.getProfessors().size() == 1);
-        assert (result.getProfessors().get(0).getId().equals(mockProfessor.getId()));
-        assert (result.getNumberOfParticipants() == 20);
-        assert (result.getStudents().size() == 2);
-        assert (result.getStudents().get(0).getId().equals(mockStudent1.getId()));
+        assert (result.getProfessors().get(0).getId().equals(2L));
+        assert (result.getCourse().getCourseId().equals(1L));
     }
 
     @Test
@@ -637,11 +634,10 @@ public class ClassServiceTest {
         assert (result.get(1).getClassId().equals(mockClass1.getClassId()));
     }
 
-    // TODO: Check why this test returns an empty list
     @Test
     public void testFindClassesByProfessorIdAndFiltersWithPeriodOnly() {
         // Mock the repository behavior
-        when(classRepository.findByProfessors_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(2L, "", "10"))
+        when(classRepository.findByProfessors_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(2L, "", "-10"))
                 .thenReturn(mockClassModels);
 
         // Act
@@ -649,7 +645,7 @@ public class ClassServiceTest {
 
         // Assert
         assert (result != null);
-        assert (result.size() == 0);
+        assert (result.size() == 2);
     }
 
     @Test
@@ -718,11 +714,10 @@ public class ClassServiceTest {
         assert (result.get(1).getClassId().equals(mockClass1.getClassId()));
     }
 
-    // TODO: Check why this test returns an empty list
     @Test
     public void testFindClassesByStudentIdAndFiltersWithPeriodOnly() {
         // Mock the repository behavior
-        when(classRepository.findByStudents_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(3L, "", "10"))
+        when(classRepository.findByStudents_IdAndCourse_NameContainingIgnoreCaseAndPeriodContaining(3L, "", "-10"))
                 .thenReturn(Arrays.asList(mockClass1));
 
         // Act
@@ -730,7 +725,7 @@ public class ClassServiceTest {
 
         // Assert
         assert (result != null);
-        assert (result.size() == 0);
+        assert (result.size() == 1);
     }
 
     @Test

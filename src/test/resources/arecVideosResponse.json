@@ -1,0 +1,677 @@
+{
+    "page_info": {
+        "total": 5,
+        "count": 5
+    },
+    "status_info": {
+        "waiting": 0,
+        "failed": 0
+    },
+    "result": [
+        {
+            "id": 6,
+            "name": "Consult2__2025_04_11_14_13_31",
+            "recorded_at": "2025-04-11T14:13:31-05:00",
+            "finished_at": "2025-04-11T15:17:33-05:00",
+            "length": 3842.474,
+            "bookmark": [],
+            "bookmark_file": "http://10.197.140.235/download/SATA/recording/Consult2__2025_04_11_14_13_31/bookmark.json",
+            "metadata_file": "http://10.197.140.235/download/SATA/recording/Consult2__2025_04_11_14_13_31/information.json",
+            "videos": [
+                {
+                    "channel_id": 1,
+                    "channel_name": "Cam1",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_CH1_Cam1.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_CH1_Cam1.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3898.66015625,
+                    "frame_rate": 2,
+                    "size": 2042055579,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_CH1_Cam1.jpg"
+                },
+                {
+                    "channel_id": 2,
+                    "channel_name": "Cam2",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_CH2_Cam2.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_CH2_Cam2.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3248.2119140625,
+                    "frame_rate": 5,
+                    "size": 1721971935,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_CH2_Cam2.jpg"
+                },
+                {
+                    "channel_id": 3,
+                    "channel_name": "PC_Consultorio",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_CH3_PC_Consultorio.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_CH3_PC_Consultorio.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3898.3046875,
+                    "frame_rate": 1,
+                    "size": 2042302244,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_CH3_PC_Consultorio.jpg"
+                },
+                {
+                    "channel_id": 4,
+                    "channel_name": "PC_Control",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_CH4_PC_Control.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_CH4_PC_Control.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3898.775390625,
+                    "frame_rate": 1,
+                    "size": 2042533989,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_CH4_PC_Control.jpg"
+                },
+                {
+                    "channel_id": 5,
+                    "channel_name": "Movie",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_Movie.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_Movie.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3899.2314453125,
+                    "frame_rate": 1,
+                    "size": 2041692070,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_04_11_14_13_31/Consult2__2025_04_11_14_13_31_Movie.jpg"
+                }
+            ],
+            "status": "ready",
+            "metadata": [
+                {
+                    "name": "Title",
+                    "value": "Consult2__2025_04_11_14_13_31"
+                },
+                {
+                    "name": "Organization",
+                    "value": ""
+                },
+                {
+                    "name": "Department",
+                    "value": ""
+                },
+                {
+                    "name": "Event_date",
+                    "value": ""
+                },
+                {
+                    "name": "Semester",
+                    "value": ""
+                },
+                {
+                    "name": "Topic",
+                    "value": ""
+                },
+                {
+                    "name": "Level",
+                    "value": ""
+                },
+                {
+                    "name": "Audience",
+                    "value": ""
+                },
+                {
+                    "name": "Room",
+                    "value": ""
+                },
+                {
+                    "name": "Category",
+                    "value": ""
+                },
+                {
+                    "name": "Presenter",
+                    "value": ""
+                },
+                {
+                    "name": "Section",
+                    "value": ""
+                },
+                {
+                    "name": "Description",
+                    "value": ""
+                }
+            ],
+            "other_files": []
+        },
+        {
+            "id": 5,
+            "name": "Consult2__2025_01_29_13_02_53",
+            "recorded_at": "2025-01-29T13:02:53-05:00",
+            "finished_at": "2025-01-29T14:01:07-05:00",
+            "length": 3495.21,
+            "bookmark": [],
+            "bookmark_file": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_29_13_02_53/bookmark.json",
+            "metadata_file": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_29_13_02_53/information.json",
+            "videos": [
+                {
+                    "channel_id": 1,
+                    "channel_name": "Cam1",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_CH1_Cam1.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_CH1_Cam1.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3898.671875,
+                    "frame_rate": 2,
+                    "size": 1857638822,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_CH1_Cam1.jpg"
+                },
+                {
+                    "channel_id": 2,
+                    "channel_name": "Cam2",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_CH2_Cam2.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_CH2_Cam2.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3247.9345703125,
+                    "frame_rate": 2,
+                    "size": 1566326597,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_CH2_Cam2.jpg"
+                },
+                {
+                    "channel_id": 3,
+                    "channel_name": "PC_Consultorio",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_CH3_PC_Consultorio.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_CH3_PC_Consultorio.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3899.9091796875,
+                    "frame_rate": 4,
+                    "size": 1858082741,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_CH3_PC_Consultorio.jpg"
+                },
+                {
+                    "channel_id": 4,
+                    "channel_name": "PC_Control",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_CH4_PC_Control.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_CH4_PC_Control.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3899.3857421875,
+                    "frame_rate": 8,
+                    "size": 1858379397,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_CH4_PC_Control.jpg"
+                },
+                {
+                    "channel_id": 5,
+                    "channel_name": "Movie",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_Movie.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_Movie.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3899.6767578125,
+                    "frame_rate": 13,
+                    "size": 1856910770,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_29_13_02_53/Consult2__2025_01_29_13_02_53_Movie.jpg"
+                }
+            ],
+            "status": "ready",
+            "metadata": [
+                {
+                    "name": "Title",
+                    "value": "Consult2__2025_01_29_13_02_53"
+                },
+                {
+                    "name": "Organization",
+                    "value": ""
+                },
+                {
+                    "name": "Department",
+                    "value": ""
+                },
+                {
+                    "name": "Event_date",
+                    "value": ""
+                },
+                {
+                    "name": "Semester",
+                    "value": ""
+                },
+                {
+                    "name": "Topic",
+                    "value": ""
+                },
+                {
+                    "name": "Level",
+                    "value": ""
+                },
+                {
+                    "name": "Audience",
+                    "value": ""
+                },
+                {
+                    "name": "Room",
+                    "value": ""
+                },
+                {
+                    "name": "Category",
+                    "value": ""
+                },
+                {
+                    "name": "Presenter",
+                    "value": ""
+                },
+                {
+                    "name": "Section",
+                    "value": ""
+                },
+                {
+                    "name": "Description",
+                    "value": ""
+                }
+            ],
+            "other_files": []
+        },
+        {
+            "id": 4,
+            "name": "Consult2__2025_01_28_13_00_29",
+            "recorded_at": "2025-01-28T13:00:29-05:00",
+            "finished_at": "2025-01-28T14:05:33-05:00",
+            "length": 3903.018,
+            "bookmark": [],
+            "bookmark_file": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_28_13_00_29/bookmark.json",
+            "metadata_file": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_28_13_00_29/information.json",
+            "videos": [
+                {
+                    "channel_id": 1,
+                    "channel_name": "Cam1",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_CH1_Cam1.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_CH1_Cam1.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3899.541015625,
+                    "frame_rate": 2,
+                    "size": 2074397653,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_CH1_Cam1.jpg"
+                },
+                {
+                    "channel_id": 2,
+                    "channel_name": "Cam2",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_CH2_Cam2.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_CH2_Cam2.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3247.990234375,
+                    "frame_rate": 1,
+                    "size": 1748753069,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_CH2_Cam2.jpg"
+                },
+                {
+                    "channel_id": 3,
+                    "channel_name": "PC_Consultorio",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_CH3_PC_Consultorio.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_CH3_PC_Consultorio.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3899.486328125,
+                    "frame_rate": 2,
+                    "size": 2074249192,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_CH3_PC_Consultorio.jpg"
+                },
+                {
+                    "channel_id": 4,
+                    "channel_name": "PC_Control",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_CH4_PC_Control.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_CH4_PC_Control.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3899.3525390625,
+                    "frame_rate": 2,
+                    "size": 2074180332,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_CH4_PC_Control.jpg"
+                },
+                {
+                    "channel_id": 5,
+                    "channel_name": "Movie",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_Movie.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_Movie.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3898.76171875,
+                    "frame_rate": 1,
+                    "size": 2073881952,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_28_13_00_29/Consult2__2025_01_28_13_00_29_Movie.jpg"
+                }
+            ],
+            "status": "ready",
+            "metadata": [
+                {
+                    "name": "Title",
+                    "value": "Consult2__2025_01_28_13_00_29"
+                },
+                {
+                    "name": "Organization",
+                    "value": ""
+                },
+                {
+                    "name": "Department",
+                    "value": ""
+                },
+                {
+                    "name": "Event_date",
+                    "value": ""
+                },
+                {
+                    "name": "Semester",
+                    "value": ""
+                },
+                {
+                    "name": "Topic",
+                    "value": ""
+                },
+                {
+                    "name": "Level",
+                    "value": ""
+                },
+                {
+                    "name": "Audience",
+                    "value": ""
+                },
+                {
+                    "name": "Room",
+                    "value": ""
+                },
+                {
+                    "name": "Category",
+                    "value": ""
+                },
+                {
+                    "name": "Presenter",
+                    "value": ""
+                },
+                {
+                    "name": "Section",
+                    "value": ""
+                },
+                {
+                    "name": "Description",
+                    "value": ""
+                }
+            ],
+            "other_files": []
+        },
+        {
+            "id": 3,
+            "name": "Consult2__2025_01_17_09_58_37",
+            "recorded_at": "2025-01-17T09:58:37-05:00",
+            "finished_at": "2025-01-17T11:39:45-05:00",
+            "length": 5930.432,
+            "bookmark": [],
+            "bookmark_file": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_17_09_58_37/bookmark.json",
+            "metadata_file": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_17_09_58_37/information.json",
+            "videos": [
+                {
+                    "channel_id": 1,
+                    "channel_name": "Cam1",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_CH1_Cam1.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_CH1_Cam1.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 4194056.5712890625,
+                    "frame_rate": 2,
+                    "size": 3152005022,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_CH1_Cam1.jpg"
+                },
+                {
+                    "channel_id": 2,
+                    "channel_name": "Cam2",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_CH2_Cam2.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_CH2_Cam2.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 4194056.5712890625,
+                    "frame_rate": 1,
+                    "size": 2657206003,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_CH2_Cam2.jpg"
+                },
+                {
+                    "channel_id": 3,
+                    "channel_name": "PC_Consultorio",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_CH3_PC_Consultorio.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_CH3_PC_Consultorio.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 4194056.5712890625,
+                    "frame_rate": 6,
+                    "size": 3152020814,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_CH3_PC_Consultorio.jpg"
+                },
+                {
+                    "channel_id": 4,
+                    "channel_name": "PC_Control",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_CH4_PC_Control.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_CH4_PC_Control.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 4194056.5712890625,
+                    "frame_rate": 5,
+                    "size": 3152002646,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_CH4_PC_Control.jpg"
+                },
+                {
+                    "channel_id": 5,
+                    "channel_name": "Movie",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_Movie.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_Movie.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 4194056.5712890625,
+                    "frame_rate": 2,
+                    "size": 3151678973,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2025_01_17_09_58_37/Consult2__2025_01_17_09_58_37_Movie.jpg"
+                }
+            ],
+            "status": "ready",
+            "metadata": [
+                {
+                    "name": "Title",
+                    "value": "Consult2__2025_01_17_09_58_37"
+                },
+                {
+                    "name": "Organization",
+                    "value": ""
+                },
+                {
+                    "name": "Department",
+                    "value": ""
+                },
+                {
+                    "name": "Event_date",
+                    "value": ""
+                },
+                {
+                    "name": "Semester",
+                    "value": ""
+                },
+                {
+                    "name": "Topic",
+                    "value": ""
+                },
+                {
+                    "name": "Level",
+                    "value": ""
+                },
+                {
+                    "name": "Audience",
+                    "value": ""
+                },
+                {
+                    "name": "Room",
+                    "value": ""
+                },
+                {
+                    "name": "Category",
+                    "value": ""
+                },
+                {
+                    "name": "Presenter",
+                    "value": ""
+                },
+                {
+                    "name": "Section",
+                    "value": ""
+                },
+                {
+                    "name": "Description",
+                    "value": ""
+                }
+            ],
+            "other_files": []
+        },
+        {
+            "id": 2,
+            "name": "Consult2__2024_10_04_14_18_29",
+            "recorded_at": "2024-10-04T14:18:29-05:00",
+            "finished_at": "2024-10-04T15:05:23-05:00",
+            "length": 2814.89,
+            "bookmark": [],
+            "bookmark_file": "http://10.197.140.235/download/SATA/recording/Consult2__2024_10_04_14_18_29/bookmark.json",
+            "metadata_file": "http://10.197.140.235/download/SATA/recording/Consult2__2024_10_04_14_18_29/information.json",
+            "videos": [
+                {
+                    "channel_id": 1,
+                    "channel_name": "Cam1",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_CH1_Cam1.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_CH1_Cam1.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3835.787109375,
+                    "frame_rate": 30,
+                    "size": 1473014808,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_CH1_Cam1.jpg"
+                },
+                {
+                    "channel_id": 2,
+                    "channel_name": "Cam2",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_CH2_Cam2.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_CH2_Cam2.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3247.9228515625,
+                    "frame_rate": 2,
+                    "size": 1261570477,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_CH2_Cam2.jpg"
+                },
+                {
+                    "channel_id": 3,
+                    "channel_name": "PC_Consultorio",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_CH3_PC_Consultorio.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_CH3_PC_Consultorio.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3898.4912109375,
+                    "frame_rate": 1,
+                    "size": 1496586647,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_CH3_PC_Consultorio.jpg"
+                },
+                {
+                    "channel_id": 4,
+                    "channel_name": "PC_Control",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_CH4_PC_Control.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_CH4_PC_Control.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3898.4453125,
+                    "frame_rate": 1,
+                    "size": 1497101664,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_CH4_PC_Control.jpg"
+                },
+                {
+                    "channel_id": 5,
+                    "channel_name": "Movie",
+                    "playback_url": "http://10.197.140.235/playback/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_Movie.mp4",
+                    "download_url": "http://10.197.140.235/download/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_Movie.mp4",
+                    "format": "MP4",
+                    "width": 1920,
+                    "height": 1080,
+                    "bit_rate": 3898.2392578125,
+                    "frame_rate": 1,
+                    "size": 1494898840,
+                    "thumbnail": "http://10.197.140.235/playback/SATA/recording/Consult2__2024_10_04_14_18_29/Consult2__2024_10_04_14_18_29_Movie.jpg"
+                }
+            ],
+            "status": "ready",
+            "metadata": [
+                {
+                    "name": "Title",
+                    "value": "Consult2__2024_10_04_14_18_29"
+                },
+                {
+                    "name": "Organization",
+                    "value": ""
+                },
+                {
+                    "name": "Department",
+                    "value": ""
+                },
+                {
+                    "name": "Event_date",
+                    "value": ""
+                },
+                {
+                    "name": "Semester",
+                    "value": ""
+                },
+                {
+                    "name": "Topic",
+                    "value": ""
+                },
+                {
+                    "name": "Level",
+                    "value": ""
+                },
+                {
+                    "name": "Audience",
+                    "value": ""
+                },
+                {
+                    "name": "Room",
+                    "value": ""
+                },
+                {
+                    "name": "Category",
+                    "value": ""
+                },
+                {
+                    "name": "Presenter",
+                    "value": ""
+                },
+                {
+                    "name": "Section",
+                    "value": ""
+                },
+                {
+                    "name": "Description",
+                    "value": ""
+                }
+            ],
+            "other_files": []
+        }
+    ]
+}

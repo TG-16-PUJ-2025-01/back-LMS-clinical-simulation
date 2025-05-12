@@ -76,10 +76,6 @@ public class ClassService {
             ClassModel classModel = classRepository.findById(id).get();
             Page<User> members = classRepository.findMembers(id, filter, pageable);
 
-            //iterar sobre los miembros de la clase y manipular el rol
-            //si pertenece a profesor, se le asigna el rol de profesor
-            //si pertenece a estudiante, se le asigna el rol de estudiante
-
             members.forEach(user -> {
                 if(classModel.getProfessors().contains(user))
                 {

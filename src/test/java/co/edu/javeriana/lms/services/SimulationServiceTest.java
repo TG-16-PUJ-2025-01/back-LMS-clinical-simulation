@@ -2,6 +2,8 @@ package co.edu.javeriana.lms.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
@@ -26,9 +28,12 @@ import org.springframework.test.context.ActiveProfiles;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
+import co.edu.javeriana.lms.booking.repositories.RoomRepository;
 import co.edu.javeriana.lms.grades.dtos.EvaluatedCriteriaDto;
 import co.edu.javeriana.lms.grades.dtos.RubricDto;
 import co.edu.javeriana.lms.grades.models.*;
+import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
+import co.edu.javeriana.lms.practices.dtos.TimeSlotDto;
 import co.edu.javeriana.lms.practices.models.*;
 import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
 import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
@@ -52,6 +57,9 @@ public class SimulationServiceTest {
 
     @Mock
     private RubricRepository rubricRepository;
+
+    @Mock
+    private RoomRepository roomRepository;
 
     private static Simulation mockSimulation;
     private static Practice mockPractice;
@@ -259,11 +267,11 @@ public class SimulationServiceTest {
                 .groupNumber(3)
                 .practice(mockPractice)
                 .build();
-    
+
         // Configurar mock para findById
         when(simulationRepository.findById(3L))
                 .thenReturn(Optional.of(simulationWithoutRubric));
-    
+
         // Configurar mock para save de Rubric
         when(rubricRepository.save(any(Rubric.class)))
                 .thenAnswer(invocation -> {
@@ -271,22 +279,22 @@ public class SimulationServiceTest {
                     r.setRubricId(1L); // Asignar ID mock
                     return r;
                 });
-    
+
         // Configurar mock para save de Simulation
         when(simulationRepository.save(any(Simulation.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
-    
+
         // 2. Ejecución
         Rubric result = simulationService.updateSimulationRubric(3L, mockRubricDto);
-    
+
         // 3. Verificaciones
         assertNotNull(result);
         assertEquals(1L, result.getRubricId());
-        
+
         // Verificar que la simulación tiene la rúbrica
         assertNotNull(simulationWithoutRubric.getRubric());
         assertEquals(result, simulationWithoutRubric.getRubric());
-        
+
         // Verificar relación inversa
         assertEquals(simulationWithoutRubric, result.getSimulation());
     }
@@ -334,28 +342,122 @@ public class SimulationServiceTest {
                 .groupNumber(1)
                 .practice(mockPractice)
                 .build();
-    
+
         List<Simulation> simulations = Collections.singletonList(expectedSimulation);
         Page<Simulation> mockPage = new PageImpl<>(simulations, PageRequest.of(0, 10), simulations.size());
-    
+
         when(practiceRepository.findById(1L))
                 .thenReturn(Optional.of(mockPractice));
         when(simulationRepository.findByPracticeIdAndGroupNumber(1L, 1, PageRequest.of(0, 10)))
                 .thenReturn(mockPage);
-    
+
         // When - Llamamos sin parámetros sort/asc
         Page<Simulation> result = simulationService.findSimulationsByPracticeId(
                 1L, 0, 10, null, null, 1);
-    
+
         // Then
         assertEquals(1, result.getTotalElements());
         Simulation actualSimulation = result.getContent().get(0);
         assertEquals(1L, actualSimulation.getSimulationId());
         assertEquals(1, actualSimulation.getGroupNumber());
         assertEquals(mockPractice, actualSimulation.getPractice());
-        
+
         verify(practiceRepository, times(1)).findById(1L);
         verify(simulationRepository, times(1))
                 .findByPracticeIdAndGroupNumber(1L, 1, PageRequest.of(0, 10));
+    }
+
+    @Test
+    public void testAddSimulations() {
+        // Given
+        when(practiceRepository.findById(1L))
+                .thenReturn(Optional.of(mockPractice));
+        when(simulationRepository.save(any(Simulation.class)))
+                .thenReturn(mockSimulation);
+
+        // When
+        List<Simulation> result = simulationService.addSimulations(List.of(SimulationByTimeSlotDto.builder()
+                .startDateTime(mockSimulation.getStartDateTime())
+                .endDateTime(mockSimulation.getEndDateTime())
+                .practiceId(1L)
+                .roomIds(List.of(1L))
+                .build()));
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(1L, result.get(0).getSimulationId());
+    }
+
+    @Test
+    public void testUpdateSimulation() {
+        // Given
+        when(simulationRepository.findById(1L))
+                .thenReturn(Optional.of(mockSimulation));
+        when(simulationRepository.save(any(Simulation.class)))
+                .thenReturn(mockSimulation);
+        when(simulationRepository.isRoomAvailable(eq(mockRoom), any(Date.class), any(Date.class))).thenReturn(true);
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(mockRoom));
+
+        // When
+        Simulation result = simulationService.updateSimulation(1L, SimulationByTimeSlotDto.builder()
+                .startDateTime(mockSimulation.getStartDateTime())
+                .endDateTime(mockSimulation.getEndDateTime())
+                .practiceId(1L)
+                .roomIds(List.of(1L))
+                .build());
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1L, result.getSimulationId());
+        assertEquals(mockPractice, result.getPractice());
+    }
+
+    @Test
+    public void testDeleteSimulationById() {
+        // Given
+        when(simulationRepository.existsById(1L))
+                .thenReturn(true);
+
+        // When
+        simulationService.deleteSimulationById(1L);
+
+        // Then
+        verify(simulationRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void testDeleteSimulationByIdNotFound() {
+        // Given
+        when(simulationRepository.existsById(99L))
+                .thenReturn(false);
+
+        // When / Then
+        assertThrows(EntityNotFoundException.class, () -> {
+            simulationService.deleteSimulationById(99L);
+        });
+    }
+
+    @Test
+    public void testFindSimulationsSchedule() {
+        String mockDate = "2023-10-01T09:00:00Z";
+        // Given
+        List<Simulation> simulations = Arrays.asList(
+                mockSimulation,
+                Simulation.builder()
+                        .simulationId(2L)
+                        .groupNumber(2)
+                        .practice(mockPractice)
+                        .build());
+
+        when(simulationRepository.findByPracticeInAndStartDateTimeBetween(
+                anyList(), any(Date.class), any(Date.class)))
+                .thenReturn(simulations);
+
+        // When
+        List<TimeSlotDto> result = simulationService.findSimulationsSchedule(mockDate);
+
+        // Then
+        assertEquals(2, result.size());
     }
 }

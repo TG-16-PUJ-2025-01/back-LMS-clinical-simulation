@@ -2,7 +2,11 @@ package co.edu.javeriana.lms.videos.services;
 
 import java.io.IOException;
 import java.net.HttpCookie;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -10,10 +14,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 
@@ -25,35 +26,22 @@ import co.edu.javeriana.lms.videos.dtos.ArecVideosResponseDto;
 import co.edu.javeriana.lms.videos.models.Video;
 import co.edu.javeriana.lms.videos.repositories.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
 public class ArecService {
-
     @Value("${AREC_USERNAME}")
     private String AREC_USERNAME;
-
     @Value("${AREC_PASSWORD}")
     private String AREC_PASSWORD;
-
     private static final String AREC_LOGIN_PATH = "/api/login";
     private static final String AREC_RECORDINGS_PATH = "/api/recording";
-
-    private Gson gson;
-
-    private final WebClient webClient;
 
     @Autowired
     private VideoRepository videoRepository;
 
     @Autowired
     private SimulationRepository simulationRepository;
-
-    public ArecService(WebClient webClient) {
-        this.webClient = webClient;
-        gson = new Gson();
-    }
 
     public String encodeCredentials(String username, String password) {
         return Base64.getEncoder()
@@ -63,58 +51,83 @@ public class ArecService {
     public ArecLoginResponseDto loginToArec(String ipAddress)
             throws URISyntaxException, IOException, InterruptedException {
         log.info("Logging in to Arec with username: {}", AREC_USERNAME);
+        Gson gson = new Gson();
+
         String base64Auth = encodeCredentials(AREC_USERNAME, AREC_PASSWORD);
-        ArecLoginRequestDto body = new ArecLoginRequestDto(AREC_USERNAME, base64Auth, "javeriana", "0");
-        log.info("Request body JSON: {}", gson.toJson(body));
 
-        return webClient.post()
-                .uri("http://" + ipAddress + AREC_LOGIN_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(body)
-                .exchangeToMono(response -> {
-                    String setCookie = response.headers().asHttpHeaders().getFirst(HttpHeaders.SET_COOKIE);
-                    ArecLoginResponseDto dto = new ArecLoginResponseDto();
+        String req = gson.toJson(new ArecLoginRequestDto(AREC_USERNAME, base64Auth, "javeriana", "0"));
+        log.info("Request to Arec: {}", req);
 
-                    if (setCookie != null) {
-                        List<HttpCookie> cookies = HttpCookie.parse(setCookie);
-                        for (HttpCookie cookie : cookies) {
-                            if ("session".equals(cookie.getName())) {
-                                dto.setSession(cookie.getValue());
-                            }
-                        }
-                    }
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI("http://" + ipAddress + AREC_LOGIN_PATH))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(req))
+                .build();
 
-                    return Mono.just(dto);
-                })
-                .block();
+                HttpClient client = HttpClient.newHttpClient();
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        log.info("Response from Arec: {}", response.body());
+        log.info("Response status code: {}", response.statusCode());
+        log.info("Response headers: {}", response.headers().map());
+
+        String setCookieHeader = response.headers().firstValue("Set-Cookie")
+                .orElseThrow(() -> new RuntimeException("No Set-Cookie header found"));
+        log.info("Set-Cookie headers: {}", setCookieHeader);
+
+        ArecLoginResponseDto cookies = new ArecLoginResponseDto();
+
+        log.info("Set-Cookie: {}", setCookieHeader);
+
+        List<HttpCookie> setCookies = HttpCookie.parse(setCookieHeader);
+        for (HttpCookie setCookie : setCookies) {
+            log.info("Name: " + setCookie.getName());
+            log.info("Value: " + setCookie.getValue());
+            log.info("Domain: " + setCookie.getDomain());
+            log.info("Path: " + setCookie.getPath());
+            log.info("Max Age: " + setCookie.getMaxAge());
+            log.info("Secure: " + setCookie.getSecure());
+            log.info("HttpOnly: " + setCookie.isHttpOnly());
+            log.info("Version: " + setCookie.getVersion());
+            log.info("Comment: " + setCookie.getComment());
+            if (setCookie.getName().equals("session")) {
+                cookies.setSession(setCookie.getValue());
+            }
+        }
+
+        return cookies;
     }
 
     public ArecVideosResponseDto fetchVideos(String ipAddress)
             throws URISyntaxException, IOException, InterruptedException {
         log.info("Getting videos from Arec");
+        Gson gson = new Gson();
 
         ArecLoginResponseDto cookies = loginToArec(ipAddress);
-        log.info("Session cookie: {}", cookies.getSession());
 
-        ArecVideosResponseDto res = webClient.get()
-                .uri("http://" + ipAddress + AREC_RECORDINGS_PATH)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.COOKIE, "session=" + cookies.getSession())
-                .retrieve()
-                .bodyToMono(ArecVideosResponseDto.class)
-                .block();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI("http://" + ipAddress + AREC_RECORDINGS_PATH))
+                .header("Content-Type", "application/json")
+                .header("Cookie", "session=" + cookies.getSession())
+                .GET()
+                .build();
 
-        log.info("Response from Arec: {}", gson.toJson(res));
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        ArecVideosResponseDto res = gson.fromJson(response.body(), ArecVideosResponseDto.class);
+
+        log.info("Response from Arec: {}", response.body());
         log.info("Total videos: {}", res.getPageInfo().getTotal());
 
         if (res.getPageInfo().getTotal() != res.getPageInfo().getCount()) {
-            res = webClient.get()
-                    .uri("http://" + ipAddress + AREC_RECORDINGS_PATH + "?per_page=" + res.getPageInfo().getTotal())
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .header(HttpHeaders.COOKIE, "session=" + cookies.getSession())
-                    .retrieve()
-                    .bodyToMono(ArecVideosResponseDto.class)
-                    .block();
+            request = HttpRequest.newBuilder()
+                    .uri(new URI(
+                            "http://" + ipAddress + AREC_RECORDINGS_PATH + "?per_page=" + res.getPageInfo().getTotal()))
+                    .header("Content-Type", "application/json")
+                    .header("Cookie", "session=" + cookies.getSession())
+                    .GET()
+                    .build();
         }
         return res;
     }

@@ -1,217 +1,69 @@
 package co.edu.javeriana.lms.services;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import com.google.gson.Gson;
-
+import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
-import co.edu.javeriana.lms.videos.dtos.ArecLoginRequestDto;
-import co.edu.javeriana.lms.videos.dtos.ArecLoginResponseDto;
 import co.edu.javeriana.lms.videos.dtos.ArecVideosResponseDto;
 import co.edu.javeriana.lms.videos.models.Video;
 import co.edu.javeriana.lms.videos.repositories.VideoRepository;
 import co.edu.javeriana.lms.videos.services.ArecService;
-import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class ArecServiceTest {
 
-        // private ArecService arecService;
+    @InjectMocks
+    private ArecService arecService;
 
-        // @Mock
-        // WebClient webClient;
+    @Mock
+    private VideoRepository videoRepository;
 
-        // @Mock
-        // private WebClient.RequestBodyUriSpec requestBodyUriSpec;
+    @Mock
+    private SimulationRepository simulationRepository;
 
-        // @Mock
-        // private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
+    @Test
+    public void testAssociateVideoWithSimulation() throws URISyntaxException, IOException, InterruptedException {
+        Long roomId = 1L;
+        String videoName = "videoName";
+        Long simulationId = 2L;
+        Video video = Video.builder()
+                .name("Test Video")
+                .recordingDate(new Date())
+                .duration(10L)
+                .size(100.0)
+                .videoUrl("playbackUrl")
+                .available(true)
+                .comments(List.of())
+                .build();
 
-        // @Mock
-        // private WebClient.RequestBodySpec requestBodySpec;
+        ArecVideosResponseDto.Video arecVideo = new ArecVideosResponseDto.Video("Test Video", 10.0, new Date(), new Date(),
+                "finished", List.of(new ArecVideosResponseDto.VideoMetadata("Movie", "playbackUrl",
+                        "downloadUrl", 10.0, "thumbnail")));
 
-        // @Mock
-        // private WebClient.RequestHeadersSpec requestHeadersSpec;
+        when(videoRepository.findByName(videoName)).thenReturn(Optional.empty());
+        when(simulationRepository.findAllByRooms_IdAndStartDateTimeAfterAndEndDateTimeBefore(eq(roomId), any(), any()))
+                .thenReturn(List.of(Simulation.builder()
+                        .simulationId(simulationId)
+                        .build()));
+        when(videoRepository.save(any(Video.class))).thenReturn(video);
 
-        // @Mock
-        // private WebClient.RequestHeadersSpec requestHeadersSpec2;
-
-        // @Mock
-        // private WebClient.ResponseSpec responseSpec;
-
-        // @Mock
-        // private WebClient.ResponseSpec responseSpec2;
-
-        // @Mock
-        // private VideoRepository videoRepository;
-
-        // @Mock
-        // private SimulationRepository simulationRepository;
-
-        // private static final String mockIp = "mockIp";
-        // private Gson gson;
-
-        // @BeforeEach
-        // public void setUp() {
-        //         gson = new Gson();
-        //         arecService = new ArecService(webClient);
-        // }
-
-        // @Test
-        // public void testLogin() throws URISyntaxException, IOException, InterruptedException {
-        //         ArecLoginResponseDto login = new ArecLoginResponseDto("abc123");
-
-        //         when(webClient.post())
-        //                         .thenReturn(requestBodyUriSpec);
-        //         when(requestBodyUriSpec.uri("http://mockIp/api/login"))
-        //                         .thenReturn(requestBodySpec);
-        //         when(requestBodySpec.contentType(MediaType.APPLICATION_JSON))
-        //                         .thenReturn(requestBodySpec);
-        //         when(requestBodySpec.bodyValue(any(ArecLoginRequestDto.class)))
-        //                         .thenReturn(requestHeadersSpec);
-        //         when(requestHeadersSpec.exchangeToMono(any()))
-        //                         .thenReturn(Mono.just(login));
-
-        //         ArecLoginResponseDto response = arecService.loginToArec(mockIp);
-
-        //         assert response != null;
-        //         assert response.getSession().equals(login.getSession());
-        // }
-
-        // @Test
-        // public void testFetchVideos() throws URISyntaxException, IOException, InterruptedException {
-        //         ArecLoginResponseDto login = new ArecLoginResponseDto("abc123");
-
-        //         when(webClient.post())
-        //                         .thenReturn(requestBodyUriSpec);
-        //         when(requestBodyUriSpec.uri("http://mockIp/api/login"))
-        //                         .thenReturn(requestBodySpec);
-        //         when(requestBodySpec.contentType(MediaType.APPLICATION_JSON))
-        //                         .thenReturn(requestBodySpec);
-        //         when(requestBodySpec.bodyValue(any(ArecLoginRequestDto.class)))
-        //                         .thenReturn(requestHeadersSpec);
-        //         when(requestHeadersSpec.exchangeToMono(any()))
-        //                         .thenReturn(Mono.just(login));
-
-        //         String jsonResponse = new String(
-        //                         Files.readAllBytes(Paths.get("./src/test/resources/arecVideosResponse.json")));
-        //         ArecVideosResponseDto response = gson.fromJson(jsonResponse, ArecVideosResponseDto.class);
-
-        //         when(webClient.get())
-        //                         .thenReturn(requestHeadersUriSpec);
-        //         when(requestHeadersUriSpec.uri("http://mockIp/api/recording"))
-        //                         .thenReturn(requestHeadersSpec);
-        //         when(requestHeadersSpec.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-        //                         .thenReturn(requestHeadersSpec);
-        //         when(requestHeadersSpec.header(HttpHeaders.COOKIE, "session=" + login.getSession()))
-        //                         .thenReturn(requestHeadersSpec);
-        //         when(requestHeadersSpec.retrieve())
-        //                         .thenReturn(responseSpec);
-        //         when(responseSpec.bodyToMono(ArecVideosResponseDto.class))
-        //                         .thenReturn(Mono.just(response));
-
-        //         ArecVideosResponseDto result = arecService.fetchVideos(mockIp);
-
-        //         assert result != null;
-        //         assert result.equals(response);
-        // }
-
-        // @Test
-        // public void testFetchVideosDifferentCount() throws URISyntaxException, IOException, InterruptedException {
-        //         ArecLoginResponseDto login = new ArecLoginResponseDto("abc123");
-
-        //         when(webClient.post())
-        //                         .thenReturn(requestBodyUriSpec);
-        //         when(requestBodyUriSpec.uri("http://mockIp/api/login"))
-        //                         .thenReturn(requestBodySpec);
-        //         when(requestBodySpec.contentType(MediaType.APPLICATION_JSON))
-        //                         .thenReturn(requestBodySpec);
-        //         when(requestBodySpec.bodyValue(any(ArecLoginRequestDto.class)))
-        //                         .thenReturn(requestHeadersSpec);
-        //         when(requestHeadersSpec.exchangeToMono(any()))
-        //                         .thenReturn(Mono.just(login));
-
-        //         String jsonResponse = new String(
-        //                         Files.readAllBytes(Paths.get("./src/test/resources/arecVideosResponse.json")));
-        //         ArecVideosResponseDto response = gson.fromJson(jsonResponse, ArecVideosResponseDto.class);
-        //         String jsonResponse2 = new String(
-        //                         Files.readAllBytes(Paths.get("./src/test/resources/arecVideosResponse2.json")));
-        //         ArecVideosResponseDto response2 = gson.fromJson(jsonResponse2, ArecVideosResponseDto.class);
-
-        //         when(webClient.get())
-        //                         .thenReturn(requestHeadersUriSpec);
-        //         when(requestHeadersUriSpec.uri("http://mockIp/api/recording"))
-        //                         .thenReturn(requestHeadersSpec);
-        //         when(requestHeadersSpec.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-        //                         .thenReturn(requestHeadersSpec);
-        //         when(requestHeadersSpec.header(HttpHeaders.COOKIE, "session=" + login.getSession()))
-        //                         .thenReturn(requestHeadersSpec);
-        //         when(requestHeadersSpec.retrieve())
-        //                         .thenReturn(responseSpec);
-        //         when(responseSpec.bodyToMono(ArecVideosResponseDto.class))
-        //                         .thenReturn(Mono.just(response));
-
-        //         when(webClient.get())
-        //                         .thenReturn(requestHeadersUriSpec);
-        //         when(requestHeadersUriSpec
-        //                         .uri("http://mockIp/api/recording?per_page=" + response2.getPageInfo().getTotal()))
-        //                         .thenReturn(requestHeadersSpec2);
-        //         when(requestHeadersSpec2.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-        //                         .thenReturn(requestHeadersSpec2);
-        //         when(requestHeadersSpec2.header(HttpHeaders.COOKIE, "session=" + login.getSession()))
-        //                         .thenReturn(requestHeadersSpec2);
-        //         when(requestHeadersSpec2.retrieve())
-        //                         .thenReturn(responseSpec2);
-        //         when(responseSpec2.bodyToMono(ArecVideosResponseDto.class))
-        //                         .thenReturn(Mono.just(response2));
-
-        //         ArecVideosResponseDto result = arecService.fetchVideos(mockIp);
-
-        //         assert result != null;
-        //         assert result.equals(response);
-        // }
-
-        // @Test
-        // public void testAssociateVideoWithSimulation() throws URISyntaxException, IOException, InterruptedException {
-        //         Long roomId = 1L;
-        //         String videoName = "videoName";
-        //         String simulationId = "simulationId";
-        //         Video video = Video.builder()
-        //                         .name("Test Video")
-        //                         .build();
-
-        //         ArecVideosResponseDto.Video arecVideo = new ArecVideosResponseDto.Video("Test Video", 10.0, null, null,
-        //                         "finished", List.of(new ArecVideosResponseDto.VideoMetadata("channel", "playbackUrl",
-        //                                         "downloadUrl", 10.0, "thumbnail")));
-
-        //         when(videoRepository.findByName(videoName)).thenReturn(Optional.empty());
-        //         when(simulationRepository.findAllByRooms_IdAndStartDateTimeAfterAndEndDateTimeBefore(roomId, any(), any()))
-        //                         .thenReturn(List.of());
-        //         when(videoRepository.save(any(Video.class))).thenReturn(video);
-
-        //         arecService.associateVideoWithSimulation(roomId, arecVideo);
-
-        //         // Verify that the video and simulation were associated correctly
-        //         // Add your assertions here if needed
-        // }
+        arecService.associateVideoWithSimulation(roomId, arecVideo);
+    }
 }

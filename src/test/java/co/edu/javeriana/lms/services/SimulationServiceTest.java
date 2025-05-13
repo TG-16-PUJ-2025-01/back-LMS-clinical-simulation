@@ -2,10 +2,10 @@ package co.edu.javeriana.lms.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -396,7 +396,8 @@ public class SimulationServiceTest {
                 .thenReturn(Optional.of(mockSimulation));
         when(simulationRepository.save(any(Simulation.class)))
                 .thenReturn(mockSimulation);
-        when(simulationRepository.isRoomAvailable(eq(mockRoom), any(Date.class), any(Date.class))).thenReturn(true);
+        when(simulationRepository.isRoomAvailable(eq(mockRoom), any(Date.class), any(Date.class)))
+                .thenReturn(true);
         when(roomRepository.findById(1L)).thenReturn(Optional.of(mockRoom));
 
         // When
@@ -448,10 +449,13 @@ public class SimulationServiceTest {
                         .simulationId(2L)
                         .groupNumber(2)
                         .practice(mockPractice)
+                        .rooms(List.of(mockRoom))
+                        .startDateTime(Date.from(Instant.parse(mockDate)))
+                        .endDateTime(Date.from(Instant.parse(mockDate).plusSeconds(3600)))
                         .build());
 
-        when(simulationRepository.findByPracticeInAndStartDateTimeBetween(
-                anyList(), any(Date.class), any(Date.class)))
+        when(simulationRepository.findByStartDateTimeBetween(
+                any(Date.class), any(Date.class)))
                 .thenReturn(simulations);
 
         // When
@@ -459,5 +463,7 @@ public class SimulationServiceTest {
 
         // Then
         assertEquals(2, result.size());
+        assertEquals(mockRoom.getName(), result.get(0).getRoom());
+        assertEquals(mockRoom.getName(), result.get(1).getRoom());
     }
 }

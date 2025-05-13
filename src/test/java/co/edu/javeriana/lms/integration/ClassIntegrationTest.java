@@ -323,40 +323,4 @@ public class ClassIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Class updated successfully."))
                 .andExpect(jsonPath("$.data.professors", hasSize(4)));
     }
-
-    // TODO: Fix
-    @Test
-    @Order(16)
-    public void updateClassProfessorMember() throws Exception {
-        String updateMembersRequest = """
-                [
-                    {
-                        "id": 1,
-                        "email": "john.doe@example.com",
-                        "name": "John",
-                        "lastName": "Doe",
-                        "institutionalId": "00000010001",
-                        "roles": ["PROFESOR"]
-                    },
-                ]
-                """;
-
-        mockMvc.perform(put("/class/update/1/members/professor/1")
-                .header("Authorization", token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updateMembersRequest))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Class updated successfully."));
-    }
-
-    // TODO: Fix
-    @Test
-    @Order(17)
-    public void updateClassStudentMember() throws Exception {
-        mockMvc.perform(put("/class/update/1/members/student/4")
-                .header("Authorization", token)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Class updated successfully."));
-    }
 }

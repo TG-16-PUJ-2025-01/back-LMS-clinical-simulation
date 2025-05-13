@@ -99,7 +99,7 @@ public class ArecService {
         ArecVideosResponseDto res = webClient.get()
                 .uri("http://" + ipAddress + AREC_RECORDINGS_PATH)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.COOKIE, "session=" + cookies.getSession())
+                .cookie("session", cookies.getSession())
                 .retrieve()
                 .bodyToMono(ArecVideosResponseDto.class)
                 .block();
@@ -111,7 +111,7 @@ public class ArecService {
             res = webClient.get()
                     .uri("http://" + ipAddress + AREC_RECORDINGS_PATH + "?per_page=" + res.getPageInfo().getTotal())
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .header(HttpHeaders.COOKIE, "session=" + cookies.getSession())
+                    .cookie("session", cookies.getSession())
                     .retrieve()
                     .bodyToMono(ArecVideosResponseDto.class)
                     .block();

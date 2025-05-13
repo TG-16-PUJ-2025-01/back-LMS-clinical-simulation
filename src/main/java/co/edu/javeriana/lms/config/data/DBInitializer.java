@@ -625,6 +625,7 @@ public class DBInitializer implements CommandLineRunner {
 					simulation.setGradeStatus(GradeStatus.PENDING);
 				}
 				simulation = simulationRepository.save(simulation);
+				if (simulation.getSimulationId() == 1L) continue;
 				Random random = new Random();
 				if (practice.getRubricTemplate() != null) {
 					AtomicInteger index = new AtomicInteger(0);

@@ -25,7 +25,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ghcr.io/tg-16-puj-2025-01/back-lms-clinical-simulation:latest
+      run: docker build . --file Dockerfile --tag ghcr.io/santicm23/back-lms-clinical-simulation:latest
 
     - name: Push the Docker image
-      run: docker push ghcr.io/tg-16-puj-2025-01/back-lms-clinical-simulation:latest
+      run: docker push ghcr.io/santicm23/back-lms-clinical-simulation:latest

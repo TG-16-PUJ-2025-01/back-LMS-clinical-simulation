@@ -104,7 +104,7 @@ public class SimulationServiceTest {
                 .description("Descripción de la práctica 1")
                 .type(PracticeType.GRUPAL)
                 .gradeable(true)
-                .numberOfGroups(3)
+                .numberOfGroups(1)
                 .maxStudentsGroup(3)
                 .simulationDuration(30)
                 .gradePercentage(30f)
@@ -374,6 +374,10 @@ public class SimulationServiceTest {
                 .thenReturn(Optional.of(mockPractice));
         when(simulationRepository.save(any(Simulation.class)))
                 .thenReturn(mockSimulation);
+        when(roomRepository.findById(1L))
+                .thenReturn(Optional.of(mockRoom));
+        when(simulationRepository.isRoomAvailable(eq(mockRoom), any(Date.class), any(Date.class)))
+                .thenReturn(true);
 
         // When
         List<Simulation> result = simulationService.addSimulations(List.of(SimulationByTimeSlotDto.builder()
@@ -385,8 +389,8 @@ public class SimulationServiceTest {
 
         // Then
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(1L, result.get(0).getSimulationId());
+        assertEquals(2, result.size());
+        assertEquals(1, result.get(0).getGroupNumber());
     }
 
     @Test

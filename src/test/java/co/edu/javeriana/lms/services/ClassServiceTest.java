@@ -58,6 +58,7 @@ public class ClassServiceTest {
 
     private static User mockCoordinator;
     private static User mockProfessor;
+    private static User mockProfessor2;
     private static User mockStudent1;
     private static User mockStudent2;
     private static Course mockCourse;
@@ -65,6 +66,7 @@ public class ClassServiceTest {
     private static ClassModel mockClass1;
     private static ClassModel mockClass2;
     private static Page<ClassModel> mockClassesPage;
+    private static Page<User> mockProfessorsPage;
     private static Page<User> mockUsersPage;
     private static ClassDto mockClassDto;
     private static List<ClassModel> mockClassModels;
@@ -93,6 +95,18 @@ public class ClassServiceTest {
                 .name("John")
                 .lastName("Smith")
                 .institutionalId("00032314")
+                .build();
+
+        // Mock Professor 2
+        mockProfessor2 = User.builder()
+                .id(5L)
+                .email("test.example@gmail.com")
+                .password("password123")
+                .roles(new HashSet<>(Set.of(Role.PROFESOR)))
+                .preferredRole(Role.PROFESOR)
+                .name("Test")
+                .lastName("Example")
+                .institutionalId("00032317")
                 .build();
 
         // Mock Students
@@ -185,6 +199,10 @@ public class ClassServiceTest {
 
         List<User> mockUsers = List.of(mockStudent1, mockStudent2);
         mockUsersPage = new PageImpl<>(mockUsers, PageRequest.of(0, 10, Sort.by("name").ascending()), mockUsers.size());
+
+        List<User> mockProfessors = List.of(mockProfessor, mockProfessor2);
+        mockProfessorsPage = new PageImpl<>(mockProfessors,
+                PageRequest.of(0, 10, Sort.by("name").ascending()), mockProfessors.size());
     }
 
     @BeforeEach
@@ -257,8 +275,8 @@ public class ClassServiceTest {
     @Test
     public void testFindAllProfessorsMembers() {
         // Mock the repository behavior
-        when(classRepository.findProfessorsMembers(1L, "", mockUsersPage.getPageable()))
-                .thenReturn(mockUsersPage);
+        when(classRepository.findProfessorsMembers(1L, "", mockProfessorsPage.getPageable()))
+                .thenReturn(mockProfessorsPage);
 
         // Act
         Page<User> result = classService.findAllMembers("", 0, 10, "name", true, 1L, Role.PROFESOR.name());
@@ -266,12 +284,12 @@ public class ClassServiceTest {
         // Assert
         assert (result.getTotalElements() == 2);
         assert (result.getContent().size() == 2);
-        assert (result.getContent().get(0).getId().equals(mockStudent1.getId()));
-        assert (result.getContent().get(1).getId().equals(mockStudent2.getId()));
+        assert (result.getContent().get(0).getId().equals(mockProfessor.getId()));
+        assert (result.getContent().get(1).getId().equals(mockProfessor2.getId()));
         assert (result.getNumber() == 0);
         assert (result.getSize() == 10);
         assert (result.getTotalPages() == 1);
-        assert (result.getSort().equals(mockUsersPage.getSort()));
+        assert (result.getSort().equals(mockProfessorsPage.getSort()));
         assert (!result.hasPrevious());
         assert (!result.hasNext());
     }

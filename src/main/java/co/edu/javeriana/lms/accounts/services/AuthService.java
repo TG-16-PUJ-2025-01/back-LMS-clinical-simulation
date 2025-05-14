@@ -45,9 +45,9 @@ public class AuthService {
         log.info("Changing password for token: " + token);
         String email = jwtService.extractUserName(token);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new IllegalArgumentException("Invalid credentials");
         }
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);

@@ -106,7 +106,6 @@ public class VideoIntegrationTest {
     @BeforeEach
     public void setup() throws Exception {
         token = getAuthTokenString();
-        System.out.println("Token: " + token);
     }
 
     @Test

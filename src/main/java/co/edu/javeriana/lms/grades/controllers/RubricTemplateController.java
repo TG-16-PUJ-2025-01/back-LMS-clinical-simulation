@@ -156,20 +156,6 @@ public class RubricTemplateController {
                 }
         }
 
-        // add new courses to the rubric template if the rubric is only used and not
-        // edited
-        @Valid
-        @PutMapping("/{id}/courses")
-        public ResponseEntity<?> updateRubricCourses(@RequestBody List<Course> courses, @PathVariable Long id) {
-
-                log.info("Updating rubric template with ID: " + id);
-
-                RubricTemplate rubricTemplateUpdated = rubricTemplateService.updateRubricTemplateCourses(courses, id);
-
-                return ResponseEntity.ok(new ApiResponseDto<RubricTemplate>(HttpStatus.OK.value(),
-                                "Course updated successfully.", rubricTemplateUpdated, null));
-        }
-
         // return the suggested rubrics if the practice is part of a chosen course
         @GetMapping("/recommended/{idPractice}")
         public ResponseEntity<?> getRecommendedRubricTemplatesByPracticeId(@PathVariable Long idPractice) {

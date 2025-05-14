@@ -2,7 +2,6 @@ package co.edu.javeriana.lms.subjects.services;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.grades.models.RubricTemplate;
@@ -51,20 +49,22 @@ public class CourseService {
     }
 
     public Course findById(Long id) {
-
-        return courseRepository.findById(id).get();
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Course with ID " + id + " not found"));
     }
 
     public Course save(CourseDto course) {
-        Optional<User> coordinator = userRepository.findById(course.getCoordinatorId());
-
-        if (coordinator.isEmpty()
-                || coordinator.get().getRoles().stream().noneMatch(role -> role.equals(Role.COORDINADOR))) {
-            throw new EntityNotFoundException("Coordinator with ID " + course.getCoordinatorId() + " not found");
+        // Check if the JaverianaId already exists
+        boolean javerianaIdExists = courseRepository.findByJaverianaId(course.getJaverianaId()).isPresent();
+        if (javerianaIdExists) {
+            throw new EntityNotFoundException("Course with javeriana ID " + course.getJaverianaId() + " already exists");
         }
 
+        User coordinator = userRepository.findById(course.getCoordinatorId()).orElseThrow(() -> new EntityNotFoundException(
+                "Coordinator with ID " + course.getCoordinatorId() + " not found"));
+
         Course newCourse = new Course(course.getName(), course.getJaverianaId(),
-                userRepository.findById(course.getCoordinatorId()).get(), course.getFaculty(), course.getDepartment(),
+                coordinator, course.getFaculty(), course.getDepartment(),
                 course.getProgram(), course.getSemester());
 
         courseRepository.save(newCourse);
@@ -72,6 +72,10 @@ public class CourseService {
     }
 
     public void deleteById(Long id) {
+        if (!courseRepository.existsById(id)) {
+            throw new EntityNotFoundException("Course not found with id: " + id);
+        }
+
         courseRepository.deleteById(id);
     }
 
@@ -82,9 +86,24 @@ public class CourseService {
         Course currentCourseModel = courseRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Course with ID " + id + " not found"));
 
+        // Check if the JaverianaId is being updated and already exists in another course
+        if (!currentCourseModel.getJaverianaId().equals(course.getJaverianaId())) {
+            boolean javerianaIdExists = courseRepository.findByJaverianaId(course.getJaverianaId())
+                    .filter(existingCourse -> !existingCourse.getCourseId().equals(id))
+                    .isPresent();
+
+            if (javerianaIdExists) {
+                throw new EntityNotFoundException("Javeriana ID " + course.getJaverianaId() + " already exists");
+            }
+        }
+
+        // Check if the coordinator exists
+        User coordinator = userRepository.findById(course.getCoordinatorId())
+                .orElseThrow(() -> new EntityNotFoundException("Coordinator with ID " + course.getCoordinatorId() + " not found"));
+
         currentCourseModel.setName(course.getName());
         currentCourseModel.setJaverianaId(course.getJaverianaId());
-        currentCourseModel.setCoordinator(userRepository.findById(course.getCoordinatorId()).get());
+        currentCourseModel.setCoordinator(coordinator);
         currentCourseModel.setFaculty(course.getFaculty());
         currentCourseModel.setDepartment(course.getDepartment());
         currentCourseModel.setProgram(course.getProgram());
@@ -92,15 +111,12 @@ public class CourseService {
 
         courseRepository.save(currentCourseModel);
 
-        // log.info("Updating course with ID: " + currentCourseModel);
         return currentCourseModel;
     }
 
     public List<CourseDto> findAllCoordinatorCourses(String filter, String sort, Boolean asc, String email,
             String searsearchByKey, String period) {
         User coordinator = userRepository.findByEmail(email).get();
-
-        // Obtener los cursos del coordinador
 
         List<Course> coordinatorCourses = new ArrayList<>();
 
@@ -117,37 +133,26 @@ public class CourseService {
         for (Course course : coordinatorCourses) {
 
             List<ClassModel> sortedClasses = new ArrayList<>();
-            // Buscar las clases del curs o y ordenarlas por periodo de mayor a menor
             if (searsearchByKey.isEmpty() || searsearchByKey.equals("Asignaturas")) {
-                sortedClasses = classRepository.findClassesByCourseId(course, period); // Convertir el stream en lista
+                sortedClasses = classRepository.findClassesByCourseId(course, period);
 
             } else if (searsearchByKey.equals("Clases")) {
-                sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter, period); // Convertir
-                                                                                                                // el //
-                                                                                                                // lista
+                sortedClasses = classRepository.findClassesByCourseIdAndNameContaining(course, filter, period);
             } else {
-                sortedClasses = classRepository.findClassesByCourseByProfessorContaining(course, filter, period); // Convertir
-                // el stream // en lista
+                sortedClasses = classRepository.findClassesByCourseByProfessorContaining(course, filter, period);
             }
 
-            // Crear un CourseDto con las clases ordenadas
             courses.add(new CourseDto(course.getCourseId(), course.getJaverianaId(), course.getName(),
                     course.getCoordinator().getId(), sortedClasses.stream()
-                            .sorted((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod())) // Ordenar por periodo (mayor
-                                                                                          // // a menor)
+                            .sorted((c1, c2) -> c2.getPeriod().compareTo(c1.getPeriod()))
                             .toList(),
                     course.getFaculty(), course.getDepartment(), course.getProgram(),
                     course.getSemester()));
 
         }
 
-        // log.info("Courses found: " + courses.toString());
-
-        // enviar el resultado de mayor a menos numero de clases encontradas
         return courses.stream()
-                .sorted((c1, c2) -> Integer.compare(c2.getClasses().size(), c1.getClasses().size())) // Ordenar por
-                                                                                                     // periodo (mayor a
-                                                                                                     // menor)
+                .sorted((c1, c2) -> Integer.compare(c2.getClasses().size(), c1.getClasses().size()))
                 .toList();
     }
 

@@ -56,7 +56,7 @@ public class UserService implements UserDetailsService {
         String subject = "Bienvenido a LMS - Tus credenciales de acceso";
         String body = "Hola " + user.getEmail() + ",\n\nTu cuenta ha sido creada exitosamente.\n" +
                   "Tu contraseña temporal es: " + password + "\n\nPor favor, cambia tu contraseña después de iniciar sesión.";
-        emailService.sendEmail(user.getEmail(), subject, body);
+        new Thread(() -> emailService.sendEmail(user.getEmail(), subject, body)).start();
 
         return savedUser;
     }
@@ -73,7 +73,7 @@ public class UserService implements UserDetailsService {
         String subject = "Bienvenido a LMS - Tus credenciales de acceso";
         String body = "Hola " + user.getEmail() + ",\n\nTu cuenta ha sido creada exitosamente.\n" +
                   "Tu contraseña temporal es: " + password + "\n\nPor favor, cambia tu contraseña después de iniciar sesión.";
-        emailService.sendEmail(user.getEmail(), subject, body);
+        new Thread(() -> emailService.sendEmail(user.getEmail(), subject, body)).start();
 
         return savedUser;
     }

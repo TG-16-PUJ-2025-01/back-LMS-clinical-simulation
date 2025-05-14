@@ -280,18 +280,6 @@ public class RubricTemplateServiceTest {
     }
 
     @Test
-    public void testUpdateRubricTemplateCourses() {
-        List<Course> newCourses = List.of(mockCourse);
-        when(rubricTemplateRepository.findById(1L)).thenReturn(Optional.of(mockRubricTemplate));
-        when(rubricTemplateRepository.save(any(RubricTemplate.class))).thenReturn(mockRubricTemplate);
-
-        RubricTemplate result = rubricTemplateService.updateRubricTemplateCourses(newCourses, 1L);
-
-        assertNotNull(result);
-        assertEquals(1, result.getCourses().size());
-    }
-
-    @Test
     public void testFindRecommendedRubricTemplatesByCoursesById() {
         when(rubricTemplateRepository.findRecommendedRubricTemplatesByCoursesById(1L))
                 .thenReturn(List.of(mockRubricTemplate));

@@ -54,7 +54,7 @@ public class AuthService {
         String subject = "Cambio de contraseña LMS";
         String body = "Hola " + user.getEmail() + ",\n\nTu contraseña ha sido cambiada con éxito.\n" +
                 "Si no fuiste tú, por favor, contacta al administrador.";
-        emailService.sendEmail(user.getEmail(), subject, body);
+        new Thread(() -> emailService.sendEmail(user.getEmail(), subject, body)).start();
         String newToken = jwtService.generateToken(user);
         return newToken;
     }

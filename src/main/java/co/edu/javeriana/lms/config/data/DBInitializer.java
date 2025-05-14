@@ -523,12 +523,12 @@ public class DBInitializer implements CommandLineRunner {
 						"Descripción de la práctica 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.GRUPAL).gradeable(true).numberOfGroups(3).maxStudentsGroup(3)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(30).gradePercentage(30f)
-						.rubricTemplate(rubricTemplateRepository.findById(1L).get())
 						.build(),
 				Practice.builder().name("Práctica 2").description(
 						"Descripción de la práctica 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")
 						.type(PracticeType.INDIVIDUAL).gradeable(true).numberOfGroups(9).maxStudentsGroup(1)
 						.classModel(classRepository.findById(1L).get()).simulationDuration(15).gradePercentage(40f)
+						.rubricTemplate(rubricTemplateRepository.findById(1L).get())
 						.build(),
 				Practice.builder().name("Práctica 3").description(
 						"Descripción de la práctica 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi viverra dictum fermentum.")

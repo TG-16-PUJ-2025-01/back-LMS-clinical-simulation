@@ -105,6 +105,8 @@ public class ClassService {
         
         if(role.equals(Role.PROFESOR.name()))
         {
+            log.info("Buscando profesores no miembros de la clase con id: " + id);
+            log.info("Filtro: " + filter);
             return classRepository.findProfessorsNotInClass(id, filter, pageable).map(user -> {
                 user.getRoles().clear();
                 ArrayList<Role> roles = new ArrayList<>();
@@ -115,6 +117,8 @@ public class ClassService {
         }
         else if(role.equals(Role.ESTUDIANTE.name()))
         {
+            log.info("Buscando estudiantes no miembros de la clase con id: " + id);
+            log.info("Filtro: " + filter);
             return classRepository.findStudentsNotInClass(id, filter, pageable).map(user -> {
                 user.getRoles().clear();
                 ArrayList<Role> roles = new ArrayList<>();

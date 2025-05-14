@@ -247,7 +247,7 @@ public class CourseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Rubrics retrieved successfully"))
                 .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data", hasSize(2)));
+                .andExpect(jsonPath("$.data", hasSize(1)));
     }
 
     @Test

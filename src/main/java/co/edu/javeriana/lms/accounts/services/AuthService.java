@@ -52,8 +52,18 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         String subject = "Cambio de contraseña LMS";
-        String body = "Hola " + user.getEmail() + ",\n\nTu contraseña ha sido cambiada con éxito.\n" +
-                "Si no fuiste tú, por favor, contacta al administrador.";
+        String body = """
+        <html>
+        <body style="font-family: Arial, sans-serif; color: #333;">
+            <h2 style="color: #2c3e50;">Cambio de contraseña exitoso</h2>
+            <p>Hola <strong>%s</strong>,</p>
+            <p>Tu contraseña ha sido <strong>cambiada exitosamente</strong>.</p>
+            <p>Si no realizaste este cambio, por favor <span style="color: red;">contacta al administrador de inmediato</span>.</p>
+            <br>
+            <p style="font-size: small; color: #999;">Este es un mensaje automático del sistema LMS. Por favor, no respondas a este correo.</p>
+        </body>
+        </html>
+        """.formatted(user.getEmail());
         new Thread(() -> emailService.sendEmail(user.getEmail(), subject, body)).start();
         String newToken = jwtService.generateToken(user);
         return newToken;

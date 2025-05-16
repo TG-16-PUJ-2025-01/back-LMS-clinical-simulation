@@ -576,9 +576,9 @@ public class DBInitializer implements CommandLineRunner {
 		List<SimulationByTimeSlotDto> simulationsPractice2 = Arrays.asList(
 				SimulationByTimeSlotDto.builder().practiceId(2L)
 						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.plusWeeks(1L).atZone(ZoneId.systemDefault()).toInstant()))
+						.startDateTime(Date.from(baseDate.plusWeeks(3L).atZone(ZoneId.systemDefault()).toInstant()))
 						.endDateTime(Date.from(
-								baseDate.plusWeeks(1L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
+								baseDate.plusWeeks(3L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
 						.build());
 
 		simulationService.addSimulations(simulationsPractice2);
@@ -602,10 +602,20 @@ public class DBInitializer implements CommandLineRunner {
 
 		for (Practice practice : practices) {
 			List<User> tempUsers = new ArrayList<>(students);
+
 			int numberOfGroups = practice.getNumberOfGroups();
 			int maxStudentsGroup = practice.getMaxStudentsGroup();
 
-			// Create groups of students and assign them to simulations
+			// Para práctica con id 2, quito 4 usuarios para que dos grupos queden
+			// incompletos
+			if (practice.getId() == 2L) {
+				int totalToRemove = 4; // 2 estudiantes menos en dos grupos
+				// Solo quito al final del listado para simular que no hay suficientes usuarios
+				for (int r = 0; r < totalToRemove && !tempUsers.isEmpty(); r++) {
+					tempUsers.remove(tempUsers.size() - 1);
+				}
+			}
+
 			List<List<User>> groups = new ArrayList<>();
 			for (int i = 0; i < numberOfGroups; i++) {
 				List<User> group = new ArrayList<>();

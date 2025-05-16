@@ -51,9 +51,24 @@ public class ResetPasswordService {
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
         String subject = "Restablecer contraseña LMS";
-        String body = "Hola " + email + ",\n\nPara restablecer tu contraseña, utiliza el siguiente código: " + token + "\n\n" +
-                  "Si no solicitaste el cambio de contraseña, por favor, ignora este mensaje.";
-        emailService.sendEmail(email, subject, body);
+        String body = """
+        <html>
+        <body style="font-family: Arial, sans-serif; color: #333;">
+            <h2 style="color: #2c3e50;">Solicitud para restablecer tu contraseña</h2>
+            <p>Hola <strong>%s</strong>,</p>
+            <p>Hemos recibido una solicitud para restablecer tu contraseña en el sistema LMS.</p>
+            <p>Utiliza el siguiente código para continuar con el proceso:</p>
+            <div style="background-color: #f2f2f2; padding: 10px 20px; display: inline-block; font-size: 18px; font-weight: bold; border-radius: 6px; border: 1px solid #ccc;">
+            %s
+            </div>
+            <p style="margin-top: 20px;">Si no solicitaste este cambio, puedes ignorar este mensaje con seguridad.</p>
+            <hr>
+            <p style="font-size: small; color: #999;">Este es un mensaje automático del sistema LMS. Por favor, no respondas a este correo.</p>
+        </body>
+        </html>
+        """.formatted(email, token);
+
+        new Thread(() -> emailService.sendEmail(email, subject, body)).start();
     }
 
     public Boolean verifyResetToken (String email, String token) {
@@ -81,8 +96,19 @@ public class ResetPasswordService {
         userRepository.save(user);
         passwordResetTokenRepository.deleteByToken(token);
         String subject = "Cambio de contraseña LMS";
-        String body = "Hola " + user.getEmail() + ",\n\nTu contraseña ha sido cambiada con éxito.\n" +
-                    "Si no fuiste tú, por favor, contacta al administrador.";
-        emailService.sendEmail(user.getEmail(), subject, body);
+        String body = """
+        <html>
+        <body style="font-family: Arial, sans-serif; color: #333;">
+            <h2 style="color: #2c3e50;">Contraseña actualizada exitosamente</h2>
+            <p>Hola <strong>%s</strong>,</p>
+            <p>Te informamos que tu contraseña ha sido <strong>cambiada con éxito</strong>.</p>
+            <p>Si tú <u>no realizaste</u> este cambio, por favor contacta inmediatamente al administrador del sistema.</p>
+            <br>
+            <p style="font-size: small; color: #999;">Este es un mensaje automático generado por el sistema LMS. No respondas a este correo.</p>
+        </body>
+        </html>
+        """.formatted(user.getEmail());
+
+        new Thread(() -> emailService.sendEmail(user.getEmail(), subject, body)).start();
     }
 }

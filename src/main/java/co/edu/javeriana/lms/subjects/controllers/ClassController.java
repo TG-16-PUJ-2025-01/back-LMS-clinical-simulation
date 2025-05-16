@@ -57,7 +57,7 @@ public class ClassController {
                 classModelPage.getTotalElements(),
                 classModelPage.getTotalPages());
 
-        return ResponseEntity.ok(new ApiResponseDto<List<ClassModel>>(HttpStatus.OK.value(), "ok",
+        return ResponseEntity.ok(new ApiResponseDto<List<ClassModel>>(HttpStatus.OK.value(), "Classes retrieved successfully",
                 classModelPage.getContent(), metadata));
     }
 

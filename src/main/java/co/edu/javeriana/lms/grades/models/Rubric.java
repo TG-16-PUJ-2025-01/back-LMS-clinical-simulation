@@ -1,5 +1,6 @@
 package co.edu.javeriana.lms.grades.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -47,32 +48,24 @@ public class Rubric {
     private RubricTemplate rubricTemplate;
 
     @OneToOne
-    @JoinColumn(nullable = false, name = "simulationId")
+    @JoinColumn(nullable = true, name = "simulationId")
     @JsonIgnore
     private Simulation simulation;
 
-    public void changeEvaluatedCriteria(List<Criteria> previousCriterias) {
+    public void changeEvaluatedCriteria(List<Criteria> newCriteria) {
+        List<EvaluatedCriteria> updatedEvaluatedCriterias = new ArrayList<>();
 
-        // Comparar entre previousCriteria y evaluatedCriterias
-        // Si el id es igual se sabe que se debe dejar, de lo contrario
-        // se debe eliminar el evaluatedCriteria
-
-        for (EvaluatedCriteria evaluatedCriteria : evaluatedCriterias) {
-
-            boolean found = false;
-
-            for (Criteria previousCriteria : previousCriterias) {
-                if (evaluatedCriteria.getId().equals(previousCriteria.getId())) {
-                    found = true;
-                }
-            }
-
-            if (!found) {
-                this.evaluatedCriterias.remove(evaluatedCriteria);
-            }
-
+        for (Criteria criteria : newCriteria) {
+            this.evaluatedCriterias.stream()
+                    .filter(ec -> ec.getId().equals(criteria.getId()))
+                    .findFirst()
+                    .ifPresentOrElse(
+                            ec -> updatedEvaluatedCriterias.add(ec),
+                            () -> updatedEvaluatedCriterias.add(new EvaluatedCriteria(criteria.getId(), "", 0F)));
         }
 
+        // Reemplazar la lista completa
+        this.evaluatedCriterias = updatedEvaluatedCriterias;
     }
 
     public void addEvaluatedCriteria(EvaluatedCriteria evaluatedCriteria) {

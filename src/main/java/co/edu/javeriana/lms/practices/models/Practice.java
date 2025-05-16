@@ -20,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.CascadeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -79,8 +80,9 @@ public class Practice {
     @ManyToOne
     @JoinColumn(nullable = true)
     private RubricTemplate rubricTemplate;
-
-    @OneToMany(mappedBy = "practice", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    
+    
+    @OneToMany(mappedBy = "practice", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Simulation> simulations;
 

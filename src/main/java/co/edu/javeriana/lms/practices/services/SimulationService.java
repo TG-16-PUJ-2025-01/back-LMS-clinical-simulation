@@ -250,6 +250,25 @@ public class SimulationService {
         simulationRepository.save(simulation);
     }
 
+    public void leaveSimulation(Long simulationId, Long userId) {
+        Simulation simulation = simulationRepository.findById(simulationId)
+            .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + simulationId));
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+            
+        if (!simulation.getUsers().contains(user)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not enrolled in this simulation");
+        }
+        // Prevent leaving if simulation already happened
+        Date now = new Date();
+        if (simulation.getEndDateTime() != null && now.after(simulation.getEndDateTime())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot leave simulation, it has already happened");
+        }
+        simulation.getUsers().remove(user);
+        simulationRepository.save(simulation);
+    }
+
     public List<TimeSlotDto> findSimulationsSchedule(String date) {
         Date startDate = parseDate(date);
         Date endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);

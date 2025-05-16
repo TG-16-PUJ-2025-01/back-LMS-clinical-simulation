@@ -49,7 +49,7 @@ public class GradeService {
         // Paso 1: Obtener prácticas calificables únicas
         Map<String, Practice> gradeablePractices = new HashMap<>();
         for (Practice practice : classModel.getPractices()) {
-            if (Boolean.TRUE.equals(practice.getGradeable())) {
+            if (practice.getGradeable()) {
                 gradeablePractices.putIfAbsent(practice.getName(), practice);
             }
         }
@@ -65,7 +65,7 @@ public class GradeService {
         // Paso 3: Procesar simulaciones con nota
         for (Simulation simulation : simulations) {
             Practice practice = simulation.getPractice();
-            if (!Boolean.TRUE.equals(practice.getGradeable()))
+            if (!practice.getGradeable())
                 continue;
 
             Float grade = simulation.getGrade();

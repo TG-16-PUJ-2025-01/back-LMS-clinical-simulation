@@ -54,9 +54,20 @@ public class UserService implements UserDetailsService {
         User savedUser = userRepository.save(user);
 
         String subject = "Bienvenido a LMS - Tus credenciales de acceso";
-        String body = "Hola " + user.getEmail() + ",\n\nTu cuenta ha sido creada exitosamente.\n" +
-                  "Tu contraseña temporal es: " + password + "\n\nPor favor, cambia tu contraseña después de iniciar sesión.";
-        emailService.sendEmail(user.getEmail(), subject, body);
+        String body = """
+        <html>
+        <body style="font-family: Arial, sans-serif; color: #333;">
+            <h2>Bienvenido a LMS</h2>
+            <p>Hola <strong>%s</strong>,</p>
+            <p>Tu cuenta ha sido creada exitosamente.</p>
+            <p><strong>Tu contraseña temporal es:</strong> <span style="color: #2c3e50;">%s</span></p>
+            <p>Por favor, cambia tu contraseña después de iniciar sesión.</p>
+            <hr>
+            <p style="font-size: small; color: #999;">Este es un mensaje automático, por favor no responder.</p>
+        </body>
+        </html>
+        """.formatted(user.getEmail(), password);
+        new Thread(() -> emailService.sendEmail(user.getEmail(), subject, body)).start();
 
         return savedUser;
     }
@@ -71,9 +82,21 @@ public class UserService implements UserDetailsService {
         User savedUser =  userRepository.save(user);
 
         String subject = "Bienvenido a LMS - Tus credenciales de acceso";
-        String body = "Hola " + user.getEmail() + ",\n\nTu cuenta ha sido creada exitosamente.\n" +
-                  "Tu contraseña temporal es: " + password + "\n\nPor favor, cambia tu contraseña después de iniciar sesión.";
-        emailService.sendEmail(user.getEmail(), subject, body);
+        String body = """
+        <html>
+        <body style="font-family: Arial, sans-serif; color: #333;">
+            <h2>Bienvenido a LMS</h2>
+            <p>Hola <strong>%s</strong>,</p>
+            <p>Tu cuenta ha sido creada exitosamente.</p>
+            <p><strong>Tu contraseña temporal es:</strong> <span style="color: #2c3e50;">%s</span></p>
+            <p>Por favor, cambia tu contraseña después de iniciar sesión.</p>
+            <hr>
+            <p style="font-size: small; color: #999;">Este es un mensaje automático, por favor no responder.</p>
+        </body>
+        </html>
+        """.formatted(user.getEmail(), password);
+
+        new Thread(() -> emailService.sendEmail(user.getEmail(), subject, body)).start();
 
         return savedUser;
     }

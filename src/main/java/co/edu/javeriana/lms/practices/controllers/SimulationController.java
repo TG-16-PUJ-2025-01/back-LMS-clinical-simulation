@@ -157,6 +157,20 @@ public class SimulationController {
         return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", null, null));
     }
 
+    @PostMapping("/{id}/leave")
+    public ResponseEntity<ApiResponseDto<?>> leaveSimulation(@RequestHeader("Authorization") String token,
+            @PathVariable Long id) {
+        token = token.substring(7);
+        log.info("Requesting to leave simulation with id: {}", id);
+
+        Long userId = authService.getUserIdByToken(token);
+
+        // Leave the simulation
+        simulationService.leaveSimulation(id, userId);
+
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "Left simulation", null, null));
+    }
+
     @GetMapping("/practice/{practiceId}/available")
     public ResponseEntity<ApiResponseDto<?>> getAvailableSimulationsByPracticeId(
             @PathVariable Long practiceId,
@@ -182,13 +196,15 @@ public class SimulationController {
             @RequestBody RubricDto rubric) {
         log.info("Updating simulation rubric with id: {}", id);
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.updateSimulationRubric(id, rubric), null));
+        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok",
+                simulationService.updateSimulationRubric(id, rubric), null));
     }
-    
+
     @PutMapping("/{id}/publish")
     public ResponseEntity<ApiResponseDto<?>> publishGrade(@PathVariable Long id) {
         log.info("Publishing grade of simulation with id: {}", id);
 
-        return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.publishGrade(id), null));
+        return ResponseEntity
+                .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.publishGrade(id), null));
     }
 }

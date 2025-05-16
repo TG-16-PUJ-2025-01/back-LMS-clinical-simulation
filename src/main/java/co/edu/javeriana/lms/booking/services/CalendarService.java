@@ -54,7 +54,9 @@ public class CalendarService {
         Date endDate = parseDate(end, "yyyy-MM-dd HH:mm");
 
         // Fetch simulations directly associated with the user and within the date range
-        List<Simulation> userSimulations = simulationRepository.findByUsers_IdAndStartDateTimeBetween(idUser, startDate, endDate);
+        List<Simulation> userSimulations = simulationRepository.findByUsers_IdAndStartDateTimeBetween(idUser, startDate,
+                endDate);
+
         log.info("Simulations found directly for user with id {}: {}", idUser, userSimulations.size());
 
         // Search classes where user is a professor
@@ -83,7 +85,8 @@ public class CalendarService {
         log.info("Practices found for user with id {}: {}", idUser, practices.size());
 
         // Search simulations associated with those practices and within the date range
-        List<Simulation> simulations = simulationRepository.findByPracticeInAndStartDateTimeBetween(practices, startDate, endDate);
+        List<Simulation> simulations = simulationRepository.findByPracticeInAndStartDateTimeBetween(practices,
+                startDate, endDate);
 
         simulations.addAll(userSimulations);
 
@@ -93,7 +96,15 @@ public class CalendarService {
         }
 
         // Remove duplicates
-        List<Simulation> distinctSimulations = simulations.stream().distinct().collect(Collectors.toList());
+        List<Simulation> distinctSimulations = new ArrayList<>(
+                simulations.stream()
+                        .collect(Collectors.toMap(
+                                Simulation::getSimulationId,
+                                s -> s,
+                                (s1, s2) -> s1,
+                                java.util.LinkedHashMap::new
+                        ))
+                        .values());
 
         log.info("Number of simulations found between {} and {}: {}", start, end, distinctSimulations.size());
         return mapSimulationsToEventDtos(distinctSimulations);
@@ -104,7 +115,8 @@ public class CalendarService {
             SimpleDateFormat dateFormat = new SimpleDateFormat(format);
             return dateFormat.parse(date);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Expected format: " + format);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Invalid date format. Expected format: " + format);
         }
     }
 
@@ -123,7 +135,7 @@ public class CalendarService {
             String calendarId = simulation.getPractice() == null ? "Supervisor" : "Reserva";
             EventDto eventDto = EventDto.builder()
                     .id(simulation.getSimulationId())
-                    .title(practice.getName() + " - " + classModel.getCourse().getName() + " - "
+                    .title(practice.getName() + " - " + classModel.getCourse().getName() + " (" + classModel.getJaverianaId() + ") - "
                             + practice.getType().name())
                     .description("Clase: " + classModel.getCourse().getName() + " - " + classModel.getJaverianaId())
                     .location(getRoomNames(simulation.getRooms()))

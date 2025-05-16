@@ -66,7 +66,7 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<ClassModel> professorClasses;
 
-    @OneToMany(mappedBy = "coordinator", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "coordinator")
     @JsonIgnore
     private List<Course> courses;
 

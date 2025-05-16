@@ -8,6 +8,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+// import java.nio.file.Files;
+// import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -64,8 +66,8 @@ public class ArecService {
                 .POST(HttpRequest.BodyPublishers.ofString(req))
                 .build();
 
-                HttpClient client = HttpClient.newHttpClient();
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         log.info("Response from Arec: {}", response.body());
         log.info("Response status code: {}", response.statusCode());
@@ -154,12 +156,15 @@ public class ArecService {
 
         Video newVideo = Video.builder()
                 .name(video.getName())
-                .duration(video.getLength())
+                .duration(video.getLength().longValue())
                 .recordingDate(video.getRecordedAt())
                 .available(video.getStatus().equals("ready"))
                 .videoUrl(videoMetadata.getPlaybackUrl())
                 .size(videoMetadata.getSize() / 1000000)
                 .build();
+
+        Video savedVideo = videoRepository.save(newVideo);
+        log.info("Video saved: {}", savedVideo.getName());
 
         List<Simulation> simulations = simulationRepository.findAllByRooms_IdAndStartDateTimeAfterAndEndDateTimeBefore(
                 roomId, video.getRecordedAt(), video.getFinishedAt());
@@ -174,15 +179,24 @@ public class ArecService {
         }
         Simulation simulation = simulations.get(0);
         log.info("Simulation found: {}", simulation.getSimulationId());
-        newVideo.setSimulation(simulation);
-        videoRepository.save(newVideo);
-        log.info("Video saved: {}", newVideo.getName());
+        savedVideo.setSimulation(simulation);
+
+        videoRepository.save(savedVideo);
+        log.info("Video saved: {}", savedVideo.getName());
     }
 
     public void syncVideos(Long roomId, String ipAddress) throws URISyntaxException, IOException, InterruptedException {
         log.info("Syncing videos with Arec");
 
         ArecVideosResponseDto res = fetchVideos(ipAddress);
+
+        // Gson gson = new Gson();
+        // String jsonResponse = new String(
+        //         Files.readAllBytes(Paths.get("./src/test/resources/arecVideosResponse.json")));
+        // ArecVideosResponseDto res = gson.fromJson(jsonResponse, ArecVideosResponseDto.class);
+        // String jsonResponse2 = new String(
+        //         Files.readAllBytes(Paths.get("./src/test/resources/arecVideosResponse2.json")));
+        // ArecVideosResponseDto res = gson.fromJson(jsonResponse2, ArecVideosResponseDto.class);
 
         for (ArecVideosResponseDto.Video video : res.getResult()) {
             log.info("Video name: {}", video.getName());

@@ -51,7 +51,7 @@ public class CourseController {
 				coursesPage.getTotalPages());
 
 		return ResponseEntity
-				.ok(new ApiResponseDto<List<Course>>(HttpStatus.OK.value(), "ok",
+				.ok(new ApiResponseDto<List<Course>>(HttpStatus.OK.value(), "Courses retrieved successfully",
 						coursesPage.getContent(), metadata));
 	}
 
@@ -70,7 +70,7 @@ public class CourseController {
 				searchByKey, period);
 
 		return ResponseEntity
-				.ok(new ApiResponseDto<List<CourseDto>>(HttpStatus.OK.value(), "ok", courses, null));
+				.ok(new ApiResponseDto<List<CourseDto>>(HttpStatus.OK.value(), "Courses retrieved successfully", courses, null));
 	}
 
 	@GetMapping("/{id}")
@@ -85,7 +85,7 @@ public class CourseController {
 							null));
 		}
 
-		return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(), "ok", course, null));
+		return ResponseEntity.ok(new ApiResponseDto<Course>(HttpStatus.OK.value(), "Course retrieved successfully", course, null));
 	}
 
 	@DeleteMapping("/delete/{id}")
@@ -116,7 +116,7 @@ public class CourseController {
 		Course course = courseService.save(courseModel);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto<Course>(HttpStatus.OK.value(),
-				"Class added successfully.", course, null));
+				"Course added successfully.", course, null));
 	}
 
 	@GetMapping("/recommend/{courseId}/rubrics")
@@ -138,7 +138,7 @@ public class CourseController {
 				rubricsPage.getTotalPages());
 
 		return ResponseEntity
-				.ok(new ApiResponseDto<List<RubricTemplate>>(HttpStatus.OK.value(), "ok",
+				.ok(new ApiResponseDto<List<RubricTemplate>>(HttpStatus.OK.value(), "Rubrics retrieved successfully",
 						rubricsPage.getContent(), metadata));
 	}
 }

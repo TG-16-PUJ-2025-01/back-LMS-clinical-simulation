@@ -3,9 +3,6 @@ package co.edu.javeriana.lms.practices.models;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import co.edu.javeriana.lms.accounts.models.User;

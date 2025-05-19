@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class RubricTemplateControllerIntegrationTest {
+public class RubricTemplateIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

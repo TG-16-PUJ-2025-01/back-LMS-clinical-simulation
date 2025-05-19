@@ -3,6 +3,7 @@ package co.edu.javeriana.lms.integration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -26,13 +27,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import co.edu.javeriana.lms.grades.dtos.EvaluatedCriteriaDto;
 import co.edu.javeriana.lms.grades.dtos.RubricDto;
-
+import co.edu.javeriana.lms.practices.dtos.CreateSimulationRequestDto;
+import co.edu.javeriana.lms.practices.dtos.SimulationByTimeSlotDto;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
 @ActiveProfiles("test")
-public class SimulationControllerIntegrationTest {
+public class SimulationIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -94,7 +96,7 @@ public class SimulationControllerIntegrationTest {
     @Test
     public void testFindSimulationById() throws Exception {
         Long simulationId = 1L; // ID de una simulación existente en tus datos de prueba
-        
+
         mockMvc.perform(get("/simulation/{id}", simulationId)
                 .header("Authorization", token))
                 .andExpect(status().isOk())
@@ -105,7 +107,7 @@ public class SimulationControllerIntegrationTest {
     @Test
     public void testFindSimulationById_NotFound() throws Exception {
         Long nonExistentId = 9999L;
-        
+
         mockMvc.perform(get("/simulation/{id}", nonExistentId)
                 .header("Authorization", token))
                 .andExpect(status().isNotFound())
@@ -115,7 +117,7 @@ public class SimulationControllerIntegrationTest {
     @Test
     public void testFindSimulationsByPracticeId() throws Exception {
         Long practiceId = 1L; // ID de práctica existente
-        
+
         mockMvc.perform(get("/simulation/practice/{practiceId}", practiceId)
                 .header("Authorization", token)
                 .param("page", "0")
@@ -132,7 +134,7 @@ public class SimulationControllerIntegrationTest {
     public void testFindSimulationsByPracticeId_WithGroupNumber() throws Exception {
         Long practiceId = 1L;
         Integer groupNumber = 1;
-        
+
         mockMvc.perform(get("/simulation/practice/{practiceId}", practiceId)
                 .header("Authorization", token)
                 .param("page", "0")
@@ -159,7 +161,7 @@ public class SimulationControllerIntegrationTest {
                         .score(4.5f)
                         .build())
                 .build();
-        
+
         mockMvc.perform(put("/simulation/{id}/rubric", simulationId)
                 .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -168,11 +170,11 @@ public class SimulationControllerIntegrationTest {
                 .andExpect(jsonPath("$.status", is(200)))
                 .andExpect(jsonPath("$.data", is(notNullValue())));
     }
-    
+
     @Test
     public void testPublishGrade() throws Exception {
         Long simulationId = 1L; // ID de simulación con rúbrica
-        
+
         mockMvc.perform(put("/simulation/{id}/publish", simulationId)
                 .header("Authorization", token))
                 .andExpect(status().isOk())
@@ -183,10 +185,50 @@ public class SimulationControllerIntegrationTest {
     @Test
     public void testPublishGrade_WithoutRubric() throws Exception {
         Long simulationId = 3L; // ID de simulación sin rúbrica (según tus datos de prueba)
-        
+
         mockMvc.perform(put("/simulation/{id}/publish", simulationId)
                 .header("Authorization", token))
                 .andExpect(status().isOk()) // Ajusta según cómo maneje tu controlador los errores
                 .andExpect(jsonPath("$.status", is(200)));
+    }
+
+    @Test
+    public void testAddSimulation() throws Exception {
+        CreateSimulationRequestDto simulationRequestDto = new CreateSimulationRequestDto(List.of(
+                SimulationByTimeSlotDto.builder()
+                        .practiceId(1L)
+                        .roomIds(List.of(1L, 2L))
+                        .startDateTime(new Date())
+                        .endDateTime(new Date(System.currentTimeMillis() + 900000)) // 15 mins later
+                        .build(),
+                SimulationByTimeSlotDto.builder()
+                        .practiceId(1L)
+                        .roomIds(List.of(1L, 2L))
+                        .startDateTime(new Date(System.currentTimeMillis() + 900000))
+                        .endDateTime(new Date(System.currentTimeMillis() + 1800000)) // 30 mins later
+                        .build(),
+                SimulationByTimeSlotDto.builder()
+                        .practiceId(1L)
+                        .roomIds(List.of(1L, 2L))
+                        .startDateTime(new Date(System.currentTimeMillis() + 1800000))
+                        .endDateTime(new Date(System.currentTimeMillis() + 2700000)) // 45 mins later
+                        .build(),
+                SimulationByTimeSlotDto.builder()
+                        .practiceId(1L)
+                        .roomIds(List.of(1L, 2L))
+                        .startDateTime(new Date(System.currentTimeMillis() + 2700000))
+                        .endDateTime(new Date(System.currentTimeMillis() + 3600000)) // 1 h later
+                        .build()
+));
+
+        String simulationRequest = objectMapper.writeValueAsString(simulationRequestDto);
+
+        mockMvc.perform(post("/simulation")
+                .header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(simulationRequest))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status", is(201)))
+                .andExpect(jsonPath("$.data.simulationId", is(notNullValue())));
     }
 }

@@ -28,7 +28,7 @@ import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
 @AutoConfigureMockMvc
 @Testcontainers
 @ActiveProfiles("test")
-public class RoomControllerIntegrationTest {
+public class RoomIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

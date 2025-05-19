@@ -22,8 +22,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import co.edu.javeriana.lms.accounts.models.PasswordResetToken;
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.accounts.repositories.PasswordResetTokenRepository;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
@@ -92,6 +94,9 @@ public class DBInitializer implements CommandLineRunner {
 	@Autowired
 	private RubricRepository rubricRepository;
 
+	@Autowired
+	private PasswordResetTokenRepository passwordResetTokenRepository;
+
 	@Override
 	public void run(String... args) throws Exception {
 		insertRoomsAndTypes();
@@ -103,6 +108,8 @@ public class DBInitializer implements CommandLineRunner {
 		insertSimulations();
 		assignStudentsRubricsAndGradesToSimulations();
 		insertSimulationsVideosAndComments();
+		// For reset password integration tests
+		insertPasswordToken();
 	}
 
 	private void insertRoomsAndTypes() {
@@ -736,5 +743,15 @@ public class DBInitializer implements CommandLineRunner {
 		simulation.setVideos(List.of(videoRepository.findById(1L).get(), videoRepository.findById(2L).get()));
 
 		simulationRepository.save(simulation);
+	}
+
+	private void insertPasswordToken() {
+		PasswordResetToken passwordToken = PasswordResetToken.builder()
+				.token("token")
+				.userEmail("superadmin@gmail.com")
+				.expirationDate(LocalDateTime.now().plusHours(1)) // 1 hour
+				.build();
+		
+		passwordResetTokenRepository.save(passwordToken);
 	}
 }

@@ -15,18 +15,22 @@ import lombok.NoArgsConstructor;
 public class ArecVideosResponseDto {
     @SerializedName("page_info")
     private PageInfo pageInfo;
-    private List<Video> results;
+    private List<Video> result;
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PageInfo {
         private Integer total;
         private Integer count;
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Video {
         private String name;
-        private Long length;
+        private Double length;
         @SerializedName("recorded_at")
         private Date recordedAt;
         @SerializedName("finished_at")
@@ -37,6 +41,8 @@ public class ArecVideosResponseDto {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class VideoMetadata {
         @SerializedName("channel_name")
         private String channelName;
@@ -44,8 +50,6 @@ public class ArecVideosResponseDto {
         private String playbackUrl;
         @SerializedName("download_url")
         private String downloadUrl;
-        @SerializedName("finished_at")
-        private String finishedAt;
         private Double size;
         private String thumbnail;
     }

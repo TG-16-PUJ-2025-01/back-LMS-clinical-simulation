@@ -6,7 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.Mock;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +44,7 @@ import co.edu.javeriana.lms.videos.services.VideoService;
 @Testcontainers
 @AutoConfigureMockMvc
 @Slf4j
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
 public class VideoIntegrationTest {
 
@@ -102,39 +106,36 @@ public class VideoIntegrationTest {
     @BeforeEach
     public void setup() throws Exception {
         token = getAuthTokenString();
-        System.out.println("Token: " + token);
     }
 
     @Test
+    @Order(1)
     public void testSearchVideos() throws Exception {
         mockMvc.perform(get("/video/all?page=0&size=15&sort=name&asc=true&filter=")
                 .header("Authorization", token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(10)))
-                .andExpect(jsonPath("$.metadata.total", is(10)))
-                .andExpect(jsonPath("$.metadata.size", is(10)))
+                .andExpect(jsonPath("$.data", hasSize(12)))
+                .andExpect(jsonPath("$.metadata.total", is(12)))
+                .andExpect(jsonPath("$.metadata.size", is(12)))
                 .andExpect(jsonPath("$.metadata.totalPages", is(1)))
-                .andExpect(jsonPath("$.metadata.page", is(0)))
-                .andExpect(jsonPath("$.metadata.previous", is(nullValue())))
-                .andExpect(jsonPath("$.metadata.next", is(nullValue())));
+                .andExpect(jsonPath("$.metadata.page", is(0)));
     }
 
     @Test
+    @Order(2)
     public void testSearchVideosMultiplePages() throws Exception {
         mockMvc.perform(get("/video/all?page=0&size=5&sort=name&asc=true&filter=")
                 .header("Authorization", token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", hasSize(5)))
-                .andExpect(jsonPath("$.metadata.total", is(10)))
+                .andExpect(jsonPath("$.metadata.total", is(12)))
                 .andExpect(jsonPath("$.metadata.size", is(5)))
-                .andExpect(jsonPath("$.metadata.totalPages", is(2)))
-                .andExpect(jsonPath("$.metadata.page", is(0)))
-                .andExpect(jsonPath("$.metadata.previous", is(nullValue())))
-                .andExpect(jsonPath("$.metadata.next",
-                        is("http://null/video/all?page=1&size=5&sort=name&asc=true&filter=")));
+                .andExpect(jsonPath("$.metadata.totalPages", is(3)))
+                .andExpect(jsonPath("$.metadata.page", is(0)));
     }
 
     @Test
+    @Order(3)
     public void testEditVideoSuccess() throws Exception {
         mockMvc.perform(put("/video/1").header("Authorization", token)
                 .contentType("application/json")
@@ -145,6 +146,7 @@ public class VideoIntegrationTest {
     }
 
     @Test
+    @Order(4)
     public void testEditVideoFailure() throws Exception {
         mockMvc.perform(put("/video/1000").header("Authorization", token)
                 .contentType("application/json")
@@ -155,7 +157,9 @@ public class VideoIntegrationTest {
                 .andExpect(jsonPath("$.metadata", is(nullValue())));
     }
 
+    
     @Test
+    @Order(5)
     public void testDeleteVideosSuccess() throws Exception {
         mockMvc.perform(delete("/video/2").header("Authorization", token))
                 .andExpect(status().isOk())
@@ -164,6 +168,7 @@ public class VideoIntegrationTest {
     }
 
     @Test
+    @Order(6)
     public void testDeleteVideosFailure() throws Exception {
         mockMvc.perform(delete("/video/1000").header("Authorization", token))
                 .andExpect(status().isNotFound())

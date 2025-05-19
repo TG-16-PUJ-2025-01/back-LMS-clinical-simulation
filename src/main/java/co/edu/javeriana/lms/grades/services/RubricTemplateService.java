@@ -27,7 +27,6 @@ import co.edu.javeriana.lms.grades.repositories.RubricTemplateRepository;
 import co.edu.javeriana.lms.practices.models.Practice;
 import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.practices.repositories.PracticeRepository;
-import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.subjects.repositories.CourseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -102,6 +101,10 @@ public class RubricTemplateService {
         // SE LE ANADEN LOS IDS A LOS CRITERIOS IMPORTANTE
         rubricTemplateModel.setCriteria(addCriteriaUUID(rubricTemplate.getCriteria()));
         rubricTemplateModel.setColumns(rubricTemplate.getColumns());
+        
+        rubricTemplateModel.setCourses(new ArrayList<>());
+        rubricTemplateModel.setPractices(new ArrayList<>());
+        rubricTemplateModel.setRubrics(new ArrayList<>());
 
         if (rubricTemplate.getCourses() != null || rubricTemplate.getCourses().size() > 0)
             rubricTemplateModel.setCourses(courseRepository.findAllById(rubricTemplate.getCourses()));
@@ -201,16 +204,6 @@ public class RubricTemplateService {
         }
 
         return rubricTemplateRepository.save(rubricTemplateModel);
-    }
-
-    // all courses are added
-    public RubricTemplate updateRubricTemplateCourses(List<Course> coursesToAdd, Long id) {
-        RubricTemplate rubricTemplate = rubricTemplateRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Rubric Template not found with ID: " + id));
-
-        rubricTemplate.getCourses().clear();
-        rubricTemplate.getCourses().addAll(coursesToAdd);
-        return rubricTemplateRepository.save(rubricTemplate);
     }
 
     public List<RubricTemplate> findRecommendedRubricTemplatesByCoursesById(Long id) {

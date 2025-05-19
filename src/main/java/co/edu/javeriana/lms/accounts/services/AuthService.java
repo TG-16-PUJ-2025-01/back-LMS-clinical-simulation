@@ -30,10 +30,10 @@ public class AuthService {
     public LoginResponseDto login(String email, String password) {
         log.info("Logging in user: " + email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new IllegalArgumentException("Invalid credentials");
         }
 
         String token = jwtService.generateToken(user);
@@ -45,16 +45,16 @@ public class AuthService {
         log.info("Changing password for token: " + token);
         String email = jwtService.extractUserName(token);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new IllegalArgumentException("Invalid credentials");
         }
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         String subject = "Cambio de contraseña LMS";
         String body = "Hola " + user.getEmail() + ",\n\nTu contraseña ha sido cambiada con éxito.\n" +
                 "Si no fuiste tú, por favor, contacta al administrador.";
-        emailService.sendEmail(user.getEmail(), subject, body);
+        new Thread(() -> emailService.sendEmail(user.getEmail(), subject, body)).start();
         String newToken = jwtService.generateToken(user);
         return newToken;
     }

@@ -53,7 +53,7 @@ public class ResetPasswordService {
         String subject = "Restablecer contraseña LMS";
         String body = "Hola " + email + ",\n\nPara restablecer tu contraseña, utiliza el siguiente código: " + token + "\n\n" +
                   "Si no solicitaste el cambio de contraseña, por favor, ignora este mensaje.";
-        emailService.sendEmail(email, subject, body);
+        new Thread(() -> emailService.sendEmail(email, subject, body)).start();
     }
 
     public Boolean verifyResetToken (String email, String token) {
@@ -83,6 +83,6 @@ public class ResetPasswordService {
         String subject = "Cambio de contraseña LMS";
         String body = "Hola " + user.getEmail() + ",\n\nTu contraseña ha sido cambiada con éxito.\n" +
                     "Si no fuiste tú, por favor, contacta al administrador.";
-        emailService.sendEmail(user.getEmail(), subject, body);
+        new Thread(() -> emailService.sendEmail(user.getEmail(), subject, body)).start();
     }
 }

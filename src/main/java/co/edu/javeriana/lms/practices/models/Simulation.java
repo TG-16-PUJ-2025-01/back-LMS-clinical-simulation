@@ -10,6 +10,7 @@ import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.grades.models.GradeStatus;
 import co.edu.javeriana.lms.grades.models.Rubric;
 import co.edu.javeriana.lms.videos.models.Video;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -63,7 +64,7 @@ public class Simulation {
     @ManyToOne
     private Practice practice;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "simulation_id")
     private List<Video> videos;
 

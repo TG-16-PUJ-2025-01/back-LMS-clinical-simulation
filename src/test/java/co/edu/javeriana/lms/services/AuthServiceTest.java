@@ -173,4 +173,24 @@ public class AuthServiceTest {
         verify(userRepository).findByEmail(mockEmail);
     }
 
+    @Test
+    public void testGetUserIdByToken() {
+        when(jwtService.extractUserName(mockToken)).thenReturn(mockEmail);
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser));
+
+        Long userId = authService.getUserIdByToken(mockToken);
+
+        assert userId.equals(mockUser.getId());
+        verify(jwtService).extractUserName(mockToken);
+        verify(userRepository).findByEmail(mockEmail);
+    }
+
+    @Test
+    public void testGetUserIdByTokenUserNotFound() {
+        when(jwtService.extractUserName(mockToken)).thenReturn(mockEmail);
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> authService.getUserIdByToken(mockToken));
+    }
+
 }

@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import co.edu.javeriana.lms.shared.dtos.ErrorDto;
 import co.edu.javeriana.lms.shared.dtos.ValidationErrorDto;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -83,6 +84,13 @@ public class GlobalExceptionHandler {
         log.warn("Entity not found: {}", ex.getMessage());
 
         return new ResponseEntity<>(new ErrorDto("Entity not found", ex.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(EntityExistsException.class)
+    public ResponseEntity<Object> handleEntityExistsException(EntityExistsException ex) {
+        log.warn("Entity not found: {}", ex.getMessage());
+
+        return new ResponseEntity<>(new ErrorDto("Entity already exists", ex.getMessage()), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

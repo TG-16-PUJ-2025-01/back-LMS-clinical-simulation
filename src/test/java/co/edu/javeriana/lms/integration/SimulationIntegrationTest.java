@@ -196,39 +196,54 @@ public class SimulationIntegrationTest {
     public void testAddSimulation() throws Exception {
         CreateSimulationRequestDto simulationRequestDto = new CreateSimulationRequestDto(List.of(
                 SimulationByTimeSlotDto.builder()
-                        .practiceId(1L)
+                        .practiceId(4L)
                         .roomIds(List.of(1L, 2L))
                         .startDateTime(new Date())
-                        .endDateTime(new Date(System.currentTimeMillis() + 900000)) // 15 mins later
+                        .endDateTime(new Date(System.currentTimeMillis() + 900000)) // 15 mins
+                                                                                    // later
                         .build(),
                 SimulationByTimeSlotDto.builder()
-                        .practiceId(1L)
+                        .practiceId(4L)
                         .roomIds(List.of(1L, 2L))
                         .startDateTime(new Date(System.currentTimeMillis() + 900000))
-                        .endDateTime(new Date(System.currentTimeMillis() + 1800000)) // 30 mins later
+                        .endDateTime(new Date(System.currentTimeMillis() + 1800000)) // 30 mins
+                                                                                     // later
                         .build(),
                 SimulationByTimeSlotDto.builder()
-                        .practiceId(1L)
+                        .practiceId(4L)
                         .roomIds(List.of(1L, 2L))
                         .startDateTime(new Date(System.currentTimeMillis() + 1800000))
-                        .endDateTime(new Date(System.currentTimeMillis() + 2700000)) // 45 mins later
+                        .endDateTime(new Date(System.currentTimeMillis() + 2700000)) // 45 mins
+                                                                                     // later
                         .build(),
                 SimulationByTimeSlotDto.builder()
-                        .practiceId(1L)
+                        .practiceId(4L)
                         .roomIds(List.of(1L, 2L))
                         .startDateTime(new Date(System.currentTimeMillis() + 2700000))
-                        .endDateTime(new Date(System.currentTimeMillis() + 3600000)) // 1 h later
-                        .build()
-));
+                        .endDateTime(new Date(System.currentTimeMillis() + 3600000)) // 1 h
+                                                                                     // later
+                        .build(),
+                SimulationByTimeSlotDto.builder()
+                        .practiceId(4L)
+                        .roomIds(List.of(1L, 2L))
+                        .startDateTime(new Date(System.currentTimeMillis() + 3600000))
+                        .endDateTime(new Date(System.currentTimeMillis() + 4500000)) // 1 h 15 mins
+                                                                                     // later
+                        .build()));
 
         String simulationRequest = objectMapper.writeValueAsString(simulationRequestDto);
 
-        mockMvc.perform(post("/simulation")
+        String response = mockMvc.perform(post("/simulation")
                 .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(simulationRequest))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status", is(201)))
-                .andExpect(jsonPath("$.data.simulationId", is(notNullValue())));
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        
+        JsonNode jsonNode = objectMapper.readTree(response);
+        assert jsonNode.get("data").size() == 5;
     }
 }

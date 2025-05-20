@@ -90,7 +90,7 @@ public class CalendarIntegrationTest {
     @Test
     @Order(1)
     public void getEvents_shouldReturnEventsSuccessfully() throws Exception {
-        mockMvc.perform(get("/calendar?start=2025-01-01&end=2025-12-31")
+        mockMvc.perform(get("/calendar?start=2025-01-01 00:00&end=2025-12-31 23:59")
                 .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -101,7 +101,7 @@ public class CalendarIntegrationTest {
     @Test
     @Order(2)
     public void getAllEvents_shouldReturnAllEventsSuccessfully() throws Exception {
-        mockMvc.perform(get("/calendar/all?start=2025-01-01&end=2025-12-31")
+        mockMvc.perform(get("/calendar/all?start=2025-01-01 00:00&end=2025-12-31 23:59")
                 .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

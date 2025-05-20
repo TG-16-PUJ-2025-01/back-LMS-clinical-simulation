@@ -1,7 +1,6 @@
 package co.edu.javeriana.lms.booking.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import co.edu.javeriana.lms.booking.models.RoomType;
 import co.edu.javeriana.lms.booking.repositories.RoomTypeRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class RoomTypeService {
@@ -26,8 +26,9 @@ public class RoomTypeService {
         return roomTypeRepository.save(type);
     }
 
-    public Optional<RoomType> findById(Long id) {
-        return roomTypeRepository.findById(id);
+    public RoomType findById(Long id) {
+        return roomTypeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
+                "Room Type with " + id + " not found"));
     }
 
     public List<RoomType> findAll(Integer page, Integer size) {
@@ -35,6 +36,9 @@ public class RoomTypeService {
     }
 
     public void deleteById(Long id) {
+        roomTypeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
+                "Room Type with " + id + " not found"));
+
         roomTypeRepository.deleteById(id);
     }
 

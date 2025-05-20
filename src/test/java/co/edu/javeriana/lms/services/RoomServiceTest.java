@@ -42,27 +42,28 @@ public class RoomServiceTest {
     @Mock
     private RoomTypeRepository roomTypeRepository;
 
-    private static Room mockRoom;
+    private static Room mockRoom1;
+    private static Room mockRoom2;
     private static RoomType mockRoomType;
     private static Page<Room> mockRoomsPage;
+
+    @BeforeAll
+    public static void setUpAll() {
+        // Mock Room Type
+        mockRoomType = RoomType.builder().id(1L).name("Cirugia").build();
+
+        // Mock Rooms
+        mockRoom1 = Room.builder().id(1L).name("Room A").capacity(20).ip("10.43.100.23").type(mockRoomType).build();
+        mockRoom2 = Room.builder().id(2L).name("Room B").capacity(15).ip("10.41.104.12").type(mockRoomType).build();
+
+        List<Room> mockRooms = Arrays.asList(mockRoom1, mockRoom2);
+
+        mockRoomsPage = new PageImpl<>(mockRooms, PageRequest.of(0, 10, Sort.by("name").ascending()), mockRooms.size());
+    }
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-    }
-
-    @BeforeAll
-    public static void setUpAll() {
-        mockRoomType = RoomType.builder().id(1L).name("Cirugia").build();
-
-        Room room1 = Room.builder().id(1L).name("Room A").type(mockRoomType).capacity(10).build();
-        Room room2 = Room.builder().id(2L).name("Room B").type(mockRoomType).capacity(15).build();
-
-        mockRoom = room1;
-
-        List<Room> mockRooms = Arrays.asList(room1, room2);
-
-        mockRoomsPage = new PageImpl<>(mockRooms, PageRequest.of(0, 10, Sort.by("name").ascending()), mockRooms.size());
     }
 
     @Test
@@ -84,74 +85,74 @@ public class RoomServiceTest {
     @Test
     public void testSaveRoom_Success() {
         // Arrange
-        when(roomRepository.findByName(mockRoom.getName())).thenReturn(null);
+        when(roomRepository.findByName(mockRoom1.getName())).thenReturn(null);
         when(roomTypeRepository.findById(mockRoomType.getId())).thenReturn(Optional.of(mockRoomType));
-        when(roomRepository.save(mockRoom)).thenReturn(mockRoom);
+        when(roomRepository.save(mockRoom1)).thenReturn(mockRoom1);
 
         // Act
-        Room savedRoom = roomService.save(mockRoom);
+        Room savedRoom = roomService.save(mockRoom1);
 
         // Assert
-        assert (savedRoom.equals(mockRoom));
-        verify(roomRepository, times(1)).save(mockRoom);
+        assert (savedRoom.equals(mockRoom1));
+        verify(roomRepository, times(1)).save(mockRoom1);
     }
 
     @Test
     public void testSaveRoom_NameConflict() {
         // Arrange
-        when(roomRepository.findByName(mockRoom.getName())).thenReturn(mockRoom);
+        when(roomRepository.findByName(mockRoom1.getName())).thenReturn(mockRoom1);
 
         // Act & Assert
         try {
-            roomService.save(mockRoom);
+            roomService.save(mockRoom1);
         } catch (DataIntegrityViolationException e) {
             assert (e.getMessage().equals("El nombre de la sala ya existe"));
         }
-        verify(roomRepository, times(0)).save(mockRoom);
+        verify(roomRepository, times(0)).save(mockRoom1);
     }
 
     @Test
     public void testSaveRoom_TypeNotFound() {
         // Arrange
-        when(roomRepository.findByName(mockRoom.getName())).thenReturn(null);
+        when(roomRepository.findByName(mockRoom1.getName())).thenReturn(null);
         when(roomTypeRepository.findById(mockRoomType.getId())).thenReturn(Optional.empty());
 
         // Act & Assert
         try {
-            roomService.save(mockRoom);
+            roomService.save(mockRoom1);
         } catch (EntityNotFoundException e) {
             assert (e.getMessage().equals("Room type not found with id: " + mockRoomType.getId()));
         }
-        verify(roomRepository, times(0)).save(mockRoom);
+        verify(roomRepository, times(0)).save(mockRoom1);
     }
 
     @Test
     public void testUpdateRoom_Success() {
         // Arrange
-        when(roomRepository.findById(mockRoom.getId())).thenReturn(Optional.of(mockRoom));
+        when(roomRepository.findById(mockRoom1.getId())).thenReturn(Optional.of(mockRoom1));
         when(roomTypeRepository.findById(mockRoomType.getId())).thenReturn(Optional.of(mockRoomType));
-        when(roomRepository.save(mockRoom)).thenReturn(mockRoom);
+        when(roomRepository.save(mockRoom1)).thenReturn(mockRoom1);
 
         // Act
-        Room updatedRoom = roomService.update(mockRoom.getId(), mockRoom);
+        Room updatedRoom = roomService.update(mockRoom1.getId(), mockRoom1);
 
         // Assert
-        assert (updatedRoom.equals(mockRoom));
-        verify(roomRepository, times(1)).save(mockRoom);
+        assert (updatedRoom.equals(mockRoom1));
+        verify(roomRepository, times(1)).save(mockRoom1);
     }
 
     @Test
     public void testUpdateRoom_NotFound() {
         // Arrange
-        when(roomRepository.findById(mockRoom.getId())).thenReturn(Optional.empty());
+        when(roomRepository.findById(mockRoom1.getId())).thenReturn(Optional.empty());
 
         // Act & Assert
         try {
-            roomService.update(mockRoom.getId(), mockRoom);
+            roomService.update(mockRoom1.getId(), mockRoom1);
         } catch (EntityNotFoundException e) {
-            assert (e.getMessage().equals("Room not found with id: " + mockRoom.getId()));
+            assert (e.getMessage().equals("Room not found with id: " + mockRoom1.getId()));
         }
-        verify(roomRepository, times(0)).save(mockRoom);
+        verify(roomRepository, times(0)).save(mockRoom1);
     }
 
     @Test
@@ -178,29 +179,153 @@ public class RoomServiceTest {
     @Test
     public void testDeleteRoom_Success() {
         // Arrange
-        when(roomRepository.findById(mockRoom.getId())).thenReturn(Optional.of(mockRoom));
+        when(roomRepository.findById(mockRoom1.getId())).thenReturn(Optional.of(mockRoom1));
         when(roomRepository.countByType(mockRoomType)).thenReturn(0L);
 
         // Act
-        roomService.deleteById(mockRoom.getId());
+        roomService.deleteById(mockRoom1.getId());
 
         // Assert
-        verify(roomRepository, times(1)).deleteById(mockRoom.getId());
+        verify(roomRepository, times(1)).deleteById(mockRoom1.getId());
         verify(roomTypeRepository, times(1)).delete(mockRoomType);
     }
 
     @Test
     public void testDeleteRoom_NotFound() {
         // Arrange
-        when(roomRepository.findById(mockRoom.getId())).thenReturn(Optional.empty());
+        when(roomRepository.findById(mockRoom1.getId())).thenReturn(Optional.empty());
 
         // Act & Assert
         try {
-            roomService.deleteById(mockRoom.getId());
+            roomService.deleteById(mockRoom1.getId());
         } catch (EntityNotFoundException e) {
-            assert (e.getMessage().equals("Room not found with id: " + mockRoom.getId()));
+            assert (e.getMessage().equals("Room not found with id: " + mockRoom1.getId()));
         }
-        verify(roomRepository, times(0)).deleteById(mockRoom.getId());
+        verify(roomRepository, times(0)).deleteById(mockRoom1.getId());
+    }
+
+    @Test
+    public void testFindById_Success() {
+        // Arrange
+        when(roomRepository.findById(mockRoom1.getId())).thenReturn(Optional.of(mockRoom1));
+
+        // Act
+        Room foundRoom = roomService.findById(mockRoom1.getId());
+
+        // Assert
+        assert (foundRoom != null);
+        assert (foundRoom.equals(mockRoom1));
+        verify(roomRepository, times(1)).findById(mockRoom1.getId());
+    }
+
+    @Test
+    public void testFindById_NotFound() {
+        // Arrange
+        when(roomRepository.findById(999L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        try {
+            roomService.findById(999L);
+            assert false; // Should not reach here
+        } catch (EntityNotFoundException e) {
+            assert (e.getMessage().equals("Room not found with id: 999"));
+        }
+        verify(roomRepository, times(1)).findById(999L);
+    }
+
+    @Test
+    public void testFindByName_Found() {
+        // Arrange
+        when(roomRepository.findByName(mockRoom1.getName())).thenReturn(mockRoom1);
+
+        // Act
+        Room foundRoom = roomService.findByName(mockRoom1.getName());
+
+        // Assert
+        assert (foundRoom != null);
+        assert (foundRoom.equals(mockRoom1));
+        verify(roomRepository, times(1)).findByName(mockRoom1.getName());
+    }
+
+    @Test
+    public void testFindByName_NotFound() {
+        // Arrange
+        when(roomRepository.findByName("NonExistentRoom")).thenReturn(null);
+
+        // Act
+        Room foundRoom = roomService.findByName("NonExistentRoom");
+
+        // Assert
+        assert (foundRoom == null);
+        verify(roomRepository, times(1)).findByName("NonExistentRoom");
+    }
+
+    @Test
+    public void testExistsByName_True() {
+        // Arrange
+        when(roomRepository.findByName(mockRoom1.getName())).thenReturn(mockRoom1);
+
+        // Act
+        boolean exists = roomService.existsByName(mockRoom1.getName());
+
+        // Assert
+        assert (exists);
+        verify(roomRepository, times(1)).findByName(mockRoom1.getName());
+    }
+
+    @Test
+    public void testExistsByName_False() {
+        // Arrange
+        when(roomRepository.findByName("NonExistentRoom")).thenReturn(null);
+
+        // Act
+        boolean exists = roomService.existsByName("NonExistentRoom");
+
+        // Assert
+        assert (!exists);
+        verify(roomRepository, times(1)).findByName("NonExistentRoom");
+    }
+
+    @Test
+    public void testFindRoomTypeByName_Found() {
+        // Arrange
+        when(roomTypeRepository.findByName(mockRoomType.getName())).thenReturn(mockRoomType);
+
+        // Act
+        RoomType foundType = roomService.findRoomTypeByName(mockRoomType.getName());
+
+        // Assert
+        assert (foundType != null);
+        assert (foundType.equals(mockRoomType));
+        verify(roomTypeRepository, times(1)).findByName(mockRoomType.getName());
+    }
+
+    @Test
+    public void testFindRoomTypeByName_NotFound() {
+        // Arrange
+        when(roomTypeRepository.findByName("NonExistentType")).thenReturn(null);
+
+        // Act
+        RoomType foundType = roomService.findRoomTypeByName("NonExistentType");
+
+        // Assert
+        assert (foundType == null);
+        verify(roomTypeRepository, times(1)).findByName("NonExistentType");
+    }
+
+    @Test
+    public void testSaveRoomType() {
+        // Arrange
+        RoomType newType = RoomType.builder().id(2L).name("Simulación").build();
+        when(roomTypeRepository.save(newType)).thenReturn(newType);
+
+        // Act
+        RoomType savedType = roomService.saveRoomType(newType);
+
+        // Assert
+        assert (savedType != null);
+        assert (savedType.equals(newType));
+        verify(roomTypeRepository, times(1)).save(newType);
     }
 
     @Test
@@ -209,10 +334,24 @@ public class RoomServiceTest {
         when(roomTypeRepository.findAll()).thenReturn(Arrays.asList(mockRoomType));
 
         // Act
-        List<RoomType> roomTypes = roomService.findAllTypes();
+        List<RoomType> types = roomService.findAllTypes();
 
         // Assert
-        assert (roomTypes.size() == 1);
-        assert (roomTypes.get(0).equals(mockRoomType));
+        assert (types.size() == 1);
+        assert (types.get(0).equals(mockRoomType));
+        verify(roomTypeRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void testCountByType() {
+        // Arrange
+        when(roomRepository.countByType(mockRoomType)).thenReturn(2L);
+
+        // Act
+        long count = roomService.countByType(mockRoomType);
+
+        // Assert
+        assert (count == 2L);
+        verify(roomRepository, times(1)).countByType(mockRoomType);
     }
 }

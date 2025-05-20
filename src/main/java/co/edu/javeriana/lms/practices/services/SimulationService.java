@@ -256,14 +256,25 @@ public class SimulationService {
 
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-            
+        
         if (!simulation.getUsers().contains(user)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not enrolled in this simulation");
         }
-        // Prevent leaving if simulation already happened
+        // Prevent leaving if simulation already happened, is in progress, or is graded
         Date now = new Date();
+        // Do not allow leaving if the simulation is in progress
+        if (simulation.getStartDateTime() != null && simulation.getEndDateTime() != null) {
+            if (now.after(simulation.getStartDateTime()) && now.before(simulation.getEndDateTime())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot leave simulation, it is in progress");
+            }
+        }
+        // Do not allow leaving if the simulation has already ended
         if (simulation.getEndDateTime() != null && now.after(simulation.getEndDateTime())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot leave simulation, it has already happened");
+        }
+        // Do not allow leaving if the simulation is already graded
+        if (simulation.getGradeStatus() != null && simulation.getGradeStatus() == co.edu.javeriana.lms.grades.models.GradeStatus.REGISTERED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot leave simulation, it is already graded");
         }
         simulation.getUsers().remove(user);
         simulationRepository.save(simulation);

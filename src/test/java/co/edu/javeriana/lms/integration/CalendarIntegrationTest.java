@@ -108,4 +108,39 @@ public class CalendarIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Events retrieved successfully"))
                 .andExpect(jsonPath("$.data").isArray());
     }
+
+    @Test
+    @Order(3)
+    public void getEvents_withoutToken_shouldReturnUnauthorized() throws Exception {
+        mockMvc.perform(get("/calendar?start=2025-01-01 00:00&end=2025-12-31 23:59")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @Order(4)
+    public void getEvents_withInvalidDateFormat_shouldReturnBadRequest() throws Exception {
+        mockMvc.perform(get("/calendar?start=2025-01-01&end=2025-12-31")
+                .header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Order(5)
+    public void getEvents_missingStartParam_shouldReturnBadRequest() throws Exception {
+        mockMvc.perform(get("/calendar?end=2025-12-31 23:59")
+                .header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Order(6)
+    public void getEvents_missingEndParam_shouldReturnBadRequest() throws Exception {
+        mockMvc.perform(get("/calendar?start=2025-01-01 00:00")
+                .header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }

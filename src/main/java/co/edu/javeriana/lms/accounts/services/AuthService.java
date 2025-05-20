@@ -96,7 +96,7 @@ public class AuthService {
         log.info("Getting user ID for token: " + token);
         String email = jwtService.extractUserName(token);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return user.getId();
     }
 }

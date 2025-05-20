@@ -22,10 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import co.edu.javeriana.lms.accounts.models.PasswordResetToken;
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
-import co.edu.javeriana.lms.accounts.repositories.PasswordResetTokenRepository;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
@@ -94,9 +92,6 @@ public class DBInitializer implements CommandLineRunner {
 	@Autowired
 	private RubricRepository rubricRepository;
 
-	@Autowired
-	private PasswordResetTokenRepository passwordResetTokenRepository;
-
 	@Override
 	public void run(String... args) throws Exception {
 		insertRoomsAndTypes();
@@ -108,8 +103,6 @@ public class DBInitializer implements CommandLineRunner {
 		insertSimulations();
 		assignStudentsRubricsAndGradesToSimulations();
 		insertSimulationsVideosAndComments();
-		// For reset password integration tests
-		insertPasswordToken();
 	}
 
 	private void insertRoomsAndTypes() {
@@ -583,9 +576,9 @@ public class DBInitializer implements CommandLineRunner {
 		List<SimulationByTimeSlotDto> simulationsPractice2 = Arrays.asList(
 				SimulationByTimeSlotDto.builder().practiceId(2L)
 						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.plusWeeks(3L).atZone(ZoneId.systemDefault()).toInstant()))
+						.startDateTime(Date.from(baseDate.plusWeeks(1L).atZone(ZoneId.systemDefault()).toInstant()))
 						.endDateTime(Date.from(
-								baseDate.plusWeeks(3L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
+								baseDate.plusWeeks(1L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
 						.build());
 
 		simulationService.addSimulations(simulationsPractice2);
@@ -609,20 +602,10 @@ public class DBInitializer implements CommandLineRunner {
 
 		for (Practice practice : practices) {
 			List<User> tempUsers = new ArrayList<>(students);
-
 			int numberOfGroups = practice.getNumberOfGroups();
 			int maxStudentsGroup = practice.getMaxStudentsGroup();
 
-			// Para práctica con id 2, quito 4 usuarios para que dos grupos queden
-			// incompletos
-			if (practice.getId() == 2L) {
-				int totalToRemove = 4; // 2 estudiantes menos en dos grupos
-				// Solo quito al final del listado para simular que no hay suficientes usuarios
-				for (int r = 0; r < totalToRemove && !tempUsers.isEmpty(); r++) {
-					tempUsers.remove(tempUsers.size() - 1);
-				}
-			}
-
+			// Create groups of students and assign them to simulations
 			List<List<User>> groups = new ArrayList<>();
 			for (int i = 0; i < numberOfGroups; i++) {
 				List<User> group = new ArrayList<>();
@@ -700,41 +683,41 @@ public class DBInitializer implements CommandLineRunner {
 
 		List<Video> videos = Arrays.asList(
 				Video.builder().name("javatechie").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/javatechie.mp4")
 						.duration(62L).size(8.3).build(),
 				Video.builder().name("10350-224234500_small").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/10350-224234500_small.mp4")
 						.duration(600L).size(31.2).build(),
 				Video.builder().name("CCrit1-1__2025_03_03_18_25_12_Movie")
 						.recordingDate(dateFormat.parse("2023-01-31"))
 						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(600L).size(31.2).build(),
 				Video.builder().name("unavailable1").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/unavailable1.mp4")
 						.duration(210L).size(300.0).available(false).build(),
 				Video.builder().name("unavailable2").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/unavailable2.mp4")
 						.duration(450L).size(420.0).available(false).build(),
 				Video.builder().name("unavailable3").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/unavailable3.mp4")
 						.duration(600L).size(500.0).available(false).build(),
 				Video.builder().name("unavailable4").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/unavailable4.mp4")
 						.duration(780L).size(780.0).available(false).build(),
 				Video.builder().name("unavailable5").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/unavailable5.mp4")
 						.duration(6000L).size(6000.0).available(false).build(),
 				Video.builder().name("unavailable6").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/unavailable6.mp4")
 						.duration(620L).size(500.0).available(false).build(),
 				Video.builder().name("unavailable7").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/unavailable7.mp4")
 						.duration(620L).size(500.0).available(false).build(),
 				Video.builder().name("unavailable8").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/unavailable8.mp4")
 						.duration(620L).size(500.0).available(false).build(),
 				Video.builder().name("unavailable9").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/unavailable9.mp4")
 						.duration(620L).size(500.0).available(false).build());
 
 		videoRepository.saveAll(videos);
@@ -743,15 +726,5 @@ public class DBInitializer implements CommandLineRunner {
 		simulation.setVideos(List.of(videoRepository.findById(1L).get(), videoRepository.findById(2L).get()));
 
 		simulationRepository.save(simulation);
-	}
-
-	private void insertPasswordToken() {
-		PasswordResetToken passwordToken = PasswordResetToken.builder()
-				.token("token")
-				.userEmail("superadmin@gmail.com")
-				.expirationDate(LocalDateTime.now().plusHours(1)) // 1 hour
-				.build();
-		
-		passwordResetTokenRepository.save(passwordToken);
 	}
 }

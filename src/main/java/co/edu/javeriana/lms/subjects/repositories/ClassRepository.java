@@ -50,21 +50,21 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
     Page<User> findMembers(@Param("classId") Long classId, @Param("filter") String filter, Pageable pageable);
 
     @Query("""
-                SELECT u FROM User u
-                WHERE (
-                    u.id IN (
-                        SELECT s.id FROM ClassModel c JOIN c.students s WHERE c.classId = :classId
-                    )
+                    SELECT u FROM User u
+                    WHERE (
+                        u.id IN (
+                            SELECT s.id FROM ClassModel c JOIN c.students s WHERE c.classId = :classId
+                        )
 
-                )
-                AND (
-                    :filter IS NULL OR :filter = '' OR
-                    LOWER(u.name) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                    LOWER(u.lastName) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                    CAST(u.institutionalId AS string) LIKE %:filter%
-                    OR LOWER(u.email) LIKE LOWER(CONCAT('%', :filter, '%'))
-                )
-            """)
+                    )
+                    AND (
+                        :filter IS NULL OR :filter = '' OR
+                        LOWER(u.name) LIKE LOWER(CONCAT('%', :filter, '%')) OR
+                        LOWER(u.lastName) LIKE LOWER(CONCAT('%', :filter, '%')) OR
+                        CAST(u.institutionalId AS string) LIKE %:filter%
+                        OR LOWER(u.email) LIKE LOWER(CONCAT('%', :filter, '%'))
+                    )
+                """)
     Page<User> findStudentsMembers(@Param("classId") Long classId, @Param("filter") String filter, Pageable pageable);
 
     @Query("""
@@ -147,32 +147,32 @@ public interface ClassRepository extends JpaRepository<ClassModel, Long> {
             Pageable pageable);
 
     @Query("""
-                        SELECT u FROM User u
-                        WHERE u.id NOT IN (
-                            SELECT s.id FROM ClassModel c JOIN c.students s WHERE c.classId = :classId
-                        )
-                        AND u.id NOT IN (
-                            SELECT p.id FROM ClassModel c JOIN c.professors p WHERE c.classId = :classId
-                        )
-                        AND NOT (
-                            'COORDINADOR' MEMBER OF u.roles AND SIZE(u.roles) = 1
-                        )
-                        AND (
-                            'ESTUDIANTE' MEMBER OF u.roles AND SIZE(u.roles) = 1
-                        )
-                        AND (
-                            (
-                                :filter IS NULL OR :filter = ''
-                            )
-                            OR (
-                                CAST(u.institutionalId AS string) LIKE %:filter%
-                                OR LOWER(TRANSLATE(u.name, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
-                                OR LOWER(TRANSLATE(u.lastName, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
-                                OR LOWER(u.email) LIKE LOWER(CONCAT('%', :filter, '%'))
-                            )
-                        )
+            SELECT u FROM User u
+            WHERE u.id NOT IN (
+                SELECT s.id FROM ClassModel c JOIN c.students s WHERE c.classId = :classId
+            )
+            AND u.id NOT IN (
+                SELECT p.id FROM ClassModel c JOIN c.professors p WHERE c.classId = :classId
+            )
+            AND NOT (
+                'COORDINADOR' MEMBER OF u.roles AND SIZE(u.roles) = 1
+            )
+            AND (
+                'ESTUDIANTE' MEMBER OF u.roles AND SIZE(u.roles) = 1
+            )
+            AND (
+                (
+                    :filter IS NULL OR :filter = ''
+                )
+                OR (
+                    CAST(u.institutionalId AS string) LIKE %:filter%
+                    OR LOWER(TRANSLATE(u.name, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
+                    OR LOWER(TRANSLATE(u.lastName, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU')) LIKE LOWER(CONCAT('%', TRANSLATE(:filter, 'áéíóúÁÉÍÓÚ', 'aeiouAEIOU'), '%'))
+                    OR LOWER(u.email) LIKE LOWER(CONCAT('%', :filter, '%'))
+                )
+            )
 
-                        """)
+            """)
     Page<User> findStudentsNotInClass(@Param("classId") Long classId, @Param("filter") String filter,
             Pageable pageable);
 

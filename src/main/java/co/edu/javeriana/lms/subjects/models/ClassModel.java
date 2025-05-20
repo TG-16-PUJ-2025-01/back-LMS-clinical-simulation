@@ -4,7 +4,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.practices.models.Practice;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,7 +31,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ClassModel {
 
-    public ClassModel(String period, List<User> professor, Course course, Long javerianaId, Integer numberOfParticipants) {
+    public ClassModel(String period, List<User> professor, Course course, Long javerianaId,
+            Integer numberOfParticipants) {
         this.period = period;
         this.professors = professor;
         this.course = course;
@@ -53,7 +53,7 @@ public class ClassModel {
     private Integer numberOfParticipants;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "professor_classes", joinColumns = @JoinColumn(name = "classId"), inverseJoinColumns = @JoinColumn(name = "id"))  
+    @JoinTable(name = "professor_classes", joinColumns = @JoinColumn(name = "classId"), inverseJoinColumns = @JoinColumn(name = "id"))
     private List<User> professors;
 
     @ManyToOne
@@ -65,7 +65,7 @@ public class ClassModel {
     @JsonIgnore
     private List<User> students;
 
-    @OneToMany(mappedBy = "classModel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "classModel")
     @JsonIgnore
     private List<Practice> practices;
 

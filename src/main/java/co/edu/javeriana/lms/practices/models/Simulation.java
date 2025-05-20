@@ -64,12 +64,11 @@ public class Simulation {
     @ManyToOne
     private Practice practice;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "simulation_id")
     private List<Video> videos;
 
-    @OneToOne
-    @JoinColumn(nullable = true)
+    @OneToOne(mappedBy = "simulation", cascade = CascadeType.ALL, orphanRemoval = true)
     private Rubric rubric;
 
     @ManyToMany(fetch = FetchType.EAGER)

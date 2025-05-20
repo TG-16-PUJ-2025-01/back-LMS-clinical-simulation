@@ -48,15 +48,13 @@ public class Rubric {
     private RubricTemplate rubricTemplate;
 
     @OneToOne
-    @JoinColumn(nullable = false, name = "simulationId")
+    @JoinColumn(nullable = true, name = "simulationId")
     @JsonIgnore
     private Simulation simulation;
 
     public void changeEvaluatedCriteria(List<Criteria> newCriteria) {
-        // Crear una nueva lista en lugar de modificar la existente
         List<EvaluatedCriteria> updatedEvaluatedCriterias = new ArrayList<>();
 
-        // Primero actualizar criterios existentes
         for (Criteria criteria : newCriteria) {
             this.evaluatedCriterias.stream()
                     .filter(ec -> ec.getId().equals(criteria.getId()))

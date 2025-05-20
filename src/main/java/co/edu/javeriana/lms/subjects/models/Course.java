@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.grades.models.RubricTemplate;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -60,7 +59,7 @@ public class Course {
 
     private Integer semester;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "course")
     @JsonIgnore
     private List<ClassModel> classModels;
 

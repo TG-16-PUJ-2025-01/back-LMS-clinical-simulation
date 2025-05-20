@@ -22,8 +22,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import co.edu.javeriana.lms.accounts.models.PasswordResetToken;
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.accounts.repositories.PasswordResetTokenRepository;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
@@ -92,6 +94,9 @@ public class DBInitializer implements CommandLineRunner {
 	@Autowired
 	private RubricRepository rubricRepository;
 
+	@Autowired
+	private PasswordResetTokenRepository passwordResetTokenRepository;
+
 	@Override
 	public void run(String... args) throws Exception {
 		insertRoomsAndTypes();
@@ -103,6 +108,8 @@ public class DBInitializer implements CommandLineRunner {
 		insertSimulations();
 		assignStudentsRubricsAndGradesToSimulations();
 		insertSimulationsVideosAndComments();
+		// For reset password integration tests
+		insertPasswordToken();
 	}
 
 	private void insertRoomsAndTypes() {
@@ -576,9 +583,9 @@ public class DBInitializer implements CommandLineRunner {
 		List<SimulationByTimeSlotDto> simulationsPractice2 = Arrays.asList(
 				SimulationByTimeSlotDto.builder().practiceId(2L)
 						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.plusWeeks(1L).atZone(ZoneId.systemDefault()).toInstant()))
+						.startDateTime(Date.from(baseDate.plusWeeks(3L).atZone(ZoneId.systemDefault()).toInstant()))
 						.endDateTime(Date.from(
-								baseDate.plusWeeks(1L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
+								baseDate.plusWeeks(3L).plusMinutes(135).atZone(ZoneId.systemDefault()).toInstant()))
 						.build());
 
 		simulationService.addSimulations(simulationsPractice2);
@@ -602,10 +609,20 @@ public class DBInitializer implements CommandLineRunner {
 
 		for (Practice practice : practices) {
 			List<User> tempUsers = new ArrayList<>(students);
+
 			int numberOfGroups = practice.getNumberOfGroups();
 			int maxStudentsGroup = practice.getMaxStudentsGroup();
 
-			// Create groups of students and assign them to simulations
+			// Para práctica con id 2, quito 4 usuarios para que dos grupos queden
+			// incompletos
+			if (practice.getId() == 2L) {
+				int totalToRemove = 4; // 2 estudiantes menos en dos grupos
+				// Solo quito al final del listado para simular que no hay suficientes usuarios
+				for (int r = 0; r < totalToRemove && !tempUsers.isEmpty(); r++) {
+					tempUsers.remove(tempUsers.size() - 1);
+				}
+			}
+
 			List<List<User>> groups = new ArrayList<>();
 			for (int i = 0; i < numberOfGroups; i++) {
 				List<User> group = new ArrayList<>();
@@ -726,5 +743,15 @@ public class DBInitializer implements CommandLineRunner {
 		simulation.setVideos(List.of(videoRepository.findById(1L).get(), videoRepository.findById(2L).get()));
 
 		simulationRepository.save(simulation);
+	}
+
+	private void insertPasswordToken() {
+		PasswordResetToken passwordToken = PasswordResetToken.builder()
+				.token("token")
+				.userEmail("superadmin@gmail.com")
+				.expirationDate(LocalDateTime.now().plusHours(1)) // 1 hour
+				.build();
+		
+		passwordResetTokenRepository.save(passwordToken);
 	}
 }

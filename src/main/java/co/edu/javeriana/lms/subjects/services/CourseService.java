@@ -19,6 +19,7 @@ import co.edu.javeriana.lms.subjects.models.Course;
 import co.edu.javeriana.lms.subjects.repositories.ClassRepository;
 import co.edu.javeriana.lms.subjects.repositories.CourseRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -71,6 +72,8 @@ public class CourseService {
         return newCourse;
     }
 
+
+    @Transactional
     public void deleteById(Long id) {
         if (!courseRepository.existsById(id)) {
             throw new EntityNotFoundException("Course not found with id: " + id);

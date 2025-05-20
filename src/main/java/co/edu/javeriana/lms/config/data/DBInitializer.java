@@ -22,8 +22,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import co.edu.javeriana.lms.accounts.models.PasswordResetToken;
 import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
+import co.edu.javeriana.lms.accounts.repositories.PasswordResetTokenRepository;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.booking.models.Room;
 import co.edu.javeriana.lms.booking.models.RoomType;
@@ -92,6 +94,9 @@ public class DBInitializer implements CommandLineRunner {
 	@Autowired
 	private RubricRepository rubricRepository;
 
+	@Autowired
+	private PasswordResetTokenRepository passwordResetTokenRepository;
+
 	@Override
 	public void run(String... args) throws Exception {
 		insertRoomsAndTypes();
@@ -103,6 +108,8 @@ public class DBInitializer implements CommandLineRunner {
 		insertSimulations();
 		assignStudentsRubricsAndGradesToSimulations();
 		insertSimulationsVideosAndComments();
+		// For reset password integration tests
+		insertPasswordToken();
 	}
 
 	private void insertRoomsAndTypes() {
@@ -693,41 +700,41 @@ public class DBInitializer implements CommandLineRunner {
 
 		List<Video> videos = Arrays.asList(
 				Video.builder().name("javatechie").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/javatechie.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(62L).size(8.3).build(),
 				Video.builder().name("10350-224234500_small").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/10350-224234500_small.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(600L).size(31.2).build(),
 				Video.builder().name("CCrit1-1__2025_03_03_18_25_12_Movie")
 						.recordingDate(dateFormat.parse("2023-01-31"))
 						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(600L).size(31.2).build(),
 				Video.builder().name("unavailable1").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/unavailable1.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(210L).size(300.0).available(false).build(),
 				Video.builder().name("unavailable2").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/unavailable2.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(450L).size(420.0).available(false).build(),
 				Video.builder().name("unavailable3").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/unavailable3.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(600L).size(500.0).available(false).build(),
 				Video.builder().name("unavailable4").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/unavailable4.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(780L).size(780.0).available(false).build(),
 				Video.builder().name("unavailable5").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/unavailable5.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(6000L).size(6000.0).available(false).build(),
 				Video.builder().name("unavailable6").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/unavailable6.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(620L).size(500.0).available(false).build(),
 				Video.builder().name("unavailable7").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/unavailable7.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(620L).size(500.0).available(false).build(),
 				Video.builder().name("unavailable8").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/unavailable8.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(620L).size(500.0).available(false).build(),
 				Video.builder().name("unavailable9").recordingDate(dateFormat.parse("2023-01-31"))
-						.videoUrl("http://localhost:8080/streaming/video/unavailable9.mp4")
+						.videoUrl("http://localhost:8080/streaming/video/CCrit1-1__2025_03_03_18_25_12_Movie.mp4")
 						.duration(620L).size(500.0).available(false).build());
 
 		videoRepository.saveAll(videos);
@@ -736,5 +743,15 @@ public class DBInitializer implements CommandLineRunner {
 		simulation.setVideos(List.of(videoRepository.findById(1L).get(), videoRepository.findById(2L).get()));
 
 		simulationRepository.save(simulation);
+	}
+
+	private void insertPasswordToken() {
+		PasswordResetToken passwordToken = PasswordResetToken.builder()
+				.token("token")
+				.userEmail("superadmin@gmail.com")
+				.expirationDate(LocalDateTime.now().plusHours(1)) // 1 hour
+				.build();
+		
+		passwordResetTokenRepository.save(passwordToken);
 	}
 }

@@ -17,6 +17,7 @@ import co.edu.javeriana.lms.accounts.models.Role;
 import co.edu.javeriana.lms.accounts.models.User;
 import co.edu.javeriana.lms.accounts.repositories.UserRepository;
 import co.edu.javeriana.lms.config.security.PasswordGenerator;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,7 @@ public class UserService implements UserDetailsService {
     public User addUser(User user) {
         log.info("Creating user: " + user.getEmail());
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("User already exists");
+            throw new EntityExistsException("User already exists with email: " + user.getEmail());
         }
         String password = PasswordGenerator.generatePassword();
         user.setPassword(passwordEncoder.encode(password));

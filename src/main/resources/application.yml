@@ -34,8 +34,6 @@ spring:
           auth: "${MAIL_AUTH}"
           starttls:
             enable: "${MAIL_STARTTLS}"
-          ssl:
-            enable: "${MAIL_SSL}"
   jackson:
     deserialization:
       fail-on-unknown-properties: false

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -171,6 +172,26 @@ public class AuthServiceTest {
         assert name.equals(mockUser.getName() + " " + mockUser.getLastName());
         verify(jwtService).extractUserName(mockToken);
         verify(userRepository).findByEmail(mockEmail);
+    }
+
+    @Test
+    public void testGetUserIdByToken() {
+        when(jwtService.extractUserName(mockToken)).thenReturn(mockEmail);
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser));
+
+        Long userId = authService.getUserIdByToken(mockToken);
+
+        assert userId.equals(mockUser.getId());
+        verify(jwtService).extractUserName(mockToken);
+        verify(userRepository).findByEmail(mockEmail);
+    }
+
+    @Test
+    public void testGetUserIdByTokenUserNotFound() {
+        when(jwtService.extractUserName(mockToken)).thenReturn(mockEmail);
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.empty());
+
+        assertThrows(UsernameNotFoundException.class, () -> authService.getUserIdByToken(mockToken));
     }
 
 }

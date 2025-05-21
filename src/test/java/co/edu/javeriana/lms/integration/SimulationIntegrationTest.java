@@ -3,6 +3,9 @@ package co.edu.javeriana.lms.integration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -227,7 +230,8 @@ public class SimulationIntegrationTest {
                         .practiceId(4L)
                         .roomIds(List.of(1L, 2L))
                         .startDateTime(new Date(System.currentTimeMillis() + 3600000))
-                        .endDateTime(new Date(System.currentTimeMillis() + 4500000)) // 1 h 15 mins
+                        .endDateTime(new Date(System.currentTimeMillis() + 4500000)) // 1 h 15
+                                                                                     // mins
                                                                                      // later
                         .build()));
 
@@ -242,8 +246,55 @@ public class SimulationIntegrationTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        
+
         JsonNode jsonNode = objectMapper.readTree(response);
         assert jsonNode.get("data").size() == 5;
+    }
+
+    @Test
+    public void testUpdateSimulation() throws Exception {
+        Long simulationId = 1L; // ID de simulación existente
+
+        SimulationByTimeSlotDto simulationRequestDto = SimulationByTimeSlotDto.builder()
+                .practiceId(4L)
+                .roomIds(List.of(1L, 2L))
+                .startDateTime(new Date())
+                .endDateTime(new Date(System.currentTimeMillis() + 900000)) // 15 mins
+                                                                            // later
+                .build();
+
+        String simulationRequest = objectMapper.writeValueAsString(simulationRequestDto);
+
+        mockMvc.perform(put("/simulation/{id}", simulationId)
+                .header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(simulationRequest))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(200)))
+                .andExpect(jsonPath("$.data.simulationId", is(simulationId.intValue())));
+    }
+
+    @Test
+    public void testDeleteSimulation() throws Exception {
+        Long simulationId = 4L; // ID de simulación existente
+
+        mockMvc.perform(delete("/simulation/{id}", simulationId)
+                .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(200)));
+    }
+
+    @Test
+    public void testFindSimulationsSchedule() throws Exception {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        String date = LocalDate.now().minusWeeks(2).with(DayOfWeek.MONDAY).format(formatter);
+
+        mockMvc.perform(get("/simulation/schedule")
+                .header("Authorization", token)
+                .param("date", date))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(200)))
+                .andExpect(jsonPath("$.data", is(not(empty()))));
     }
 }

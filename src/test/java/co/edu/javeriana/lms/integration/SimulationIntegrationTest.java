@@ -297,4 +297,53 @@ public class SimulationIntegrationTest {
                 .andExpect(jsonPath("$.status", is(200)))
                 .andExpect(jsonPath("$.data", is(not(empty()))));
     }
+
+    @Test
+    public void testFindSimulationStudents() throws Exception {
+        Long simulationId = 1L; // ID de simulación existente
+
+        mockMvc.perform(get("/simulation/{id}/users", simulationId)
+                .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(200)))
+                .andExpect(jsonPath("$.data", is(not(empty()))));
+    }
+
+    @Test
+    public void testJoinSimulation() throws Exception {
+        Long simulationId = 8L; // ID de simulación existente
+
+        mockMvc.perform(post("/simulation/{id}/join", simulationId)
+                .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(200)))
+                .andExpect(jsonPath("$.data", is(notNullValue())));
+    }
+
+    @Test
+    public void testLeaveSimulation() throws Exception {
+        Long simulationId = 2L; // ID de simulación existente
+
+        mockMvc.perform(post("/simulation/{id}/leave", simulationId)
+                .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(200)))
+                .andExpect(jsonPath("$.data", is(notNullValue())));
+    }
+
+    @Test
+    public void testFindAvailableSimulationsByPracticeId() throws Exception {
+        Long practiceId = 1L; // ID de práctica existente
+
+        mockMvc.perform(get("/simulation/practice/{practiceId}/available", practiceId)
+                .header("Authorization", token)
+                .param("page", "0")
+                .param("size", "10")
+                .param("sort", "simulationId")
+                .param("asc", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(200)))
+                .andExpect(jsonPath("$.data", is(not(empty()))))
+                .andExpect(jsonPath("$.metadata.total", is(greaterThan(0))));
+    }
 }

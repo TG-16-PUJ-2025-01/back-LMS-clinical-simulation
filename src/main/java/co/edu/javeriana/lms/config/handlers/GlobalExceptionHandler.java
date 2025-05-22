@@ -105,4 +105,11 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(new ErrorDto("Response status exception", ex.getMessage()), ex.getStatusCode());
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
+        log.warn("Illegal state: {}", ex.getMessage());
+
+        return new ResponseEntity<>(new ErrorDto("Illegal state", ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
 }

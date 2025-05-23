@@ -533,8 +533,6 @@ public class SimulationService {
         cal.set(java.util.Calendar.MILLISECOND, 0);
         Date dayStart = cal.getTime();
 
-        log.info("[findSimulationCandidates] Base simulation startDate={}", startDate);
-
         // dayEnd is the start of the next day (exclusive)
         cal.add(java.util.Calendar.DATE, 1);
         Date dayEnd = cal.getTime();
@@ -544,18 +542,10 @@ public class SimulationService {
         // 4. Search for all simulations in those rooms and that day
         List<Simulation> candidates = new ArrayList<>();
         for (Room room : rooms) {
-            log.info("[findSimulationCandidates] Querying for roomId={}", room.getId());
             List<Simulation> sims = simulationRepository.findByRooms_IdAndStartDateTimeBetween(
                 room.getId(), dayStart, dayEnd
             );
-            log.info("[findSimulationCandidates] Found {} candidates for roomId={}", sims.size(), room.getId());
             candidates.addAll(sims);
-        }
-
-        // Log all the candidates simulations id
-        log.info("[findSimulationCandidates] Found {} candidates", candidates.size());
-        for (Simulation s : candidates) {
-            log.info("[findSimulationCandidates] Candidate simulation id={}", s.getSimulationId());
         }
 
         // 5. Remove duplicates and the base simulation

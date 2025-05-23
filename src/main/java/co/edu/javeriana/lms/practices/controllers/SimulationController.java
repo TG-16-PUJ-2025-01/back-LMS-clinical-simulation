@@ -208,7 +208,7 @@ public class SimulationController {
                 .ok(new ApiResponseDto<>(HttpStatus.OK.value(), "ok", simulationService.publishGrade(id), null));
     }
 
-    @GetMapping("/{id}/candidate")
+    @GetMapping("/{id}/candidates")
     public ResponseEntity<ApiResponseDto<?>> getCandidateSimulations(@PathVariable Long id) {
         log.info("Requesting simulation candidates with id: {}", id);
 

@@ -11,6 +11,7 @@ import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.videos.dtos.EditVideoDto;
 import co.edu.javeriana.lms.videos.models.Video;
 import co.edu.javeriana.lms.videos.repositories.VideoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -64,6 +65,12 @@ public class VideoService {
 
         videoRepository.delete(video);
         return video;
+    }
+
+    public Simulation getVideoSimulation(Long id) {
+        Video video = videoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Video not found with id: " + id));
+
+        return video.getSimulation();
     }
 
 }

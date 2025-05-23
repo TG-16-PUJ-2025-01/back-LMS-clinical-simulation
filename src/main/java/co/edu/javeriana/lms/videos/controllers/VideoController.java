@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
+import co.edu.javeriana.lms.practices.models.Simulation;
 
 
 @Slf4j
@@ -65,7 +66,19 @@ public class VideoController {
 
         return ResponseEntity.ok(new ApiResponseDto<Video>(HttpStatus.OK.value(), "ok", video, null));
     }
-    
+
+    @GetMapping("{id}/simulation")
+    public ResponseEntity<ApiResponseDto<Simulation>> getVideoSimulation(@PathVariable Long id) {
+        log.info("Requesting simulations for video with id: {}", id);
+
+        Simulation simulation = videoService.getVideoSimulation(id);
+
+        if (simulation == null) {
+            return ResponseEntity.ok(new ApiResponseDto<>(HttpStatus.OK.value(), "No simulations found", null, null));
+        }
+
+        return ResponseEntity.ok(new ApiResponseDto<Simulation>(HttpStatus.OK.value(), "ok", simulation, null));
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDto<Video>> editVideo(@PathVariable Long id, @Valid @RequestBody EditVideoDto dto) {

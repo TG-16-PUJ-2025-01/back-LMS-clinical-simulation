@@ -11,6 +11,7 @@ import co.edu.javeriana.lms.practices.models.Simulation;
 import co.edu.javeriana.lms.videos.dtos.EditVideoDto;
 import co.edu.javeriana.lms.videos.models.Video;
 import co.edu.javeriana.lms.videos.repositories.VideoRepository;
+import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,6 +21,9 @@ public class VideoService {
 
     @Autowired
     private VideoRepository videoRepository;
+
+    @Autowired
+    private SimulationRepository simulationRepository;
 
     public Page<Video> searchVideos(String filter, Integer page, Integer size, String sort, Boolean asc) {
         Sort sortOrder = asc ? Sort.by(sort).ascending() : Sort.by(sort).descending();
@@ -38,7 +42,35 @@ public class VideoService {
         }
 
         videoToEdit.setName(video.getName());
-    
+
+        // Only modify the simulation if there is a change
+        Long currentSimulationId = videoToEdit.getSimulation() != null ? videoToEdit.getSimulation().getSimulationId() : null;
+        Long newSimulationId = video.getSimulationId();
+        if ((currentSimulationId != null && !currentSimulationId.equals(newSimulationId)) || (currentSimulationId == null && newSimulationId != null)) {
+            // If the new simulation is not null, we need to check if it exists
+            if (newSimulationId != null) {
+                Simulation newSimulation = simulationRepository.findById(newSimulationId).orElse(null);
+                if (newSimulation != null) {
+                    // Remove the video from the old simulation
+                    Simulation oldSimulation = videoToEdit.getSimulation();
+                    if (oldSimulation != null && oldSimulation.getVideos() != null) {
+                        oldSimulation.getVideos().remove(videoToEdit);
+                    }
+                    videoToEdit.setSimulation(newSimulation);
+                    if (newSimulation.getVideos() != null && !newSimulation.getVideos().contains(videoToEdit)) {
+                        newSimulation.getVideos().add(videoToEdit);
+                    }
+                }
+            } else {
+                // If the new simulation is null, we need to remove the video from the current simulation
+                Simulation oldSimulation = videoToEdit.getSimulation();
+                if (oldSimulation != null && oldSimulation.getVideos() != null) {
+                    oldSimulation.getVideos().remove(videoToEdit);
+                }
+                videoToEdit.setSimulation(null);
+            }
+        }
+
         return videoRepository.save(videoToEdit);
     }
 

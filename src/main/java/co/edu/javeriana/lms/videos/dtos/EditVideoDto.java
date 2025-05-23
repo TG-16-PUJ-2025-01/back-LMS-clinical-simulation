@@ -13,4 +13,6 @@ public class EditVideoDto {
     @NotBlank(message = "The name is required")
     private String name;
 
+    private Long simulationId;
+
 }

@@ -23,6 +23,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import co.edu.javeriana.lms.videos.dtos.EditVideoDto;
 import co.edu.javeriana.lms.videos.models.Video;
+import co.edu.javeriana.lms.practices.models.Simulation;
+import co.edu.javeriana.lms.practices.repositories.SimulationRepository;
 import co.edu.javeriana.lms.videos.repositories.VideoRepository;
 import co.edu.javeriana.lms.videos.services.VideoService;
 
@@ -35,6 +37,9 @@ public class VideoServiceTest {
 
     @Mock
     private VideoRepository videoRepository;
+
+    @Mock
+    private SimulationRepository simulationRepository;
 
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -108,13 +113,21 @@ public class VideoServiceTest {
     @Test
     public void testEditVideoSuccess() {
         Long id = 1L;
+
+        Simulation oldSimulation = new Simulation();
+        oldSimulation.setSimulationId(2L);
+        Simulation newSimulation = new Simulation();
+        newSimulation.setSimulationId(1L);
+        mockVideo.setSimulation(oldSimulation);
+        when(simulationRepository.findById(1L)).thenReturn(Optional.of(newSimulation));
+
         when(videoRepository.findById(id)).thenReturn(Optional.of(mockVideo));
         when(videoRepository.save(mockVideo)).thenReturn(mockVideo);
 
-        Video editedVideo = videoService.editVideo(id,
-                new EditVideoDto(mockVideo.getName()));
+        Video editedVideo = videoService.editVideo(id, new EditVideoDto(mockVideo.getName(), 1L));
 
         assert (editedVideo.equals(mockVideo));
+        assert (mockVideo.getSimulation() == newSimulation);
     }
 
     @Test
@@ -123,7 +136,7 @@ public class VideoServiceTest {
         when(videoRepository.findById(id)).thenReturn(Optional.empty());
 
         Video editedVideo = videoService.editVideo(id,
-                new EditVideoDto(mockVideo.getName()));
+                new EditVideoDto(mockVideo.getName(), 1L));
 
         assert (editedVideo == null);
     }

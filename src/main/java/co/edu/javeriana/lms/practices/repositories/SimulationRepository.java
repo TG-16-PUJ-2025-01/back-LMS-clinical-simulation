@@ -60,4 +60,9 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
 
         List<Simulation> findAllByRooms_IdAndStartDateTimeAfterAndEndDateTimeBefore(Long roomId, Date startDateTime,
                         Date endDateTime);
+
+        @Query("SELECT s FROM Simulation s JOIN s.rooms r WHERE r.id = :roomId AND s.startDateTime >= :startDate AND s.startDateTime < :endDate")
+        List<Simulation> findByRooms_IdAndStartDateTimeBetween(@Param("roomId") Long roomId,
+                        @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
 }

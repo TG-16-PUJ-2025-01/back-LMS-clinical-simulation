@@ -566,16 +566,16 @@ public class DBInitializer implements CommandLineRunner {
 
 				SimulationByTimeSlotDto.builder().practiceId(1L)
 						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
+						.startDateTime(Date.from(baseDate.plusMinutes(60).atZone(ZoneId.systemDefault()).toInstant()))
 						.endDateTime(Date
-								.from(baseDate.plusDays(1).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+								.from(baseDate.plusMinutes(90).atZone(ZoneId.systemDefault()).toInstant()))
 						.build(),
 
 				SimulationByTimeSlotDto.builder().practiceId(1L)
 						.roomIds(Arrays.asList(1L, 2L))
-						.startDateTime(Date.from(baseDate.plusDays(2).atZone(ZoneId.systemDefault()).toInstant()))
+						.startDateTime(Date.from(baseDate.plusMinutes(180).atZone(ZoneId.systemDefault()).toInstant()))
 						.endDateTime(Date
-								.from(baseDate.plusDays(2).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()))
+								.from(baseDate.plusMinutes(210).atZone(ZoneId.systemDefault()).toInstant()))
 						.build());
 
 		simulationService.addSimulations(simulationsPractice1);

@@ -504,4 +504,72 @@ public class SimulationService {
                     .build();
         }).toList();
     }
+
+    public List<Simulation> findSimulationCandidates(Long id) {
+        // 1. Get the base simulation
+        Simulation baseSimulation = simulationRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Simulation not found with id: " + id));
+
+        // 2. Obtain the rooms associated with the simulation
+        List<Room> rooms = baseSimulation.getRooms();
+        if (rooms == null || rooms.isEmpty()) {
+            log.warn("[findSimulationCandidates] No rooms found for simulation id={}", baseSimulation.getSimulationId());
+            return new ArrayList<>();
+        }
+
+        // 3. Obtain the start date of the simulation
+        Date startDate = baseSimulation.getStartDateTime();
+        if (startDate == null) {
+            log.warn("[findSimulationCandidates] No startDate found for simulation id={}", baseSimulation.getSimulationId());
+            return new ArrayList<>();
+        }
+
+        // Normalize the date to 00:00:00.000 to search for the whole day
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.setTime(startDate);
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        cal.set(java.util.Calendar.MINUTE, 0);
+        cal.set(java.util.Calendar.SECOND, 0);
+        cal.set(java.util.Calendar.MILLISECOND, 0);
+        Date dayStart = cal.getTime();
+
+        log.info("[findSimulationCandidates] Base simulation startDate={}", startDate);
+
+        // dayEnd is the start of the next day (exclusive)
+        cal.add(java.util.Calendar.DATE, 1);
+        Date dayEnd = cal.getTime();
+
+        log.info("[findSimulationCandidates] Searching for candidates between {} and {}", dayStart, dayEnd);
+        
+        // 4. Search for all simulations in those rooms and that day
+        List<Simulation> candidates = new ArrayList<>();
+        for (Room room : rooms) {
+            log.info("[findSimulationCandidates] Querying for roomId={}", room.getId());
+            List<Simulation> sims = simulationRepository.findByRooms_IdAndStartDateTimeBetween(
+                room.getId(), dayStart, dayEnd
+            );
+            log.info("[findSimulationCandidates] Found {} candidates for roomId={}", sims.size(), room.getId());
+            candidates.addAll(sims);
+        }
+
+        // Log all the candidates simulations id
+        log.info("[findSimulationCandidates] Found {} candidates", candidates.size());
+        for (Simulation s : candidates) {
+            log.info("[findSimulationCandidates] Candidate simulation id={}", s.getSimulationId());
+        }
+
+        // 5. Remove duplicates and the base simulation
+        int beforeRemove = candidates.size();
+        candidates.removeIf(s -> s.getSimulationId().equals(baseSimulation.getSimulationId()));
+        int afterRemove = candidates.size();
+        log.info("[findSimulationCandidates] Candidates before remove base: {}, after: {}", beforeRemove, afterRemove);
+
+        // Remove duplicates by id
+        Map<Long, Simulation> unique = new HashMap<>();
+        for (Simulation s : candidates) {
+            unique.put(s.getSimulationId(), s);
+        }
+        log.info("[findSimulationCandidates] Returning {} unique candidates", unique.size());
+        return new ArrayList<>(unique.values());
+    }
 }

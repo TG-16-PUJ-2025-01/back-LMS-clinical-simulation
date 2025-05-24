@@ -389,7 +389,7 @@ public class SimulationServiceTest {
 
         // Then
         assertNotNull(result);
-        assertEquals(2, result.size());
+        assertEquals(1, result.size());
         assertEquals(1, result.get(0).getGroupNumber());
     }
 

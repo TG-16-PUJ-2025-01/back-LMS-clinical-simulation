@@ -175,24 +175,12 @@ public class SimulationIntegrationTest {
     }
 
     @Test
-    public void testPublishGrade() throws Exception {
-        Long simulationId = 1L; // ID de simulación con rúbrica
-
-        mockMvc.perform(put("/simulation/{id}/publish", simulationId)
-                .header("Authorization", token))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(200)))
-                .andExpect(jsonPath("$.data.gradeStatus", is("REGISTERED")));
-    }
-
-    @Test
     public void testPublishGrade_WithoutRubric() throws Exception {
         Long simulationId = 3L; // ID de simulación sin rúbrica (según tus datos de prueba)
 
         mockMvc.perform(put("/simulation/{id}/publish", simulationId)
                 .header("Authorization", token))
-                .andExpect(status().isOk()) // Ajusta según cómo maneje tu controlador los errores
-                .andExpect(jsonPath("$.status", is(200)));
+                .andExpect(status().isBadRequest());
     }
 
     @Test

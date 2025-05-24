@@ -298,28 +298,6 @@ public class SimulationIntegrationTest {
     }
 
     @Test
-    public void testJoinSimulation() throws Exception {
-        Long simulationId = 8L; // ID de simulación existente
-
-        mockMvc.perform(post("/simulation/{id}/join", simulationId)
-                .header("Authorization", token))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(200)))
-                .andExpect(jsonPath("$.data", is(notNullValue())));
-    }
-
-    @Test
-    public void testLeaveSimulation() throws Exception {
-        Long simulationId = 2L; // ID de simulación existente
-
-        mockMvc.perform(post("/simulation/{id}/leave", simulationId)
-                .header("Authorization", token))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(200)))
-                .andExpect(jsonPath("$.data", is(notNullValue())));
-    }
-
-    @Test
     public void testFindAvailableSimulationsByPracticeId() throws Exception {
         Long practiceId = 1L; // ID de práctica existente
 

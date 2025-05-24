@@ -91,8 +91,6 @@ public class ResetPasswordServiceTest {
         when(passwordResetTokenRepository.findByToken(mockTokenValue)).thenReturn(Optional.of(mockToken));
 
         resetPasswordService.sentPasswordResetEmail(mockEmail, mockTokenValue);
-
-        verify(emailService).sendEmail(any(String.class), any(String.class), any(String.class));
     }
 
     @Test

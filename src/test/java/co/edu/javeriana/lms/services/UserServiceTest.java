@@ -111,13 +111,13 @@ public class UserServiceTest {
 
         User foundUser = userService.findById(1L);
 
-        assert foundUser.getEmail().equals("mockEmail1");
-        assert foundUser.getPassword().equals("mockPassword1");
+        assert foundUser.getEmail().equals(mockUser1.getEmail());
+        assert foundUser.getPassword().equals(mockUser1.getPassword());
         assert foundUser.getRoles().contains(Role.ADMIN);
         assert foundUser.getPreferredRole().equals(Role.ADMIN);
-        assert foundUser.getName().equals("Mock User 1");
-        assert foundUser.getLastName().equals("Mock Last Name 1");
-        assert foundUser.getInstitutionalId().equals("123456");
+        assert foundUser.getName().equals(mockUser1.getName());
+        assert foundUser.getLastName().equals(mockUser1.getLastName());
+        assert foundUser.getInstitutionalId().equals(mockUser1.getInstitutionalId());
     }
 
     @Test

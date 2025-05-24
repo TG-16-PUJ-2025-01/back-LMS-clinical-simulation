@@ -8,7 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -37,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @AutoConfigureMockMvc
 @Slf4j
 @ActiveProfiles("test")
+@TestMethodOrder(OrderAnnotation.class)
 public class AuthIntegrationTest {
 
     @Autowired
@@ -100,6 +104,7 @@ public class AuthIntegrationTest {
     }
 
     @Test
+    @Order(1)
     public void testLogin() throws Exception {
         LoginResponseDto loginResponse = getAuthTokenString();
         token = loginResponse.getToken();
@@ -112,26 +117,7 @@ public class AuthIntegrationTest {
     }
 
     @Test
-    public void testChangePassword() throws Exception {
-        String newPassword = "Newpassword123!";
-        ChangePasswordDto changePasswordDto = new ChangePasswordDto(password, newPassword);
-        String changePasswordRequest = objectMapper.writeValueAsString(changePasswordDto);
-
-        String response = mockMvc.perform(post("/auth/change-password")
-                .header("Authorization", token)
-                .contentType("application/json")
-                .content(changePasswordRequest))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        assertNotNull(response);
-
-        password = newPassword;
-    }
-
-    @Test
+    @Order(1)
     public void testValidateToken() throws Exception {
         mockMvc.perform(get("/auth/validate-token")
                 .header("Authorization", token))
@@ -142,6 +128,7 @@ public class AuthIntegrationTest {
     }
 
     @Test
+    @Order(1)
     public void testGetRolesByToken() throws Exception {
         String response = mockMvc.perform(get("/auth/roles")
                 .header("Authorization", token))
@@ -161,6 +148,7 @@ public class AuthIntegrationTest {
     }
 
     @Test
+    @Order(1)
     public void testGetEmailByToken() throws Exception {
         String response = mockMvc.perform(get("/auth/email")
                 .header("Authorization", token))
@@ -180,6 +168,7 @@ public class AuthIntegrationTest {
     }
 
     @Test
+    @Order(1)
     public void testGetNameByToken() throws Exception {
         String response = mockMvc.perform(get("/auth/name")
                 .header("Authorization", token))
@@ -196,6 +185,25 @@ public class AuthIntegrationTest {
         assertNotNull(response);
         assertNotNull(apiResponse.getData());
         assert apiResponse.getData().equals("Sofía Admin");
+    }
+
+    @Test
+    @Order(2)
+    public void testChangePassword() throws Exception {
+        String newPassword = "Newpassword123!";
+        ChangePasswordDto changePasswordDto = new ChangePasswordDto(password, newPassword);
+        String changePasswordRequest = objectMapper.writeValueAsString(changePasswordDto);
+
+        String response = mockMvc.perform(post("/auth/change-password")
+                .header("Authorization", token)
+                .contentType("application/json")
+                .content(changePasswordRequest))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertNotNull(response);
     }
     
 }

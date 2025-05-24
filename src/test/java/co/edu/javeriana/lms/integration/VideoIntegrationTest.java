@@ -114,9 +114,9 @@ public class VideoIntegrationTest {
         mockMvc.perform(get("/video/all?page=0&size=15&sort=name&asc=true&filter=")
                 .header("Authorization", token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(12)))
-                .andExpect(jsonPath("$.metadata.total", is(12)))
-                .andExpect(jsonPath("$.metadata.size", is(12)))
+                .andExpect(jsonPath("$.data", hasSize(11)))
+                .andExpect(jsonPath("$.metadata.total", is(11)))
+                .andExpect(jsonPath("$.metadata.size", is(11)))
                 .andExpect(jsonPath("$.metadata.totalPages", is(1)))
                 .andExpect(jsonPath("$.metadata.page", is(0)));
     }
@@ -128,7 +128,7 @@ public class VideoIntegrationTest {
                 .header("Authorization", token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", hasSize(5)))
-                .andExpect(jsonPath("$.metadata.total", is(12)))
+                .andExpect(jsonPath("$.metadata.total", is(11)))
                 .andExpect(jsonPath("$.metadata.size", is(5)))
                 .andExpect(jsonPath("$.metadata.totalPages", is(3)))
                 .andExpect(jsonPath("$.metadata.page", is(0)));

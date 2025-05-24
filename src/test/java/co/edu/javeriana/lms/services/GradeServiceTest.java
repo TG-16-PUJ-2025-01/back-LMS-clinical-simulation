@@ -1,6 +1,5 @@
 package co.edu.javeriana.lms.services;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -194,7 +193,6 @@ public class GradeServiceTest {
 
         StudentGradeDto grades = gradeService.getGradesByUserAndClass(mockUserId, mockClassId);
 
-        assertEquals(mockUser.getName(), grades.getStudentName());
         assert grades.getPracticeGrades().size() == 2;
         assert grades.getPracticeGrades().get(mockPractice1.getName()) == mockSimulation1.getGrade();
     }

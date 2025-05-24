@@ -382,7 +382,7 @@ public class DBInitializer implements CommandLineRunner {
 						.course(courseRepository.findById(1L).get())
 						.javerianaId(20001L)
 						.numberOfParticipants(9)
-						.students(allStudents.subList(0, 9))
+						.students(allStudents)
 						.build(),
 				ClassModel.builder()
 						.period("2025-10")

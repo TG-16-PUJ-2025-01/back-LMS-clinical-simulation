@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @AutoConfigureMockMvc
 @Testcontainers
 @ActiveProfiles("test")
-public class RoomControllerIntegrationTest {
+public class RoomIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

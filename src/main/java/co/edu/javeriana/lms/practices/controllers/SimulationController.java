@@ -119,7 +119,7 @@ public class SimulationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<?>> deleteSimulation(@Min(1) @RequestParam Long id) {
+    public ResponseEntity<ApiResponseDto<?>> deleteSimulation(@Min(1) @PathVariable Long id) {
         log.info("Deleting simulation with id: {}", id);
 
         simulationService.deleteSimulationById(id);

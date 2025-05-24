@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +24,12 @@ import co.edu.javeriana.lms.subjects.repositories.CourseRepository;
 @Component
 @Profile("prod")
 public class DBInitializerProd implements CommandLineRunner {
+
+	@Value("${SUPER_ADMIN_EMAIL}")
+    private String SUPER_ADMIN_EMAIL;
+
+    @Value("${SUPER_ADMIN_PASSWORD}")
+    private String SUPER_ADMIN_PASSWORD;
 
 	@Autowired
 	private RoomRepository roomRepository;
@@ -101,44 +108,21 @@ public class DBInitializerProd implements CommandLineRunner {
 	private void createUsers() {
 
 		List<User> users = Arrays.asList(
-				// Profesores
-				User.builder().email("profesor@gmail.com").password(passwordEncoder.encode("profesor"))
-						.name("María").lastName("López").institutionalId("00000010001")
-						.roles(Set.of(Role.PROFESOR)).build(),
-
-				// Coordinadores
-				User.builder().email("coordinador@gmail.com").password(passwordEncoder.encode("coordinador"))
-						.name("Laura").lastName("Martínez").institutionalId("00000020001")
-						.roles(Set.of(Role.COORDINADOR)).build(),
-
-				// Administradores
-				User.builder().email("admin@gmail.com").password(passwordEncoder.encode("admin"))
-						.name("Andrés").lastName("García").institutionalId("00000040001")
-						.roles(Set.of(Role.ADMIN)).build(),
-
 				// SuperAdmin (todos los roles)
-				User.builder().email("superadmin@gmail.com").password(passwordEncoder.encode("superadmin"))
-						.name("Sofía").lastName("Admin").institutionalId("00000090001")
-						.roles(Set.of(Role.ADMIN, Role.COORDINADOR, Role.PROFESOR, Role.ESTUDIANTE)).build(),
-
-				// Estudiantes
-				User.builder().email("estudiante@gmail.com").password(passwordEncoder.encode("estudiante"))
-						.name("Camilo").lastName("Mendoza").institutionalId("00000050001")
-						.roles(Set.of(Role.ESTUDIANTE)).build());
+				User.builder().email(SUPER_ADMIN_EMAIL).password(passwordEncoder.encode(SUPER_ADMIN_PASSWORD))
+						.name("Super").lastName("Admin").institutionalId("00000090001")
+						.roles(Set.of(Role.ADMIN, Role.COORDINADOR, Role.PROFESOR, Role.ESTUDIANTE)).build());
 
 		// Guardar todos los usuarios
 		userRepository.saveAll(users);
 	}
 
 	private void insertCourses() {
-
-		List<User> allCoordinators = userRepository.findAllCoordinators();
-
 		List<Course> courses = List.of(
 				Course.builder()
 						.name("Semiología Clínica")
 						.javerianaId(100001L)
-						.coordinator(allCoordinators.get(0))
+						.coordinator(userRepository.findById(1L).get())
 						.faculty("medicina")
 						.department("medicina interna")
 						.program("pregrado")
@@ -148,7 +132,7 @@ public class DBInitializerProd implements CommandLineRunner {
 				Course.builder()
 						.name("Farmacología General")
 						.javerianaId(100002L)
-						.coordinator(allCoordinators.get(1))
+						.coordinator(userRepository.findById(1L).get())
 						.faculty("medicina")
 						.department("farmacología")
 						.program("pregrado")
@@ -158,7 +142,7 @@ public class DBInitializerProd implements CommandLineRunner {
 				Course.builder()
 						.name("Cuidados de Enfermería en el Adulto")
 						.javerianaId(100003L)
-						.coordinator(allCoordinators.get(2))
+						.coordinator(userRepository.findById(1L).get())
 						.faculty("enfermeria")
 						.department("cuidados intensivos")
 						.program("pregrado")
@@ -168,7 +152,7 @@ public class DBInitializerProd implements CommandLineRunner {
 				Course.builder()
 						.name("Fisiopatología Clínica")
 						.javerianaId(100004L)
-						.coordinator(allCoordinators.get(3))
+						.coordinator(userRepository.findById(1L).get())
 						.faculty("medicina")
 						.department("medicina interna")
 						.program("maestria")
@@ -178,7 +162,7 @@ public class DBInitializerProd implements CommandLineRunner {
 				Course.builder()
 						.name("Terapia Intravenosa y Manejo de Vía Aérea")
 						.javerianaId(100005L)
-						.coordinator(allCoordinators.get(4))
+						.coordinator(userRepository.findById(1L).get())
 						.faculty("enfermeria")
 						.department("emergencias")
 						.program("especialización")
@@ -188,7 +172,7 @@ public class DBInitializerProd implements CommandLineRunner {
 				Course.builder()
 						.name("Simulación Clínica Avanzada")
 						.javerianaId(100006L)
-						.coordinator(allCoordinators.get(0))
+						.coordinator(userRepository.findById(1L).get())
 						.faculty("medicina")
 						.department("medicina crítica")
 						.program("doctorado")
@@ -198,7 +182,7 @@ public class DBInitializerProd implements CommandLineRunner {
 				Course.builder()
 						.name("Atención Primaria en Salud")
 						.javerianaId(100007L)
-						.coordinator(allCoordinators.get(0))
+						.coordinator(userRepository.findById(1L).get())
 						.faculty("medicina")
 						.department("medicina familiar")
 						.program("pregrado")
@@ -208,7 +192,7 @@ public class DBInitializerProd implements CommandLineRunner {
 				Course.builder()
 						.name("Ética y Humanismo Médico")
 						.javerianaId(100008L)
-						.coordinator(userRepository.findById(3L).get())
+						.coordinator(userRepository.findById(1L).get())
 						.faculty("medicina")
 						.department("ética médica")
 						.program("pregrado")

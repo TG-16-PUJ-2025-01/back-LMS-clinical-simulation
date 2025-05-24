@@ -120,9 +120,9 @@ public class PracticeController {
     }
 
     @GetMapping("/{id}/enrolled")
-    public ResponseEntity<ApiResponseDto<?>> getEnroledSimulation(@RequestHeader("Authorization") String token,
+    public ResponseEntity<ApiResponseDto<?>> getEnrolledSimulation(@RequestHeader("Authorization") String token,
             @PathVariable Long id) {
-        log.info("Requesting enroled simulation with id: {}", id);
+        log.info("Requesting enrolled simulation with id: {}", id);
 
         token = token.substring(7);
 

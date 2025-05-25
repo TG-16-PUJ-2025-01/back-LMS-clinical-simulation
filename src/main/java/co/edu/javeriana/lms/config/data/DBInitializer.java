@@ -642,7 +642,8 @@ public class DBInitializer implements CommandLineRunner {
 					simulation.setGradeStatus(GradeStatus.PENDING);
 				}
 				simulation = simulationRepository.save(simulation);
-				if (simulation.getSimulationId() == 1L) continue;
+				if (simulation.getSimulationId() == 1L)
+					continue;
 				Random random = new Random();
 				if (practice.getRubricTemplate() != null) {
 					AtomicInteger index = new AtomicInteger(0);
@@ -747,7 +748,7 @@ public class DBInitializer implements CommandLineRunner {
 				.userEmail("superadmin@gmail.com")
 				.expirationDate(LocalDateTime.now().plusHours(1)) // 1 hour
 				.build();
-		
+
 		passwordResetTokenRepository.save(passwordToken);
 	}
 }

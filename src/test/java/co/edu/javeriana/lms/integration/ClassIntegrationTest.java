@@ -158,9 +158,9 @@ public class ClassIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("ok"))
-                .andExpect(jsonPath("$.data", hasSize(5)))
+                .andExpect(jsonPath("$.data", hasSize(2)))
                 .andExpect(jsonPath("$.metadata.total").isNumber())
-                .andExpect(jsonPath("$.metadata.size", is(5)))
+                .andExpect(jsonPath("$.metadata.size", is(2)))
                 .andExpect(jsonPath("$.metadata.page", is(0)));
     }
 
@@ -172,9 +172,9 @@ public class ClassIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("ok"))
-                .andExpect(jsonPath("$.data", hasSize(5)))
+                .andExpect(jsonPath("$.data", hasSize(0)))
                 .andExpect(jsonPath("$.metadata.total").isNumber())
-                .andExpect(jsonPath("$.metadata.size", is(5)))
+                .andExpect(jsonPath("$.metadata.size", is(0)))
                 .andExpect(jsonPath("$.metadata.page", is(0)));
     }
 

@@ -138,13 +138,13 @@ public class UserServiceTest {
 
         User updatedUser = userService.updateUserById(1L, mockUser2);
 
-        assert updatedUser.getEmail().equals("mockEmail2");
-        assert updatedUser.getPassword().equals("mockPassword1");
+        assert updatedUser.getEmail().equals(mockUser2.getEmail());
+        assert updatedUser.getPassword().equals(mockUser1.getPassword());
         assert updatedUser.getRoles().contains(Role.ADMIN);
         assert updatedUser.getPreferredRole().equals(Role.ADMIN);
-        assert updatedUser.getName().equals("Mock User 2");
-        assert updatedUser.getLastName().equals("Mock Last Name 2");
-        assert updatedUser.getInstitutionalId().equals("654321");
+        assert updatedUser.getName().equals(mockUser2.getName());
+        assert updatedUser.getLastName().equals(mockUser2.getLastName());
+        assert updatedUser.getInstitutionalId().equals(mockUser2.getInstitutionalId());
     }
 
     @Test

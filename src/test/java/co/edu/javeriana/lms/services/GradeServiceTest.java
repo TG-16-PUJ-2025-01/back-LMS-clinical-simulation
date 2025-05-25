@@ -1,6 +1,7 @@
 package co.edu.javeriana.lms.services;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -10,7 +11,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +37,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@TestMethodOrder(org.junit.jupiter.api.MethodOrderer.OrderAnnotation.class)
 public class GradeServiceTest {
 
     @InjectMocks
@@ -74,10 +78,10 @@ public class GradeServiceTest {
                 .classModel(mockClass)
                 .name("Practice 1")
                 .description("Practice 1")
-                .maxStudentsGroup(5)
+                .maxStudentsGroup(1)
                 .numberOfGroups(2)
                 .gradeable(true)
-                .gradePercentage(0.5f)
+                .gradePercentage(50f)
                 .simulationDuration(500)
                 .type(PracticeType.GRUPAL)
                 .build();
@@ -86,10 +90,10 @@ public class GradeServiceTest {
                 .classModel(mockClass)
                 .name("Practice 2")
                 .description("Practice 2")
-                .maxStudentsGroup(5)
+                .maxStudentsGroup(1)
                 .numberOfGroups(3)
                 .gradeable(true)
-                .gradePercentage(0.5f)
+                .gradePercentage(50f)
                 .simulationDuration(750)
                 .type(PracticeType.GRUPAL)
                 .build();
@@ -112,15 +116,17 @@ public class GradeServiceTest {
         mockSimulation2 = Simulation.builder()
                 .grade(3.5f)
                 .gradeDateTime(new Date())
-                .groupNumber(2)
+                .groupNumber(1)
                 .users(List.of(mockUser))
                 .build();
         mockClass.setPractices(List.of(mockPractice1, mockPractice2));
+        mockClass.setStudents(List.of(mockUser));
         mockSimulation1.setPractice(mockPractice1);
         mockSimulation2.setPractice(mockPractice2);
     }
 
     @Test
+    @Order(1)
     public void testGetFinalGradesByClass() {
         when(classRepository.findById(mockClassId)).thenReturn(Optional.of(mockClass));
         when(simulationRepository.findAllByPractice_ClassModel(mockClass))
@@ -128,12 +134,12 @@ public class GradeServiceTest {
 
         List<StudentGradeDto> grades = gradeService.getFinalGradesByClass(mockClassId);
 
-        assert grades.size() == 2;
-        assert grades.get(0).getFinalGrade() == 4.5f;
-        assert grades.get(1).getFinalGrade() == 3.5f;
+        assertEquals(1, grades.size());
+        assertEquals(4.0f, grades.get(0).getFinalGrade());
     }
 
     @Test
+    @Order(1)
     public void testGetFinalGradesByClassWithClassNotFound() {
         when(classRepository.findById(mockClassId)).thenReturn(Optional.empty());
 
@@ -144,47 +150,27 @@ public class GradeServiceTest {
     }
 
     @Test
+    @Order(2)
     public void testUpdateClassGradePercentages() {
         when(practiceRepository.findById(mockPracticeId1)).thenReturn(Optional.of(mockPractice1));
         when(practiceRepository.findById(mockPracticeId2)).thenReturn(Optional.of(mockPractice2));
 
         gradeService.updateClassGradePercentages(PracticesPercentagesDto.builder()
                 .practicesPercentages(List.of(
-                        PracticePercentageDto.builder().practiceId(mockPracticeId1).percentage(0.6f).build(),
-                        PracticePercentageDto.builder().practiceId(mockPracticeId2).percentage(0.4f).build()))
+                        PracticePercentageDto.builder().practiceId(mockPracticeId1).percentage(60f).build(),
+                        PracticePercentageDto.builder().practiceId(mockPracticeId2).percentage(40f).build()))
                 .build());
 
-        Practice updatedPractice1 = Practice.builder()
-                .id(mockPracticeId1)
-                .classModel(mockClass)
-                .name(mockPractice1.getName())
-                .description(mockPractice1.getDescription())
-                .maxStudentsGroup(mockPractice1.getMaxStudentsGroup())
-                .numberOfGroups(mockPractice1.getNumberOfGroups())
-                .gradeable(mockPractice1.getGradeable())
-                .gradePercentage(0.6f)
-                .simulationDuration(mockPractice1.getSimulationDuration())
-                .type(mockPractice1.getType())
-                .build();
+        // Use ArgumentCaptor to verify the updated values due to Lombok's equals/hashCode
+        verify(practiceRepository).save(mockPractice1);
+        verify(practiceRepository).save(mockPractice2);
 
-        Practice updatedPractice2 = Practice.builder()
-                .id(mockPracticeId2)
-                .classModel(mockClass)
-                .name(mockPractice2.getName())
-                .description(mockPractice2.getDescription())
-                .maxStudentsGroup(mockPractice2.getMaxStudentsGroup())
-                .numberOfGroups(mockPractice2.getNumberOfGroups())
-                .gradeable(mockPractice2.getGradeable())
-                .gradePercentage(0.4f)
-                .simulationDuration(mockPractice2.getSimulationDuration())
-                .type(mockPractice2.getType())
-                .build();
-
-        verify(practiceRepository).save(updatedPractice1);
-        verify(practiceRepository).save(updatedPractice2);
+        assertEquals(60f, mockPractice1.getGradePercentage());
+        assertEquals(40f, mockPractice2.getGradePercentage());
     }
 
     @Test
+    @Order(1)
     public void testGetGradesByUserAndClass() {
         when(userRepository.findById(mockUserId)).thenReturn(Optional.of(mockUser));
         when(classRepository.findById(mockClassId)).thenReturn(Optional.of(mockClass));

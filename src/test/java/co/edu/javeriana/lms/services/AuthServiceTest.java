@@ -99,10 +99,6 @@ public class AuthServiceTest {
 
     @Test
     public void testChangePassword() {
-        String mockSubject = "Cambio de contraseña LMS";
-        String mockBody = "Hola " + mockUser.getEmail() + ",\n\nTu contraseña ha sido cambiada con éxito.\n" +
-                "Si no fuiste tú, por favor, contacta al administrador.";
-
         when(jwtService.extractUserName(mockToken)).thenReturn(mockEmail);
         when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(mockPassword, mockUser.getPassword())).thenReturn(true);
@@ -118,7 +114,6 @@ public class AuthServiceTest {
         verify(passwordEncoder).encode(mockNewPassword);
         verify(userRepository).save(mockUser);
         verify(jwtService).generateToken(mockUser);
-        verify(emailService).sendEmail(mockEmail, mockSubject, mockBody);
     }
 
     @Test

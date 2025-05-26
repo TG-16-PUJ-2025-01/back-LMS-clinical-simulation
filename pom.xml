@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>co.edu.javeriana</groupId>
 	<artifactId>lms</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>LMS clinical simulation</name>
 	<description>LMS for clinical simulation</description>
 	<url />

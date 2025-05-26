@@ -27,8 +27,8 @@ public class ScheduleTaskHandler {
     @Value("${AREC_SYNC:false}")
     private Boolean arecSync;
 
-    // @Scheduled(cron = "0 0 6 * * *") // Cron expression for running 6AM every day
-    @Scheduled(cron = "0 * * * * *") // Cron expression for running every minute
+    @Scheduled(cron = "0 0 * * * *") // Cron expression for running every hour
+    // @Scheduled(cron = "0 * * * * *") // Cron expression for running every minute
     public void syncArecVideos() throws URISyntaxException, IOException, InterruptedException {
         log.info("Scheduled task to sync videos with Arec started");
         List<Room> rooms = roomRepository.findAll();
